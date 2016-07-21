@@ -1,0 +1,23 @@
+{
+  "name": "commute",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "run-ios": "react-native run-ios"
+  },
+  "dependencies": {
+    "geopoint": "^1.0.1",
+    "lodash": "^4.13.1",
+    "moment": "^2.14.1",
+    "react": "15.2.1",
+    "react-mixin": "^3.0.5",
+    "react-native": "0.29.0",
+    "react-native-blur": "^1.0.0",
+    "react-native-extended-stylesheet": "^0.3.0",
+    "react-native-vector-icons": "^2.0.3"
+  },
+  "devDependencies": {
+    "flow-bin": "^0.28.0"
+  }
+}
