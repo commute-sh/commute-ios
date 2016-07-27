@@ -1,17 +1,16 @@
 import React, { Component, PropTypes } from 'react';
 import GeoPoint from 'geopoint';
 import EStyleSheet from 'react-native-extended-stylesheet';
-import _ from 'lodash'
 import {
     Animated,
     Image,
-    View
+    View,
+    Text
 } from 'react-native';
 
 import Map from './Map';
 import StationToast from './StationToast';
 import * as StationService from '../services/StationService';
-import moment from 'moment';
 
 const pinGreen = require('../images/location-pin-green@2x.png');
 const pinYellow = require('../images/location-pin-yellow@2x.png');
@@ -29,7 +28,7 @@ import reactMixin from 'react-mixin';
 
 import Subscribable from 'Subscribable';
 
-class MapTabView extends Component {
+class MapTabScene extends Component {
 
     static propTypes = {
         eventEmitter: PropTypes.object
@@ -39,82 +38,91 @@ class MapTabView extends Component {
         super(props);
 
         this.state = {
-            stationToaster: new Animated.ValueXY(),
+            stationToaster: new Animated.ValueXY(0, -500),
             stationToasterVisible: true,
-            annotations: []
+            stations: [],
+            annotations: [],
+            annotationTextInfo: 'STANDS'
         };
 
         this.onRegionChange = this.onRegionChange.bind(this);
         this.onRegionChangeComplete = this.onRegionChangeComplete.bind(this);
         this.loadNearbyStations = this.loadNearbyStations.bind(this);
-        this.pushStationToAnnotations = this.pushStationToAnnotations.bind(this);
         this.onRefresh = this.onRefresh.bind(this);
+        this.stationToasterAppear = this.stationToasterAppear.bind(this);
+        this.stationToasterDisappear = this.stationToasterDisappear.bind(this);
+        this.onChange = this.onChange.bind(this);
+        this.mapStationToAnnotation = this.mapStationToAnnotation.bind(this);
+        this.useSmallPins = this.useSmallPins.bind(this);
 
-        this.annotations = [];
-        this.annotationsById = {};
         this.pinImages = {
             'red': {
                 'small': {
-                    'opaque': <Image source={smallPinRed} />,
-                    'transparent': <Image source={smallPinRed} style={{ opacity: 0.25 }} />
+                    'opaque': <Image source={smallPinRed}  style={{ zIndex: 3 }} />,
+                    'transparent': <Image source={smallPinRed} style={{ opacity: 0.25, zIndex: 3 }} />
                 },
                 'big': {
-                    'opaque': <Image source={pinRed} />,
-                    'transparent': <Image source={pinRed} style={{ opacity: 0.25 }} />
+                    'opaque': <Image source={pinRed}  style={{ zIndex: 3 }} />,
+                    'transparent': <Image source={pinRed} style={{ opacity: 0.25, zIndex: 3 }} />
                 }
             },
             'yellow': {
                 'small': {
-                    'opaque': <Image source={smallPinYellow} />,
+                    'opaque': <Image source={smallPinYellow}  style={{ zIndex: 3 }} />,
                     'transparent': <Image source={smallPinYellow} style={{ opacity: 0.25 }} />
                 },
                 'big': {
-                    'opaque': <Image source={pinYellow} />,
-                    'transparent': <Image source={pinYellow} style={{ opacity: 0.25 }} />
+                    'opaque': <Image source={pinYellow}  style={{ zIndex: 3 }} />,
+                    'transparent': <Image source={pinYellow} style={{ opacity: 0.25, zIndex: 3 }} />
                 }
             },
             'green': {
                 'small': {
-                    'opaque': <Image source={smallPinGreen} />,
+                    'opaque': <Image source={smallPinGreen}  style={{ zIndex: 3 }} />,
                     'transparent': <Image source={smallPinGreen} style={{ opacity: 0.25 }} />
                 },
                 'big': {
-                    'opaque': <Image source={pinGreen} />,
-                    'transparent': <Image source={pinGreen} style={{ opacity: 0.25 }} />
+                    'opaque': <Image source={pinGreen}  style={{ zIndex: 3 }} />,
+                    'transparent': <Image source={pinGreen} style={{ opacity: 0.25, zIndex: 3 }} />
                 }
             },
             'orange': {
                 'small': {
-                    'opaque': <Image source={smallPinOrange} />,
-                    'transparent': <Image source={smallPinOrange} style={{ opacity: 0.25 }} />
+                    'opaque': <Image source={smallPinOrange}  style={{ zIndex: 3 }} />,
+                    'transparent': <Image source={smallPinOrange} style={{ opacity: 0.25, zIndex: 3 }} />
                 },
                 'big': {
-                    'opaque': <Image source={pinOrange} />,
-                    'transparent': <Image source={pinOrange} style={{ opacity: 0.25 }} />
+                    'opaque': <Image source={pinOrange}  style={{ zIndex: 3 }} />,
+                    'transparent': <Image source={pinOrange} style={{ opacity: 0.25, zIndex: 3 }} />
                 }
             },
             'black': {
                 'small': {
-                    'opaque': <Image source={smallPinBlack} />,
-                    'transparent': <Image source={smallPinBlack} style={{ opacity: 0.25 }} />
+                    'opaque': <Image source={smallPinBlack}  style={{ zIndex: 3 }} />,
+                    'transparent': <Image source={smallPinBlack} style={{ opacity: 0.25, zIndex: 3 }} />
                 },
                 'big': {
-                    'opaque': <Image source={pinBlack} />,
-                    'transparent': <Image source={pinBlack} style={{ opacity: 0.25 }} />
+                    'opaque': <Image source={pinBlack}  style={{ zIndex: 3 }} />,
+                    'transparent': <Image source={pinBlack} style={{ opacity: 0.25, zIndex: 3 }} />
                 }
             }
         };
     }
 
+    onChange(event) {
+        this.state.annotationTextInfo = event.nativeEvent.selectedSegmentIndex === 0 ? 'STANDS' : 'BIKES';
+        this.setState({ annotations: this.state.stations.map(this.mapStationToAnnotation) });
+    }
+
     onStationBlur(station) {
         console.log('On Blur - Station:', station.number);
-        this.stationToasterDisappear();
+        this.stationToasterDisappear(300);
         this.setState({ station: undefined });
     }
 
     onStationFocus(station) {
         console.log('On Focus - Station:', station.number);
-        this.setState({ station: station });
+        this.setState({ station: station, atLeastOneStationAlreadyShown: true });
         this.stationToasterAppear();
     }
 
@@ -142,8 +150,6 @@ class MapTabView extends Component {
     componentDidMount() {
         this.addListenerOn(this.props.eventEmitter, 'Refresh', this.onRefresh);
 
-        this.stationToasterDisappear();
-
         navigator.geolocation.getCurrentPosition((position) => {
             console.log('navigator.geolocation.getCurrentPosition - position:', position);
                 this.setState({ position, geoPosition: new GeoPoint(position.coords.latitude, position.coords.longitude) });
@@ -154,9 +160,13 @@ class MapTabView extends Component {
         );
         this.watchID = navigator.geolocation.watchPosition((position) => {
             console.log('navigator.geolocation.watchPosition - position:', position);
-            this.setState({position, geoPosition: new GeoPoint(position.coords.latitude, position.coords.longitude) });
+            this.setState({position, gMapTabSceneeoPosition: new GeoPoint(position.coords.latitude, position.coords.longitude) });
             this.loadNearbyStations(position);
         });
+
+        setTimeout(() => {
+            this.stationToasterDisappear(0);
+        }, 0);
     }
 
     componentWillUnmount() {
@@ -165,7 +175,7 @@ class MapTabView extends Component {
 
     stationToasterAppear(cb) {
         const stationToast = this.refs.stationToast;
-        Animated.timing(this.state.stationToaster, { duration: 150, toValue: { x: 0, y: 0 } }).start(() => {
+        Animated.timing(this.state.stationToaster, { duration: 300, toValue: { x: 0, y: 0 } }).start(() => {
             this.stationToasterVisible = true;
             if (stationToast && stationToast.measure) {
                 stationToast.measure((fx, fy, width, height, px, py) => {
@@ -182,26 +192,43 @@ class MapTabView extends Component {
         });
     }
 
-    stationToasterDisappear(cb) {
-        Animated.timing(this.state.stationToaster, { duration: 150, toValue: { x: 0, y: -160 } }).start(() => {
-            this.stationToasterVisible = false;
-            cb && cb();
-        });
+    stationToasterDisappear(duration, cb) {
+        const stationToast = this.refs.stationToast;
+        if (stationToast && stationToast.measure) {
+            stationToast.measure((fx, fy, width, height, px, py) => {
+                console.log('Component width is: ' + width);
+                console.log('Component height is: ' + height);
+                console.log('X offset to frame: ' + fx);
+                console.log('Y offset to frame: ' + fy);
+                console.log('X offset to page: ' + px);
+                console.log('Y offset to page: ' + py);
+
+                Animated.timing(this.state.stationToaster, { duration: duration, toValue: { x: 0, y: -height } }).start(() => {
+                    this.stationToasterVisible = false;
+                    cb && cb();
+                });
+            });
+        } else {
+            Animated.timing(this.state.stationToaster, { duration: duration, toValue: { x: 0, y: -160 } }).start(() => {
+                this.stationToasterVisible = false;
+                cb && cb();
+            });
+        }
     }
 
     onRegionChange(region) {
-        console.log('onRegionChange:', region);
-        this.setState({region});
+//        console.log('onRegionChange:', region);
+        this.setState({ region, annotations: this.state.stations.map(this.mapStationToAnnotation) });
     }
 
     onRegionChangeComplete(region) {
-        console.log('onRegionChangeComplete:', region);
+//        console.log('onRegionChangeComplete:', region);
 
         if (!region) {
            console.log('No region defined. Abort trying to load stations ...');
         }
 
-        this.setState({region});
+        this.setState({ region, annotations: this.state.stations.map(this.mapStationToAnnotation) });
 
         let centerPoint = new GeoPoint(region.latitude, region.longitude);
 
@@ -213,7 +240,7 @@ class MapTabView extends Component {
 
         let distance = Math.min(10000, regionToCenterDistance);
 
-        console.log("[onRegionChangeComplete] regionToCenterDistance:", regionToCenterDistance, ", distance:", distance);
+//        console.log("[onRegionChangeComplete] regionToCenterDistance:", regionToCenterDistance, ", distance:", distance);
 
         this.loadNearbyStations({ coords: { latitude: region.latitude, longitude: region.longitude } }, distance);
     }
@@ -237,20 +264,18 @@ class MapTabView extends Component {
             .then((stations) => {
                 console.log("Found", stations.length, "matching position", position, " and distance", distance);
 
-                stations.forEach(station => {
-                    this.pushStationToAnnotations(station);
-                });
-
-                this.setState({ annotations: this.annotations });
+                this.setState({ stations: stations, annotations: stations.map(this.mapStationToAnnotation) });
             })
-            .catch(err => alert(err))
+            .catch(err => {
+                this.props.globalEventEmitter.emit('ToastShow', { message: err.message, type: 'error' });
+            })
             .finally(() => {
                 console.log("isFetching: false");
                 this.setState({ isFetching: false })
             });
     }
 
-    pushStationToAnnotations(station) {
+    mapStationToAnnotation(station) {
         if (!station.geoPosition) {
             station.geoPosition = new GeoPoint(station.position.lat, station.position.lng);
         }
@@ -267,55 +292,57 @@ class MapTabView extends Component {
             pinColor = 'yellow';
         }
 
-        let useSmallPin = this.state.region && this.state.region.longitudeDelta > 0.025;
+        let useSmallPin = this.useSmallPins();
 
         let distanceFromPosition = this.distanceFromPosition(station);
 
         const stationNumber = String(station.number);
 
-        let annotation = this.annotationsById[stationNumber];
-        if (annotation) {
-            let image = this.pinImages[pinColor][useSmallPin ? 'small' : 'big'][distanceFromPosition < 1000 ? 'opaque' : 'transparent'];
-            if (annotation.view != image) {
-                annotation.view = image;
-            }
-        } else {
-            annotation = {
-                id: stationNumber,
-                latitude: station.position.lat,
-                longitude: station.position.lng,
-                onFocus: this.onStationFocus.bind(this, station),
-                onBlur: this.onStationBlur.bind(this, station),
-                view: this.pinImages[pinColor][useSmallPin ? 'small' : 'big'][distanceFromPosition < 1000 ? 'opaque' : 'transparent']
-            };
+        return {
+            id: stationNumber,
+            latitude: station.position.lat,
+            longitude: station.position.lng,
+            onFocus: this.onStationFocus.bind(this, station),
+            onBlur: this.onStationBlur.bind(this, station),
+            view:
+                <View>
+                    {this.pinImages[pinColor][useSmallPin ? 'small' : 'big'][distanceFromPosition < 1000 ? 'opaque' : 'transparent']}
+                    {
+                        <Text style={{ zIndex: 4, position: 'absolute', top: 24, left: 28, color: 'white', backgroundColor: 'rgba(0,0,0,0)', fontSize: 12 }}>
+                            {this.state.annotationTextInfo === 'STANDS' ? station.available_bike_stands : station.available_bikes}
+                        </Text>
+                    }
+                </View>
+        };
 
-            this.annotations.push(annotation);
-            this.annotationsById[stationNumber] = annotation;
-        }
     }
 
     distanceFromPosition(station) {
         if (!this.state.geoPosition) {
-        return -1;
+            return -1;
+        }
+
+        return station.geoPosition.distanceTo(this.state.geoPosition, true) * 1000;
     }
 
-    return station.geoPosition.distanceTo(this.state.geoPosition, true) * 1000;
-}
+    useSmallPins() {
+        return this.state.region && this.state.region.longitudeDelta > 0.025;
+    }
 
     render() {
-        console.log('--- [MapTabView] Render -------------------------------------------------------------------------------------');
+        console.log('--- [MapTabScene] Render -------------------------------------------------------------------------------------');
 
         let position = this.state.position;
-        console.log('position:', position);
+//        console.log('position:', position);
 
         let currentLocation;
 
         if (position) {
 
             currentLocation = new GeoPoint(position.coords.latitude, position.coords.longitude);
-            console.log('currentLocation:', currentLocation);
+//            console.log('currentLocation:', currentLocation);
 
-            console.log('annotation count:', this.state.annotations.length);
+//            console.log('annotation count:', this.state.annotations.length);
         }
 
         return (
@@ -327,10 +354,24 @@ class MapTabView extends Component {
                          </BlurView>
                      </Image>
                  */}
-                <Animated.View style={[{ transform: this.state.stationToaster.getTranslateTransform()}, styles.container]}>
-                    { this.state.station && <StationToast ref="stationToast" station={this.state.station} /> }
+                <Animated.View style={[{ transform: this.state.stationToaster.getTranslateTransform()}, styles.container, {
+                    shadowColor: "#000000",
+                    shadowOpacity: 0.8,
+                    shadowRadius: 2,
+                    shadowOffset: {
+                    height: 1,
+                    width: 0
+                }}]}>
+                    {this.state.atLeastOneStationAlreadyShown && <StationToast ref="stationToast" station={this.state.station} />}
                 </Animated.View>
-                <Map annotations={this.state.annotations} location={currentLocation} onRegionChange={this.onRegionChange} onRegionChangeComplete={this.onRegionChangeComplete} />
+                <Map
+                    annotations={this.state.annotations}
+                    location={currentLocation}
+                    useSmallPins={this.useSmallPins()}
+                    onRegionChange={this.onRegionChange}
+                    onRegionChangeComplete={this.onRegionChangeComplete}
+                    onChange={this.onChange}
+                />
             </View>
         )
     }
@@ -341,7 +382,7 @@ var styles = EStyleSheet.create({
         flexDirection:'row',
         alignSelf: 'stretch',
         width: '100%',
-        height: 160,
+/*        height: 147,*/
         top: 64,
         left: 0,
         position: 'absolute',
@@ -356,9 +397,9 @@ var styles = EStyleSheet.create({
     }
 });
 
-reactMixin(MapTabView.prototype, Subscribable.Mixin);
+reactMixin(MapTabScene.prototype, Subscribable.Mixin);
 
 // calculate styles
 EStyleSheet.build();
 
-export default MapTabView;
+export default MapTabScene;

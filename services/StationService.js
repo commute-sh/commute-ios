@@ -22,7 +22,7 @@ export async function getStationsNearby(position, distance = 1000, city = 'Paris
 
         return stations;
     } catch(error) {
-        console.error(error);
-        return [];
+        console.debug(error);
+        throw error;
     }
 }

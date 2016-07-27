@@ -22,7 +22,7 @@ import {
     Image
 } from 'react-native';
 
-import MapTabView from './MapTabView';
+import MapTabScene from './MapTabScene';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -31,6 +31,7 @@ import EventEmitter from 'EventEmitter';
 export default class MapTab extends Component {
 
     static propTypes = {
+        globalEventEmitter: PropTypes.object,
         selectedTab: PropTypes.string,
         onPress: PropTypes.func
     };
@@ -50,18 +51,19 @@ export default class MapTab extends Component {
     }
 
     render() {
+
         return (
             <Icon.TabBarItemIOS
                 title="Plan"
-                iconName="ios-map-outline"
-                selectedIconName="ios-map"
+                iconName="ios-globe-outline"
+                selectedIconName="ios-globe"
                 selected={this.props.selectedTab === 'map'}
                 onPress={this.props.onPress}
             >
                 <Navigator
                     initialRoute={{id: 'map', title: 'Plan' }}
-                    renderScene={(route, navigator) => <MapTabView eventEmitter={this.eventEmitter} />}
-                    style={{ flex:1 }}
+                    renderScene={(route, navigator) => <MapTabScene globalEventEmitter={this.props.globalEventEmitter} eventEmitter={this.eventEmitter} />}
+                    style={{ flex: 1 }}
                     navigationBar={
                         <Navigator.NavigationBar
                             routeMapper={{
@@ -77,9 +79,9 @@ export default class MapTab extends Component {
                                     else { return null }
                                 },
                                 RightButton: (route, navigator, index, navState) =>
-                                    <View style={{ paddingTop: 5, paddingRight: 10 }}>
+                                    <View style={{ paddingTop: 0, paddingRight: 16 }}>
                                         <TouchableHighlight underlayColor="transparent" onPress={this.onRightButtonPress}>
-                                            <Icon name="ios-refresh-outline" size={30} color="white" />
+                                            <Icon name="ios-more-outline" size={40} color="white" />
                                         </TouchableHighlight>
                                     </View>
                                 ,
@@ -93,6 +95,7 @@ export default class MapTab extends Component {
                         />
                     }
                 />
+
             </Icon.TabBarItemIOS>
         );
     }

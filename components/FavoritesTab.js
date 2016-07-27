@@ -24,11 +24,9 @@ import {
 
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import MapTabView from './MapTabView';
-
 import EventEmitter from 'EventEmitter';
 
-export default class StationsTab extends Component {
+export default class FavoriteTab extends Component {
 
     static propTypes = {
         selectedTab: PropTypes.string,
@@ -52,17 +50,17 @@ export default class StationsTab extends Component {
     render() {
         return (
             <Icon.TabBarItemIOS
-                title="Stations"
-                iconName="ios-list-outline"
-                selectedIconName="ios-list"
-                selected={this.props.selectedTab === 'stations'}
+                title="Favoris"
+                iconName="ios-star-outline"
+                selectedIconName="ios-star"
+                selected={this.props.selectedTab === 'favorites'}
                 onPress={this.props.onPress}
             >
 
                 <Navigator
-                    initialRoute={{id: 'stations', title: 'Stations' }}
-                    renderScene={(route, navigator) => <MapTabView eventEmitter={this.eventEmitter} />}
-                    style={{ flex:1 }}
+                    initialRoute={{id: 'favorites', title: 'Favoris' }}
+                    renderScene={(route, navigator) => null}
+                    style={{ flex: 1 }}
                     navigationBar={
                         <Navigator.NavigationBar
                             routeMapper={{
@@ -78,11 +76,7 @@ export default class StationsTab extends Component {
                                     else { return null }
                                 },
                                 RightButton: (route, navigator, index, navState) =>
-                                    <View style={{ paddingTop: 5, paddingRight: 10 }}>
-                                        <TouchableHighlight underlayColor="transparent" onPress={this.onRightButtonPress}>
-                                            <Icon name="ios-refresh-outline" size={30} color="white" />
-                                        </TouchableHighlight>
-                                    </View>
+                                    null
                                 ,
                                 Title: (route, navigator, index, navState) =>
                                     <View style={{ paddingTop: 2 }}>
@@ -102,4 +96,4 @@ export default class StationsTab extends Component {
 
 }
 
-export default StationsTab
+export default FavoriteTab
