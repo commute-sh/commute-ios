@@ -5,8 +5,6 @@ import {
     SegmentedControlIOS
 } from 'react-native';
 
-import _ from 'lodash';
-
 import FaIcon from 'react-native-vector-icons/FontAwesome';
 
 export default class Map extends Component {
@@ -69,24 +67,30 @@ export default class Map extends Component {
 
     shouldComponentUpdate(nextProps, nextState) {
         if (this.props.useSmallPins !== nextProps.useSmallPins) {
+            console.log('[Map][Updating] useSmallPins changed (', this.props.useSmallPins, ', ', nextProps.useSmallPins, ')');
             return true;
-        } else if (this.state.selectedIndex !== nextState.selectecIndex) {
+        } else if (this.state.selectedIndex !== nextState.selectedIndex) {
+            console.log('[Map][Updating] selectedIndex changed (', this.state.selectedIndex, ', ', nextState.selectedIndex, ')');
             return true;
-        } else if ((this.state.region && nextState && nextState.region && !_.isEqual(nextState.region, this.state.region))) {
+        } /*else if ((this.state.region && nextState && nextState.region && (nextState.region.latitude != this.state.region.latitude || nextState.region.longitude != this.state.region.longitude))) {
             console.log('shouldComponentUpdate - centerOnLocation');
 
             return true;
-        } else if (nextState.centerOnLocation) {
-            console.log("Force refresh");
+        }*/ else if (nextState.centerOnLocation) {
+            console.log('[Map][Updating] center on location');
 
             return true;
         }
 
-        const annotationsAreEqual = this.annotationsLength === nextProps.annotations.length;
+        const annotationsChanged = this.annotationsLength !== nextProps.annotations.length;
         this.annotationsLength = nextProps.annotations.length;
 
+        if (annotationsChanged) {
+            console.log('[Map][Updating] annotationChanged changed (', this.props.annotations.length, ', ', nextProps.annotations.length, ')');
+        }
+
  //       console.log('Received annotations are:', annotationsAreEqual ? 'equal' : 'not equal - should update component');
-        return !annotationsAreEqual;
+        return annotationsChanged;
     }
 
     render() {
@@ -101,8 +105,8 @@ export default class Map extends Component {
             let currentLocationBoundingCoordinates = currentLocation.boundingCoordinates(0.5, undefined, true);
   //          console.log('currentLocationBoundingCoordinates:', currentLocationBoundingCoordinates);
 
-            let latitudeDelta = Math.abs(Math.abs(currentLocation.latitude()) - Math.abs(currentLocationBoundingCoordinates[0].latitude()))// + Math.random() / 1000 + 0.0001;
-            let longitudeDelta = Math.abs(Math.abs(currentLocation.longitude()) - Math.abs(currentLocationBoundingCoordinates[0].longitude()))// + Math.random() / 1000 + 0.0001;
+            let latitudeDelta = Math.abs(Math.abs(currentLocation.latitude()) - Math.abs(currentLocationBoundingCoordinates[0].latitude())); // + Math.random() / 1000 + 0.0001;
+            let longitudeDelta = Math.abs(Math.abs(currentLocation.longitude()) - Math.abs(currentLocationBoundingCoordinates[0].longitude())); // + Math.random() / 1000 + 0.0001;
 
   //          console.log('latitudeDelta:', latitudeDelta);
   //          console.log('longitudeDelta:', longitudeDelta);
@@ -113,7 +117,6 @@ export default class Map extends Component {
                 latitudeDelta: latitudeDelta,
                 longitudeDelta: longitudeDelta
             };
-
         }
 
         if (this.state.centerOnLocation) {
@@ -124,7 +127,6 @@ export default class Map extends Component {
         }
 
         console.log('------------------ region:', region);
-
 
         return (
             <View style={{ flex: 1 }}>

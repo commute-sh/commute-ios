@@ -1,10 +1,9 @@
 package com.commute;
 
 import com.facebook.react.ReactActivity;
-import com.smixx.reactnativeicons.ReactNativeIcons;
 import com.oblador.vectoricons.VectorIconsPackage;
+import com.mapbox.reactnativemapboxgl.ReactNativeMapboxGLPackage;
 import com.cmcewen.blurview.BlurViewPackage;
-import com.airbnb.android.react.maps.MapsPackage;
 
 public class MainActivity extends ReactActivity {
 

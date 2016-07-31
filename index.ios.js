@@ -46,8 +46,9 @@ class App extends Component {
             selectedTab: 'map',
             toast: {
                 modalShown: false,
-                toastColor: 'green',
-                message: 'Success!'
+                toastColor: 'GREEN',
+                title: 'Succès',
+                message: 'Succès!'
             }
         };
 
@@ -61,23 +62,29 @@ class App extends Component {
     }
 
     onToastShow(event) {
-        this.callToast(event.message, event.type);
+        this.callToast(event.title, event.message, event.type);
     }
 
     onTabIconPress(selectedTab) {
         this.setState({ selectedTab: selectedTab });
     }
 
-    callToast(message, type) {
-        console.log('Calling toast with message:"', message, '" and type:', type);
+    callToast(title, message, type) {
+        console.log('Calling toast with message:"', message, '", title: "', title, '" and type:', type);
 
         if(this.state.toast.modalShown) {
             return ;
         }
 
-        this.setToastType(message, type);
-
-        this.setState({ modalShown: true });
+        this.setState({
+            modalShown: true,
+            toast: {
+                title: title,
+                backgroundColor: this.getToastBackgroundColor(type),
+                type: type,
+                message: message
+            }
+        });
 
         Animated.timing(this.animatedValue, { toValue: 1, duration: 350 }).start(() => {
             setTimeout(() => {
@@ -87,20 +94,17 @@ class App extends Component {
         });
     }
 
-    setToastType(message='Success!', type='success') {
-        let color;
+    getToastBackgroundColor(type) {
+        // INFO
+        let color = '#2980b9';
 
-        if (type == 'error') {
+        if (type == 'ERROR') {
             color = '#e74c3c';
-        } else if (type == 'primary') {
-            color = '#2980b9';
-        } else if (type == 'warning') {
+        } else if (type == 'WARNING') {
             color = '#f39c12';
-        } else if (type == 'success') {
-            color = '#1abc9c';
         }
 
-        this.setState({ toast: { toastColor: color, message: message } });
+        return color;
     }
 
     render() {
@@ -110,6 +114,14 @@ class App extends Component {
             outputRange: [70, 10, 0]
         });
 
+
+        let messagePrefix = 'Info';
+
+        if (this.state.toast.type == 'ERROR') {
+            messagePrefix = 'Erreur';
+        }
+
+
         return (
             <View style={{ flex: 1 }}>
                 <TabBarIOS style={{ zIndex: 1 }}>
@@ -118,12 +130,12 @@ class App extends Component {
                     <SearchTab selectedTab={this.state.selectedTab} onPress={this.onTabIconPress.bind(this, 'search')} />
                 </TabBarIOS>
 
-                <Animated.View  style={{ zIndex: 2, transform: [{ translateY: animation }], height: 70, backgroundColor: this.state.toast.toastColor, position: 'absolute',left:0, top: windowHeight - 70, right:0, justifyContent:  'center' }}>
+                <Animated.View  style={{ zIndex: 2, transform: [{ translateY: animation }], height: 70, backgroundColor: this.state.toast.backgroundColor, position: 'absolute',left:0, top: windowHeight - 70, right:0, justifyContent:  'center' }}>
                     <Text style={{ marginLeft: 10,  color: 'white',  fontSize: 16, fontWeight: '500', fontFamily: 'System'  }}>
-                        Impossible de charger la liste des stations
+                        { this.state.toast.title }
                     </Text>
                     <Text style={{ marginLeft: 10,  color: 'white',  fontSize: 12, fontWeight: '300', fontFamily: 'System' }}>
-                        Erreur: { this.state.toast.message }
+                        { messagePrefix }: { this.state.toast.message }
                     </Text>
                 </Animated.View>
             </View>

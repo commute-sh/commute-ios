@@ -15,6 +15,8 @@ export async function getStationsNearby(position, distance = 1000, city = 'Paris
         });
         var stations = await response.json();
 
+//        var stations = require('../data/stations.json');
+
         const duration = moment.duration(moment().diff(start)).milliseconds();
 
         console.log("*** Stations loaded in", duration, "ms");

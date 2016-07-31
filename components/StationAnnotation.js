@@ -29,58 +29,28 @@ class StationAnnotation extends Component {
 
     static defaultTypes = {
         textInfo: 'STANDS'
-    }
+    };
 
     static pinImages = {
         'red': {
-            'small': {
-                'opaque': <Image source={smallPinRed}  style={{ zIndex: 3 }} />,
-                'transparent': <Image source={smallPinRed} style={{ opacity: 0.25, zIndex: 3 }} />
-            },
-            'big': {
-                'opaque': <Image source={pinRed}  style={{ zIndex: 3 }} />,
-                'transparent': <Image source={pinRed} style={{ opacity: 0.25, zIndex: 3 }} />
-            }
+            'small': smallPinRed,
+            'big': pinRed
         },
         'yellow': {
-            'small': {
-                'opaque': <Image source={smallPinYellow}  style={{ zIndex: 3 }} />,
-                'transparent': <Image source={smallPinYellow} style={{ opacity: 0.25 }} />
-            },
-            'big': {
-                'opaque': <Image source={pinYellow}  style={{ zIndex: 3 }} />,
-                'transparent': <Image source={pinYellow} style={{ opacity: 0.25, zIndex: 3 }} />
-            }
+            'small': smallPinYellow,
+            'big': pinYellow
         },
         'green': {
-            'small': {
-                'opaque': <Image source={smallPinGreen}  style={{ zIndex: 3 }} />,
-                'transparent': <Image source={smallPinGreen} style={{ opacity: 0.25 }} />
-            },
-            'big': {
-                'opaque': <Image source={pinGreen}  style={{ zIndex: 3 }} />,
-                'transparent': <Image source={pinGreen} style={{ opacity: 0.25, zIndex: 3 }} />
-            }
+            'small': smallPinGreen,
+            'big': pinGreen
         },
         'orange': {
-            'small': {
-                'opaque': <Image source={smallPinOrange}  style={{ zIndex: 3 }} />,
-                'transparent': <Image source={smallPinOrange} style={{ opacity: 0.25, zIndex: 3 }} />
-            },
-            'big': {
-                'opaque': <Image source={pinOrange}  style={{ zIndex: 3 }} />,
-                'transparent': <Image source={pinOrange} style={{ opacity: 0.25, zIndex: 3 }} />
-            }
+            'small': smallPinOrange,
+            'big': pinOrange
         },
         'black': {
-            'small': {
-                'opaque': <Image source={smallPinBlack}  style={{ zIndex: 3 }} />,
-                'transparent': <Image source={smallPinBlack} style={{ opacity: 0.25, zIndex: 3 }} />
-            },
-            'big': {
-                'opaque': <Image source={pinBlack}  style={{ zIndex: 3 }} />,
-                'transparent': <Image source={pinBlack} style={{ opacity: 0.25, zIndex: 3 }} />
-            }
+            'small': smallPinBlack,
+            'big': pinBlack
         }
     };
 
@@ -104,14 +74,17 @@ class StationAnnotation extends Component {
         let distanceFromPosition = this.props.distanceFromPosition(station);
 
         return (
-            <View style={{ backgroundColor:'#FF0000', width: 64, height: 64 }}>
-                {StationAnnotation.pinImages[pinColor][useSmallPin ? 'small' : 'big'][distanceFromPosition < 1000 ? 'opaque' : 'transparent']}
-                {
-                    <Text style={{ backgroundColor:'#00FF00', zIndex: 4, position: 'absolute', top: 24, left: 28, color: 'white', backgroundColor: 'rgba(0,0,0,0)', fontSize: 12 }}>
-                        {this.props.textInfo === this.props.textInfo() ? station.available_bike_stands : station.available_bikes}
-                    </Text>
-                }
-            </View>
+            <Image source={StationAnnotation.pinImages[pinColor][useSmallPin ? 'small' : 'big']} style={{
+                zIndex: 3,
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+                opacity: distanceFromPosition < 1000 ? 1 : 0.25
+            }}>
+                <Text style={{ backgroundColor: 'rgba(0,0,0,0)', zIndex: 4, color: 'white', fontSize: 12 }}>
+                    {this.props.textInfo === 'STANDS' ? station.available_bike_stands : station.available_bikes}
+                </Text>
+            </Image>
         );
     }
 
