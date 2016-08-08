@@ -10,13 +10,19 @@ import FaIcon from 'react-native-vector-icons/FontAwesome';
 export default class Map extends Component {
 
     static propTypes = {
-        location: PropTypes.object,
+        annotations: PropTypes.array,
+        center: PropTypes.object,
+        geoLocation: PropTypes.object,
         onAnnotationPress: PropTypes.func,
         onRegionChange: PropTypes.func,
         onRegionChangeComplete: PropTypes.func,
         onChange: PropTypes.func,
         useSmallPins: PropTypes.bool
     };
+
+    static defaultProps = {
+        annotations: []
+    }
 
     constructor(props) {
         super(props);
@@ -39,30 +45,84 @@ export default class Map extends Component {
     }
 
     onRegionChange(region) {
-        if (this.state.centerOnLocation) {
-            this.state.centerOnLocation = false;
-        } else {
-            this.setState({region: region});
-            this.props.onRegionChange(region);
-        }
+        this.props.onRegionChange(region);
     }
 
     onRegionChangeComplete(region) {
-        if (this.state.centerOnLocation) {
-            this.state.centerOnLocation = false;
-        } else {
-            this.setState({region: region});
-            this.props.onRegionChangeComplete(region);
-        }
+        this.props.onRegionChangeComplete(region);
     }
 
     onCenterOnLocation() {
-//        console.log('onCenterOnLocation');
-        this.setState({ centerOnLocation: true });
+
+        if (this.state.region) {
+
+            let region = Object.assign({}, this.state.region);
+
+            region.latitude = this.props.geoLocation.latitude();
+            region.longitude = this.props.geoLocation.longitude();
+            region.latitudeDelta = region.latitudeDelta + (Math.random() + 0.0001) * 0.0001;
+            region.longitudeDelta = region.longitudeDelta +  (Math.random() + 0.0001) * 0.0001;
+
+            this.setState({ region: region, centerOnLocation: true });
+        } else {
+            let region = this.computeRegionFromLocation(this.props.geoLocation);
+
+            this.setState({ region: region, centerOnLocation: true });
+        }
+    }
+
+    computeRegionFromLocation(location, delta = 0.5) {
+        let currentLocationBoundingCoordinates = location.boundingCoordinates(delta, undefined, true);
+
+        let latitudeDelta = Math.abs(Math.abs(location.latitude()) - Math.abs(currentLocationBoundingCoordinates[0].latitude())) * 2;
+        let longitudeDelta = Math.abs(Math.abs(location.longitude()) - Math.abs(currentLocationBoundingCoordinates[0].longitude())) * 2;
+
+        return {
+            latitude: location.latitude(),
+            longitude: location.longitude(),
+            latitudeDelta: latitudeDelta,
+            longitudeDelta: longitudeDelta
+        };
     }
 
     componentDidMount() {
-        this.annotationsLength = this.props.annotations.length;
+        // if (this.props.geoLocation) {
+        //     this.state.region = this.computeRegionFromLocation(this.props.geoLocation, 0.5);
+        //
+        //     console.log('[Map] ------------------ Current location region from geoLocation[1]:', this.state.region);
+        // } else if (this.props.center) {
+        //     this.state.region = this.computeRegionFromLocation(this.props.center, 0.5);
+        //
+        //     console.log('[Map] ------------------ Current location region from center[1]:', this.state.region);
+        // }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (!this.props.geoLocation && nextProps.geoLocation) {
+            if (this.state.region) {
+
+                this.setState({
+                    region: {
+                        latitude: nextProps.geoLocation.latitude(),
+                        longitude: nextProps.geoLocation.longitude(),
+                        latitudeDelta: this.state.region.latitudeDelta,
+                        longitudeDelta: this.state.region.longitudeDelta
+                    }
+                });
+            } else {
+                this.setState({
+                    region: this.computeRegionFromLocation(nextProps.geoLocation, 0.5)
+                });
+            }
+
+            console.log('[Map] ------------------ Current location region from geoLocation[2]:', this.state.region);
+        } else if (!this.props.geoLocation && !nextProps.geoLocation && nextProps.center) {
+            this.setState({
+                region: this.computeRegionFromLocation(nextProps.center, 0.5)
+            });
+
+            console.log('[Map] ------------------ Current location region from center[1]:', this.state.region);
+        }
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -77,16 +137,16 @@ export default class Map extends Component {
 
             return true;
         }*/ else if (nextState.centerOnLocation) {
+            this.state.centerOnLocation = false;
             console.log('[Map][Updating] center on location');
 
             return true;
         }
 
-        const annotationsChanged = this.annotationsLength !== nextProps.annotations.length;
-        this.annotationsLength = nextProps.annotations.length;
+        const annotationsChanged = this.props.annotations.length !== nextProps.annotations.length;
 
         if (annotationsChanged) {
-            console.log('[Map][Updating] annotationChanged changed (', this.props.annotations.length, ', ', nextProps.annotations.length, ')');
+            console.log('[Map][Updating] annotation changed (', this.props.annotations.length, ', ', nextProps.annotations.length, ')');
         }
 
  //       console.log('Received annotations are:', annotationsAreEqual ? 'equal' : 'not equal - should update component');
@@ -94,39 +154,10 @@ export default class Map extends Component {
     }
 
     render() {
+
         console.log('--- [Map] Render -------------------------------------------------------------------------------------');
 
-        const currentLocation = this.props.location;
-//        console.log('currentLocation:', currentLocation);
-
-        let region = this.state.region;
-
-        if (currentLocation) {
-            let currentLocationBoundingCoordinates = currentLocation.boundingCoordinates(0.5, undefined, true);
-  //          console.log('currentLocationBoundingCoordinates:', currentLocationBoundingCoordinates);
-
-            let latitudeDelta = Math.abs(Math.abs(currentLocation.latitude()) - Math.abs(currentLocationBoundingCoordinates[0].latitude())); // + Math.random() / 1000 + 0.0001;
-            let longitudeDelta = Math.abs(Math.abs(currentLocation.longitude()) - Math.abs(currentLocationBoundingCoordinates[0].longitude())); // + Math.random() / 1000 + 0.0001;
-
-  //          console.log('latitudeDelta:', latitudeDelta);
-  //          console.log('longitudeDelta:', longitudeDelta);
-
-            region = {
-                latitude: currentLocation.latitude(),
-                longitude: currentLocation.longitude(),
-                latitudeDelta: latitudeDelta,
-                longitudeDelta: longitudeDelta
-            };
-        }
-
-        if (this.state.centerOnLocation) {
-            region.latitudeDelta = region.latitudeDelta + (Math.random() + 0.0001) * 0.0001;
-            region.longitudeDelta = region.longitudeDelta +  (Math.random() + 0.0001) * 0.0001;
-
-            this.state.centerOnLocation = false;
-        }
-
-        console.log('------------------ region:', region);
+        console.log('[Map] -------------- Region:', this.state.region);
 
         return (
             <View style={{ flex: 1 }}>
@@ -176,7 +207,7 @@ export default class Map extends Component {
                     showsUserLocation={true}
                     onRegionChangeComplete={this.onRegionChangeComplete}
                     onRegionChange={this.onRegionChange}
-                    region={region}
+                    region={this.state.region}
                     annotations={this.props.annotations}
                  />
             </View>
