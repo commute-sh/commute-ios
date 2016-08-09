@@ -15,7 +15,7 @@
 
 - (void)drawRect:(CGRect)rect {
   
-  NSLog(@"Number: %@, use Small Pin: %d", self.number, self.useSmallPin);
+//  NSLog(@"Number: %@, use Small Pin: %d", self.number, self.useSmallPin);
   
   [super drawRect:rect];
   

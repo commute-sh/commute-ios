@@ -130,6 +130,7 @@ class MapTabScene extends Component {
         this.setState({
             selectedIndex: event.nativeEvent.selectedSegmentIndex,
             annotations: this.mapStationsToAnnotations(this.state.stations, {
+                region: this.state.region,
                 useSmallPins: this.state.useSmallPins,
                 selectedIndex: event.nativeEvent.selectedSegmentIndex
             })
@@ -258,6 +259,7 @@ class MapTabScene extends Component {
 //             center: new GeoPoint(region.latitude, region.longitude),
 //             useSmallPins: region.longitudeDelta > 0.025,
 //             annotations: this.mapStationsToAnnotations(this.state.stations, {
+//                 region: this.state.region,
 //                 selectedIndex: this.state.selectedIndex,
 //                 useSmallPins: region.longitudeDelta > 0.025
 //             })
@@ -276,6 +278,7 @@ class MapTabScene extends Component {
             center: new GeoPoint(region.latitude, region.longitude),
             useSmallPins: region.longitudeDelta > 0.025,
             annotations: this.mapStationsToAnnotations(this.state.stations, {
+                region: region,
                 selectedIndex: this.state.selectedIndex,
                 useSmallPins: region.longitudeDelta > 0.025
             })
@@ -285,11 +288,11 @@ class MapTabScene extends Component {
 
 //        console.log("[onRegionChangeComplete] regionToCenterDistance:", regionToCenterDistance, ", distance:", distance);
 
-        if (distance <= 50000) {
-            console.log("Region radius (", distance, ") <= 50000 - Fetching stations inside perimeter");
+        if (distance <= 100000) {
+            console.log("Region radius (", distance, ") <= 100000 - Fetching stations inside perimeter");
             this.loadNearbyStations({ coords: { latitude: region.latitude, longitude: region.longitude } }, distance);
         } else {
-            console.log("Region radius (", distance, ") > 50000 - Do not fetch stations inside perimeter");
+            console.log("Region radius (", distance, ") > 100000 - Do not fetch stations inside perimeter");
         }
     }
 
@@ -321,12 +324,21 @@ class MapTabScene extends Component {
             .then((stations) => {
                 console.log("Found", stations.length, "matching position", position, " and distance", distance);
 
+                const mergedStations = _.unionBy(stations, this.state.stations, 'number');
+
+                stations.forEach(station => {
+                    if (!station.geoLocation) {
+                        station.geoLocation = new GeoPoint(station.position.lat, station.position.lng);
+                    }
+                });
+
                 self.setState({
                     lastPosition: currentPosition,
                     lastDistance: distance,
-                    stations: stations,
+                    stations: mergedStations,
                     isFetching: false,
-                    annotations: self.mapStationsToAnnotations(stations, {
+                    annotations: self.mapStationsToAnnotations(mergedStations, {
+                        region: this.state.region,
                         selectedIndex: self.state.selectedIndex,
                         useSmallPins: self.state.useSmallPins
                     })
@@ -351,9 +363,7 @@ class MapTabScene extends Component {
 
     mapStationsToAnnotations(stations, opts) {
 
-
         const start = moment();
-
 
         this.uid = (this.uid || 0) + 1;
 
@@ -364,30 +374,33 @@ class MapTabScene extends Component {
             console.log("Stations (Not array: ", JSON.stringify(stations), ")");
         }
 
-        this.annotations = _.map(stations, (station) => {
+        const region = opts.region;
+
+        const latMin = region.latitude - region.latitudeDelta / 2;
+        const latMax = region.latitude + region.latitudeDelta / 2;
+        const lngMin = region.longitude - region.longitudeDelta / 2;
+        const lngMax = region.longitude + region.longitudeDelta / 2;
+
+        const stationsInRegion = _.filter(stations, station =>
+            latMin <= station.position.lat && station.position.lat <= latMax &&
+            lngMin <= station.position.lng && station.position.lng <= lngMax
+        );
+
+        const annotations = _.map(stationsInRegion, (station) => {
             return this.mapStationToAnnotation(station, opts);
         });
-
-        // if (this.annotations) {
-        //     this.annotations.map(annotation => {
-        //         annotation.view.props.useSmallPin = !annotation.view.props.useSmallPin;
-        //         annotation.view.props.value = annotation.view.props.value + 1;
-        //         annotation.view.forceUpdate();
-        //     });
-        // }
 
         const end = moment();
         const duration = moment.duration(end.diff(start)).asMilliseconds();
 
         console.log("*** Annotations mapped in", duration, "ms");
 
-        return this.annotations;
+        return annotations;
     }
 
     mapStationToAnnotation(station, opts) {
-        if (!station.geoLocation) {
-            station.geoLocation = new GeoPoint(station.position.lat, station.position.lng);
-        }
+
+
 
         let pinColor = '#2ecc71';
 
@@ -406,6 +419,7 @@ class MapTabScene extends Component {
         const stationNumber = String(station.number);
 
         const distanceToRegion = this.state.center ? station.geoLocation.distanceTo(this.state.center, true) * 1000 : -1;
+
         const distanceToPosition = this.state.geoLocation ? station.geoLocation.distanceTo(this.state.geoLocation, true) * 1000 : -1;
         // if (distanceToRegion < 1000 || distanceToPosition < 1000) {
         //     console.log('Station[', station.number, ' / ', station.name , '] distanceToRegion:', distanceToRegion, ', distanceToPosition:', distanceToPosition);
@@ -450,9 +464,9 @@ class MapTabScene extends Component {
 
     shouldComponentUpdate(nextProps, nextState) {
 
-        if (nextState.isFetching) {
+        /*if (nextState.isFetching) {
             return false;
-        } else if (this.state.station !== nextState.station) {
+        } else */if (this.state.station !== nextState.station) {
             console.log('[MapTabScene][Updating] selected station changed');
             return true;
         } else if (this.state.selectedIndex !== nextState.selectedIndex) {
