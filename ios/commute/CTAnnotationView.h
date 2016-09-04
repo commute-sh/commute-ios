@@ -11,7 +11,7 @@
 
 @interface CTAnnotationView : UIView
 
-@property (nonatomic, assign) BOOL useSmallPin;
+@property (nonatomic, assign) NSNumber *pinSize;
 @property (nonatomic, assign) NSNumber *value;
 @property (nonatomic, assign) CGFloat lineWidth;
 @property (nonatomic, assign) CGFloat opacity;

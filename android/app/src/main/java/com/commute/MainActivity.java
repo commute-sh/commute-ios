@@ -1,6 +1,8 @@
 package com.commute;
 
 import com.facebook.react.ReactActivity;
+import com.BV.LinearGradient.LinearGradientPackage;
+import com.horcrux.svg.RNSvgPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.mapbox.reactnativemapboxgl.ReactNativeMapboxGLPackage;
 import com.cmcewen.blurview.BlurViewPackage;

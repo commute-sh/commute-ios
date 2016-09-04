@@ -17,7 +17,7 @@ export default class Map extends Component {
         onRegionChange: PropTypes.func,
         onRegionChangeComplete: PropTypes.func,
         onChange: PropTypes.func,
-        useSmallPins: PropTypes.bool
+        pinSize: PropTypes.number
     };
 
     static defaultProps = {
@@ -126,8 +126,8 @@ export default class Map extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (this.props.useSmallPins !== nextProps.useSmallPins) {
-            console.log('[Map][Updating] useSmallPins changed (', this.props.useSmallPins, ', ', nextProps.useSmallPins, ')');
+        if (this.props.pinSize !== nextProps.pinSize) {
+            console.log('[Map][Updating] pinSize changed (', this.props.pinSize, ', ', nextProps.pinSize, ')');
             return true;
         } else if (this.state.selectedIndex !== nextState.selectedIndex) {
             console.log('[Map][Updating] selectedIndex changed (', this.state.selectedIndex, ', ', nextState.selectedIndex, ')');

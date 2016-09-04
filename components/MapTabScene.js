@@ -6,7 +6,8 @@ import {
     Image,
     View,
     Text,
-    processColor
+    processColor,
+    TouchableHighlight
 } from 'react-native';
 
 import Map from './Map';
@@ -37,8 +38,9 @@ import _ from 'lodash';
 class MapTabScene extends Component {
 
     static propTypes = {
-        eventEmitter: PropTypes.object
-    }
+        eventEmitter: PropTypes.object,
+        navigator: PropTypes.object
+    };
 
     constructor(props) {
         super(props);
@@ -52,7 +54,7 @@ class MapTabScene extends Component {
             annotations: [],
             annotationTextInfo: 'STANDS',
             selectedIndex: 0,
-            useSmallPins: false,
+            pinSize: 32,
             center: new GeoPoint(48.85319, 2.34831)
         };
 
@@ -68,6 +70,8 @@ class MapTabScene extends Component {
         this.processAnimationQueue = this.processAnimationQueue.bind(this);
         this.enqueueAnimation = this.enqueueAnimation.bind(this);
         this.processAnimationQueueInternal = this.processAnimationQueueInternal.bind(this);
+        this.renderStationToast = this.renderStationToast.bind(this);
+        this._onPressButton = this._onPressButton.bind(this);
 
         this.pinImages = {
             'red': {
@@ -131,7 +135,7 @@ class MapTabScene extends Component {
             selectedIndex: event.nativeEvent.selectedSegmentIndex,
             annotations: this.mapStationsToAnnotations(this.state.stations, {
                 region: this.state.region,
-                useSmallPins: this.state.useSmallPins,
+                pinSize: this.state.pinSize,
                 selectedIndex: event.nativeEvent.selectedSegmentIndex
             })
         });
@@ -189,7 +193,7 @@ class MapTabScene extends Component {
                 this.setState({ position, geoLocation: new GeoPoint(position.coords.latitude, position.coords.longitude) });
                 this.loadNearbyStations(position);
             }, (error) => {
-                alert(error.message)
+                alert(error.message);
             }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
         );
         this.watchID = navigator.geolocation.watchPosition((position) => {
@@ -257,17 +261,17 @@ class MapTabScene extends Component {
 //         this.setState({
 //             region,
 //             center: new GeoPoint(region.latitude, region.longitude),
-//             useSmallPins: region.longitudeDelta > 0.025,
+//             pinSize: region.longitudeDelta > 0.1 ? 16 : (this.state.region.longitudeDelta < 0.025 ? 32 : 24),
 //             annotations: this.mapStationsToAnnotations(this.state.stations, {
 //                 region: this.state.region,
 //                 selectedIndex: this.state.selectedIndex,
-//                 useSmallPins: region.longitudeDelta > 0.025
+//                 pinSize: region.longitudeDelta > 0.1 ? 16 : (this.state.region.longitudeDelta < 0.025 ? 32 : 24),
 //             })
 //         });
     }
 
     onRegionChangeComplete(region) {
-        console.log('[MapTabScene] onRegionChangeComplete:', region);
+        console.log('[MapTabScene] onRegionChangeComplete:', region, '*************************************************');
 
         if (!region) {
            console.log('No region defined. Abort trying to load stations ...');
@@ -276,11 +280,11 @@ class MapTabScene extends Component {
         this.setState({
             region,
             center: new GeoPoint(region.latitude, region.longitude),
-            useSmallPins: region.longitudeDelta > 0.025,
+            pinSize: region.longitudeDelta > 0.1 ? 16 : (region.longitudeDelta < 0.025 ? 32 : 24),
             annotations: this.mapStationsToAnnotations(this.state.stations, {
                 region: region,
                 selectedIndex: this.state.selectedIndex,
-                useSmallPins: region.longitudeDelta > 0.025
+                pinSize: region.longitudeDelta > 0.1 ? 16 : (region.longitudeDelta < 0.025 ? 32 : 24)
             })
         });
 
@@ -340,7 +344,7 @@ class MapTabScene extends Component {
                     annotations: self.mapStationsToAnnotations(mergedStations, {
                         region: this.state.region,
                         selectedIndex: self.state.selectedIndex,
-                        useSmallPins: self.state.useSmallPins
+                        pinSize: self.state.pinSize
                     })
                 });
             })
@@ -401,20 +405,22 @@ class MapTabScene extends Component {
     mapStationToAnnotation(station, opts) {
 
 
+        let showStands = opts.selectedIndex === 0;
+        let showBikes = !showStands;
 
-        let pinColor = '#2ecc71';
+        let pinColor = '#2ecc71'; // GREEN
 
         if (station.status === 'CLOSED') {
             pinColor = '#000000';
-        } else if (station.available_bike_stands === 0 || station.available_bikes === 0) {
+        } else if (showStands && station.available_bike_stands === 0 || showBikes && station.available_bikes === 0) {
             pinColor = '#e74c3c'; // RED
-        } else if (station.available_bike_stands <= 3 || station.available_bikes <= 3) {
+        } else if (showStands && station.available_bike_stands <= 3 || showBikes && station.available_bikes <= 3) {
             pinColor = '#d35400'; // ORANGE
-        } else if (station.available_bike_stands <= 5 || station.available_bikes <= 5) {
+        } else if (showStands && station.available_bike_stands <= 5 || showBikes && station.available_bikes <= 5) {
             pinColor = '#f39c12'; // YELLOW
         }
 
-        let useSmallPin = opts.useSmallPins;
+        let pinSize = opts.pinSize;
 
         const stationNumber = String(station.number);
 
@@ -437,28 +443,18 @@ class MapTabScene extends Component {
 //                key={stationNumber}
                 key={this.uid + '-' + stationNumber}
                 number={station.number}
-                useSmallPin={useSmallPin}
-                value={opts.selectedIndex === 0 ? station.available_bike_stands : station.available_bikes}
+                pinSize={pinSize}
+                value={showStands ? station.available_bike_stands : station.available_bikes}
                 strokeColor={processColor(pinColor)}
                 bgColor={processColor('white')}
-                lineWidth={useSmallPin ? 0 : 4}
-                fontSize={14}
+                lineWidth={pinSize <= 16 ? 0 : (pinSize <= 24 ? 3 : 4)}
+                fontSize={(pinSize <= 24 ? 10 : 14)}
                 fontWeight='900'
                 opacity={(distanceToPosition > 1000 && distanceToRegion > 1000) ? 0.33 : 1}
                 style={{
-                    width: useSmallPin ? 16 : 32,
-                    height: useSmallPin ? 16 : 32,
+                    width: pinSize,
+                    height: pinSize,
                 }} />
-            // view:
-            //     <Image source={this.pinImages[pinColor][useSmallPin ? 'small' : 'big']} style={{ opacity: (distanceToPosition > 1000 && distanceToRegion > 1000) ? 0.25 : 1, zIndex: 3,
-            //         flex: 1,
-            //         justifyContent: 'center',
-            //         alignItems: 'center'
-            //      }}>{ (distanceToPosition <= 1000 || distanceToRegion <= 1000) &&
-            //         <Text style={{ backgroundColor: 'rgba(0,0,0,0)', zIndex: 4, color: 'white', fontSize: 12 }}>
-            //             {opts.selectedIndex === 0 ? station.available_bike_stands : station.available_bikes}
-            //         </Text>}
-            //     </Image>
         };
     }
 
@@ -472,8 +468,8 @@ class MapTabScene extends Component {
         } else if (this.state.selectedIndex !== nextState.selectedIndex) {
             console.log('[MapTabScene][Updating] selectedIndex changed (', this.state.selectedIndex, ', ', nextState.selectedIndex, ')');
             return true;
-        } else if (this.state.useSmallPins !== nextState.useSmallPins) {
-            console.log('[MapTabScene][Updating] useSmallPins changed (', this.state.useSmallPins, ', ', nextState.useSmallPins, ')');
+        } else if (this.state.pinSize !== nextState.pinSize) {
+            console.log('[MapTabScene][Updating] pinSize changed (', this.state.pinSize, ', ', nextState.pinSize, ')');
             return true;
         } else if (this.state.stations.length !== nextState.stations.length) {
             console.log('[MapTabScene][Updating] stations length changed (', this.state.stations.length, ', ', nextState.stations.length, ')');
@@ -510,13 +506,13 @@ class MapTabScene extends Component {
                         }
                     }
                 ]}>
-                    {this.state.atLeastOneStationAlreadyShown && <StationToast ref="stationToast" station={this.state.station} />}
+                    {this.state.atLeastOneStationAlreadyShown && this.renderStationToast()}
                 </Animated.View>
                 <Map
                     annotations={this.state.annotations}
                     center={this.state.center}
                     geoLocation={this.state.geoLocation}
-                    useSmallPins={this.state.useSmallPins}
+                    pinSize={this.state.pinSize}
                     onRegionChange={this.onRegionChange}
                     onRegionChangeComplete={this.onRegionChangeComplete}
                     onChange={this.onChange}
@@ -524,6 +520,21 @@ class MapTabScene extends Component {
             </View>
         )
     }
+
+    _onPressButton() {
+        this.props.navigator.push({ id: 'StationDetails', station: this.state.station });
+    }
+
+    renderStationToast() {
+        return (
+            <TouchableHighlight onPress={this._onPressButton} activeOpacity={0.5} underlayColor="white" style={{ flex: 1 }}>
+                <View style={{ flex: 1 }}>
+                    <StationToast ref="stationToast" station={this.state.station} />
+                </View>
+            </TouchableHighlight>
+        );
+    }
+
 }
 
 var styles = EStyleSheet.create({

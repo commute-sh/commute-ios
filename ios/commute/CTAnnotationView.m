@@ -28,18 +28,18 @@
   CGContextRef context = UIGraphicsGetCurrentContext();
   
   
-  if (!self.useSmallPin) {
+  if ([self.pinSize integerValue] > 16) {
     CGContextSetStrokeColorWithColor(context, strokeColor);
     CGContextSetLineWidth(context, self.lineWidth);
     CGContextStrokeEllipseInRect(context, borderRect);
   }
   
-  CGContextSetFillColorWithColor(context, self.useSmallPin ? strokeColor : backgroundColor);
+  CGContextSetFillColorWithColor(context, [self.pinSize integerValue] <= 16 ? strokeColor : backgroundColor);
   CGContextFillEllipseInRect (context, borderRect);
   CGContextFillPath(context);
 
 
-  if (!self.useSmallPin) {
+  if ([self.pinSize integerValue] > 16) {
     NSString *string = [NSString stringWithFormat:@"%@", self.value];
     
     NSMutableParagraphStyle* style = [[NSMutableParagraphStyle alloc] init];
@@ -49,7 +49,7 @@
     
     NSDictionary *textAttributes = @{
                                      NSFontAttributeName: font,
-                                     NSForegroundColorAttributeName: self.useSmallPin ? [UIColor whiteColor] : [RCTConvert UIColor: self.strokeColor],
+                                     NSForegroundColorAttributeName: [self.pinSize integerValue] <= 16 ? [UIColor whiteColor] : [RCTConvert UIColor: self.strokeColor],
                                      NSParagraphStyleAttributeName: style
                                      };
     

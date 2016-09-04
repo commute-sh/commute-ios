@@ -24,46 +24,18 @@ import {
 
 } from 'react-native';
 
-import SearchBar from 'react-native-search-bar';
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    searchBar: {
-        marginTop: 20,
-        height: 44
-    },
-    listView: {
-        backgroundColor: 'white',
-    },
-});
-
 import Icon from 'react-native-vector-icons/Ionicons';
-
-import EventEmitter from 'EventEmitter';
 
 import SearchTabScene from './SearchTabScene';
 
-export default class FavoriteTab extends Component {
+import EventEmitter from 'EventEmitter';
+
+export default class SearchTab extends Component {
 
     static propTypes = {
         selectedTab: PropTypes.string,
-        onPress: PropTypes.func,
-        dataSource: PropTypes.object.isRequired
+        onPress: PropTypes.func
     };
-    static defaultProps = { dataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}) }
-    state = { dataSource: this.props.dataSource.cloneWithRows(['User 1', 'User 2', 'User 3', 'User 4', 'User 5']) }
-
-    constructor(props) {
-        super(props);
-
-        this.onRightButtonPress = this.onRightButtonPress.bind(this);
-    }
-
-    onRightButtonPress() {
-        this.eventEmitter.emit('Refresh');
-    }
 
     componentWillMount() {
         this.eventEmitter = new EventEmitter();
@@ -78,25 +50,46 @@ export default class FavoriteTab extends Component {
                 selected={this.props.selectedTab === 'search'}
                 onPress={this.props.onPress}
             >
+                <Navigator
+                    initialRoute={{ id: 'StationSearch', title: 'Recherche de stations' }}
+                    renderScene={(route, navigator) => {
+                        if (route.id == 'StationSearch') {
+                            return (
+                                <SearchTabScene
+                                    globalEventEmitter={this.props.globalEventEmitter}
+                                    eventEmitter={this.eventEmitter}
+                                    navigator={navigator}
+                                />
+                            );
+                        }
 
-                <View style={styles.container}>
-                    <View style={{ backgroundColor: "#325d7a", height: 64 }}>
-                    <SearchBar placeholder="Search"
-                               style={styles.searchBar}
-                               barTintColor="#325d7a"
-                               textColor="black"
-                               tintColor="white" />
-                    </View>
-                    <ListView style={styles.listView} dataSource={this.state.dataSource}
-                              automaticallyAdjustContentInsets={false}
-                              renderRow={(rowData) => <Text>{rowData}</Text>} />
-                </View>
-
+                    }}
+                    style={{ flex: 1 }}
+                    navigationBar={
+                        <Navigator.NavigationBar
+                            routeMapper={{
+                                LeftButton: (route, navigator, index, navState) => {
+                                    return null;
+                                },
+                                RightButton: (route, navigator, index, navState) => {
+                                    return null;
+                                },
+                                Title: (route, navigator, index, navState) => {
+                                    return (
+                                        <View style={{ paddingTop: 2 }}>
+                                            <Image source={require('../images/commute-icon.png')} style={{ width: 32, height: 32 }} />
+                                        </View>
+                                    );
+                                },
+                            }}
+                            style={{ backgroundColor: '#325d7a' }}
+                        />
+                    }
+                />
             </Icon.TabBarItemIOS>
-
         );
     }
 
 }
 
-export default FavoriteTab
+export default SearchTab;

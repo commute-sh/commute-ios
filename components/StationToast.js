@@ -12,6 +12,7 @@ import reactMixin from 'react-mixin';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 class StationToast extends Component {
+
     render() {
         console.log('--- [StationToast] Render -------------------------------------------------------------------------------------');
 
@@ -20,30 +21,25 @@ class StationToast extends Component {
         return (
             <View style={{ flex: 1, paddingLeft: 16, paddingTop: 5, paddingBottom: 5 }}>
                 <View style={{ paddingTop: 5, paddingBottom: 5, borderBottomWidth: 1, borderBottomColor: '#E4E4E4' }}>
-                    <Text style={{ fontFamily: 'System', fontSize: 17, fontWeight: '500', fontFamily: 'System', color: '#4A4A4A' }}>{station.name || ' '}</Text>
+                    <Text style={{ fontFamily: 'System', fontSize: 17, fontWeight: '500', color: '#4A4A4A' }}>{station.name || ' '}</Text>
                     <Text style={{ fontFamily: 'System', fontSize: 12, color: '#325d7a', paddingTop: 5, paddingBottom: 5 }}>{station.address || ' '}</Text>
                 </View>
 
                 { station.status == 'CLOSED' && (
-                    <View style={{
-                        padding: 20,
-                        flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                    }}>
+                    <View style={{ padding: 20, justifyContent: 'center', alignItems: 'center' }}>
                         <Text style={{ fontFamily: 'System', fontSize: 12, color: '#e74c3c' }}>Station fermée</Text>
                     </View>
                 )}
 
                 { station.status != 'CLOSED' && (
-                    <View style={{ paddingTop: 10, flex: 1, flexDirection: 'row' }}>
+                    <View style={{ paddingTop: 10, flexDirection: 'row' }}>
                         <View style={{ flex: 1, flexDirection: 'column' }}>
                             <Text style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Vélos Dispos.</Text>
-                            <Text style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: this.getColor(station.available_bike_stands) }}>{station.available_bike_stands !== undefined ? station.available_bike_stands : '-'}</Text>
+                            <Text style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: this.getColor(station.available_bikes) }}>{station.available_bikes !== undefined ? station.available_bikes : '-'}</Text>
                         </View>
                         <View style={{ flex: 1, flexDirection: 'column' }}>
                             <Text style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Places Dispos.</Text>
-                            <Text style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: this.getColor(station.available_bikes) }}>{station.available_bikes !== undefined ? station.available_bikes : '-'}</Text>
+                            <Text style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: this.getColor(station.available_bike_stands) }}>{station.available_bike_stands !== undefined ? station.available_bike_stands : '-'}</Text>
                         </View>
                         <View style={{ paddingRight: 16, width: 32, flex: 1, flexDirection: 'column', alignItems: "flex-end" }}>
                             { station.banking && (<Icon name='ios-card' size={24} color='#7ED321' style={{  }} />) }
@@ -51,27 +47,25 @@ class StationToast extends Component {
                         </View>
                     </View>
                 )}
-
             </View>
         );
     }
 
     getColor(items) {
 
-        let pinColor = 'green';
+        let pinColor = '#2ecc71';
 
         if (items === 0) {
-            pinColor = 'red';
+            pinColor = '#e74c3c';
         } else if (items <= 3) {
-            pinColor = 'orange';
+            pinColor = '#d35400';
         } else if (items <= 5) {
-            pinColor = 'yellow';
+            pinColor = '#f39c12';
         }
 
         return pinColor;
     }
 }
-
 
 reactMixin(StationToast.prototype, NativeMethodsMixin);
 

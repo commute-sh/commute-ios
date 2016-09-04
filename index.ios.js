@@ -114,13 +114,11 @@ class App extends Component {
             outputRange: [70, 10, 0]
         });
 
-
         let messagePrefix = 'Info';
 
         if (this.state.toast.type == 'ERROR') {
             messagePrefix = 'Erreur';
         }
-
 
         return (
             <View style={{ flex: 1 }}>

@@ -23,8 +23,10 @@ import {
 } from 'react-native';
 
 import MapTabScene from './MapTabScene';
+import StationDetailsScene from './StationDetailsScene';
 
 import Icon from 'react-native-vector-icons/Ionicons';
+import EvilIcon from 'react-native-vector-icons/EvilIcons';
 
 import EventEmitter from 'EventEmitter';
 
@@ -62,7 +64,27 @@ export default class MapTab extends Component {
             >
                 <Navigator
                     initialRoute={{id: 'map', title: 'Plan' }}
-                    renderScene={(route, navigator) => <MapTabScene globalEventEmitter={this.props.globalEventEmitter} eventEmitter={this.eventEmitter} />}
+                    renderScene={(route, navigator) => {
+                        if (route.id == 'StationDetails') {
+                            return (
+                                <StationDetailsScene
+                                    globalEventEmitter={this.props.globalEventEmitter}
+                                    eventEmitter={this.eventEmitter}
+                                    station={route.station}
+                                    navigator={navigator}
+                                />
+                            );
+                        } else {
+                            return (
+                                <MapTabScene
+                                    globalEventEmitter={this.props.globalEventEmitter}
+                                    eventEmitter={this.eventEmitter}
+                                    navigator={navigator}
+                                />
+                            );
+                        }
+
+                    }}
                     style={{ flex: 1 }}
                     navigationBar={
                         <Navigator.NavigationBar
@@ -70,9 +92,12 @@ export default class MapTab extends Component {
                                 LeftButton: (route, navigator, index, navState) => {
                                     if(index > 0) {
                                         return (
-                                            <View style={{ paddingTop: 5, paddingRight: 10 }}>
+                                            <View style={{ marginLeft: -4 }}>
                                                 <TouchableHighlight underlayColor="transparent" onPress={() => { if (index > 0) { navigator.pop() } }}>
-                                                    <Text>Back</Text>
+                                                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                                                        <EvilIcon name="chevron-left" size={48} color="white" style={{ width: 36, paddingTop: 2 }} />
+                                                        <Text style={{ color: 'white' }}>Back</Text>
+                                                    </View>
                                                 </TouchableHighlight>
                                             </View>)
                                     }
