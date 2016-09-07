@@ -1,10 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
-import React, {Component, PropTypes } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import {
     Animated,
@@ -28,12 +22,10 @@ import StationDetailsScene from './StationDetailsScene';
 import Icon from 'react-native-vector-icons/Ionicons';
 import EvilIcon from 'react-native-vector-icons/EvilIcons';
 
-import EventEmitter from 'EventEmitter';
 
 export default class MapTab extends Component {
 
     static propTypes = {
-        globalEventEmitter: PropTypes.object,
         selectedTab: PropTypes.string,
         onPress: PropTypes.func
     };
@@ -45,11 +37,7 @@ export default class MapTab extends Component {
     }
 
     onRightButtonPress() {
-        this.eventEmitter.emit('Refresh');
-    }
-
-    componentWillMount() {
-        this.eventEmitter = new EventEmitter();
+        // Do Something
     }
 
     render() {
@@ -68,8 +56,6 @@ export default class MapTab extends Component {
                         if (route.id == 'StationDetails') {
                             return (
                                 <StationDetailsScene
-                                    globalEventEmitter={this.props.globalEventEmitter}
-                                    eventEmitter={this.eventEmitter}
                                     station={route.station}
                                     navigator={navigator}
                                 />
@@ -77,8 +63,6 @@ export default class MapTab extends Component {
                         } else {
                             return (
                                 <MapTabScene
-                                    globalEventEmitter={this.props.globalEventEmitter}
-                                    eventEmitter={this.eventEmitter}
                                     navigator={navigator}
                                 />
                             );

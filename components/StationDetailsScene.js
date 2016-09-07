@@ -26,6 +26,8 @@ import PageControl from 'react-native-page-control';
 
 import { fetchDataByDateAndStationNumber } from '../services/StationService';
 
+import NetworkImage from './NetworkImage';
+
 var screen = require('Dimensions').get('window');
 
 class StationDetailsScene extends Component {
@@ -143,14 +145,19 @@ class StationDetailsScene extends Component {
         const station = this.props.station || { name: ' ', address: ' ' };
 
         const backgroundSourceUri = `https://s3-eu-west-1.amazonaws.com/image-commute-sh/${station.contract_name}-${station.number}-1-${640}-${60}.jpg`;
+        const contractBackgroundSourceUri = `https://s3-eu-west-1.amazonaws.com/image-commute-sh/contracts/${station.contract_name}-1-${640}-${60}.jpg`;
 
         console.log("Photo URL:", backgroundSourceUri);
 
         return (
-            <Image source={{ uri: backgroundSourceUri }} style={{
-                width: screen.width,
-                height: screen.width * 240 / 320,
-            }} />
+            <NetworkImage
+                source={{ uri: backgroundSourceUri }}
+                errorSource={{ uri: contractBackgroundSourceUri }}
+                style={{
+                    width: screen.width,
+                    height: screen.width * 240 / 320,
+                }}
+            />
         );
     }
 
@@ -168,7 +175,7 @@ class StationDetailsScene extends Component {
         console.log("Map URL:", backgroundSourceUri);
 
         return (
-            <Image source={{ uri: backgroundSourceUri }} style={{
+            <NetworkImage source={{ uri: backgroundSourceUri }} style={{
                 width: screen.width,
                 height: screen.width * 240 / 320,
                 flexDirection: 'column',
@@ -191,7 +198,7 @@ class StationDetailsScene extends Component {
                         backgroundColor: 'rgba(0, 0, 0, 0)'
                     }}
                 />
-            </Image>
+            </NetworkImage>
     );
 
     }

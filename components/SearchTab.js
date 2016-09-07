@@ -1,10 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
-import React, {Component, PropTypes } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import {
     Animated,
@@ -28,18 +22,12 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import SearchTabScene from './SearchTabScene';
 
-import EventEmitter from 'EventEmitter';
-
 export default class SearchTab extends Component {
 
     static propTypes = {
         selectedTab: PropTypes.string,
         onPress: PropTypes.func
     };
-
-    componentWillMount() {
-        this.eventEmitter = new EventEmitter();
-    }
 
     render() {
         return (
@@ -55,11 +43,7 @@ export default class SearchTab extends Component {
                     renderScene={(route, navigator) => {
                         if (route.id == 'StationSearch') {
                             return (
-                                <SearchTabScene
-                                    globalEventEmitter={this.props.globalEventEmitter}
-                                    eventEmitter={this.eventEmitter}
-                                    navigator={navigator}
-                                />
+                                <SearchTabScene navigator={navigator} />
                             );
                         }
 

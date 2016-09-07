@@ -1,9 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
 import React, {Component, PropTypes } from 'react';
 
 import {
@@ -24,8 +18,6 @@ import {
 
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import EventEmitter from 'EventEmitter';
-
 export default class FavoriteTab extends Component {
 
     static propTypes = {
@@ -40,11 +32,7 @@ export default class FavoriteTab extends Component {
     }
 
     onRightButtonPress() {
-        this.eventEmitter.emit('Refresh');
-    }
-
-    componentWillMount() {
-        this.eventEmitter = new EventEmitter();
+        // Do Something
     }
 
     render() {
@@ -90,7 +78,6 @@ export default class FavoriteTab extends Component {
                 />
 
             </Icon.TabBarItemIOS>
-
         );
     }
 
