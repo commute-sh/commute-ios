@@ -13,8 +13,6 @@ import Commute from './commute';
 import thunk from 'redux-thunk';
 import createLogger from 'redux-logger';
 
-import EventEmitter from 'EventEmitter';
-
 let middleware = applyMiddleware(thunk, createLogger());
 
 let store = createStore(reducers, {}, middleware);
@@ -22,17 +20,10 @@ let store = createStore(reducers, {}, middleware);
 
 class App extends Component {
 
-
-    constructor(props) {
-        super(props);
-
-        this.eventEmitter = new EventEmitter();
-    }
-
     render() {
         return (
             <Provider store={store}>
-                <Commute eventEmitter={this.eventEmitter} />
+                <Commute />
             </Provider>
         );
     }

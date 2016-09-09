@@ -4,17 +4,16 @@ import axios from 'axios';
 import { notifyError } from './toast'
 
 export function receiveStations(stations, position, distance, contractName) {
-    return (dispatch, state) => {
-        dispatch({
-            type: constants.RECEIVE_STATIONS,
-            payload: { stations, position, distance, contractName }
-        })
-    }
+    return {
+        type: constants.RECEIVE_STATIONS,
+        payload: { stations, position, distance, contractName }
+    };
 }
 
-export function fetchStationsRequest() {
+export function fetchStationsRequest(search) {
     return {
-        type: constants.FETCH_STATIONS_REQUEST
+        type: constants.FETCH_STATIONS_REQUEST,
+        payload: { search }
     }
 }
 
@@ -27,7 +26,7 @@ export function fetchStationsFailed(err) {
 
 export function fetchStations(position, distance = 1000, contractName = 'Paris') {
     return (dispatch, state) => {
-        dispatch(fetchStationsRequest());
+        dispatch(fetchStationsRequest({ position, distance, contractName }));
 
         const start = moment();
         let url = `http://api.commute.sh/stations/nearby?lat=${position.latitude}&lng=${position.longitude}&distance=${distance}&city=${contractName}`;

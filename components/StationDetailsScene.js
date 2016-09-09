@@ -36,11 +36,13 @@ class StationDetailsScene extends Component {
         super(props);
 
         this.state = {
-            currentPage: 0
+            currentPage: 0,
+            dataToShow: 'AVAILABLE_BIKES'
         };
 
         this.onScroll = this.onScroll.bind(this);
         this.onItemTap = this.onItemTap.bind(this);
+        this.onChartPress = this.onChartPress.bind(this);
     }
 
     render() {
@@ -250,7 +252,6 @@ class StationDetailsScene extends Component {
 
     renderHistory() {
 
-        const showMax = true;
         const station = this.props.station;
 
         console.log("this.state.data:", this.state.data);
@@ -272,7 +273,7 @@ class StationDetailsScene extends Component {
             // console.log('Date:', d.time.toDate());
             return d.time.toDate();
         };
-        if (showMax) {
+        if (this.state.dataToShow === 'AVAILABLE_BIKES') {
             graphProps.yAccessor = (d) => {
                 // console.log('d.available_bikes:', d.available_bikes);
                 return d.available_bikes;
@@ -285,13 +286,36 @@ class StationDetailsScene extends Component {
             <View style={{ padding: 20 }}>
                 <ArtChart
                     icon="ios-bicycle"
-                    title="Vélos disponibles"
-                    titleValue={station.available_bikes}
-                    subTitle={"Moyenne journalière: " + "nc"}
+                    title={ this.state.dataToShow === 'AVAILABLE_BIKES' ? "Vélos disponibles" : "Places disponibles" }
+                    titleValue={ this.state.dataToShow === 'AVAILABLE_BIKES' ? station.available_bikes : station.available_bike_stands }
+                    subTitle={ "Moyenne journalière: " + "nc" }
                     subTitleValue="Aujourd'hui"
-                    {...graphProps} />
+                    linearGradients={
+                        this.state.dataToShow === 'AVAILABLE_BIKES' ? {
+                            '0': 'rgba(251,179,116,1)',
+                            '0.25': 'rgba(251,179,116,0.5)',
+                            '1': 'rgba(251,179,116,0)'
+                        } : {
+                            '0': 'rgba(71, 202, 238, 1)',
+                            '0.25': 'rgba(71, 202, 238, 0.5)',
+                            '1': 'rgba(71, 202, 238, 0)'
+                        }
+                    }
+                    linearGradientColors={
+                        this.state.dataToShow === 'AVAILABLE_BIKES' ?
+                            [ "#fb9757", "#fc6040", "#fb412b" ] :
+                            [ "#4295ff", "#2165c6", "#053a9a" ]
+                    }
+                    onPress={this.onChartPress}
+                    {...graphProps}
+                />
             </View>
         );
+    }
+
+    onChartPress() {
+        console.log("On Chart Click:", this.state.dataToShow);
+        this.setState({ dataToShow: this.state.dataToShow === 'AVAILABLE_BIKES' ? 'AVAILABLE_BIKE_STANDS' : 'AVAILABLE_BIKES' });
     }
 
     fetchHistory(station) {

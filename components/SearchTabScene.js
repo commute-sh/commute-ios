@@ -14,7 +14,9 @@ import {
     ListView,
     StyleSheet,
     Text,
-    View
+    View,
+    TouchableHighlight,
+    RefreshControl
 } from 'react-native';
 
 import SearchBar from 'react-native-search-bar';
@@ -33,10 +35,21 @@ class SearchTabScene extends Component {
         super(props);
 
         this.state = {
-            dataSource: this.props.dataSource.cloneWithRows([])
+            dataSource: this.props.dataSource.cloneWithRows([]),
+            highlightedRow: {
+                sectionID: undefined,
+                rowID: undefined
+            }
         };
 
-        this.onSearch = this.onSearch.bind(this);
+        this.onChangeText = this.onChangeText.bind(this);
+        this.onCancelButtonPress = this.onCancelButtonPress.bind(this);
+        this.onSearchButtonPress = this.onSearchButtonPress.bind(this);
+        this.pressRowIn = this.pressRowIn.bind(this);
+        this.pressRowOut = this.pressRowOut.bind(this);
+        this.pressRow = this.pressRow.bind(this);
+        this.renderRow = this.renderRow.bind(this);
+        this.onRefresh = this.onRefresh.bind(this);
     }
 
     componentDidMount() {
@@ -61,7 +74,7 @@ class SearchTabScene extends Component {
             this.setState({
                 dataSource: !this.state.searchText ?
                     nextProps.dataSource.cloneWithRows(stations.data) :
-                    nextProps.dataSource.cloneWithRows(stations.data.filter(station => station.name.indexOf(this.state.searchText) >= 0))
+                    nextProps.dataSource.cloneWithRows(stations.data.filter(station => station.name.search(new RegExp(this.state.searchText, "i")) >= 0))
             });
         }
     }
@@ -99,45 +112,97 @@ class SearchTabScene extends Component {
         return (
             <View style={{ flex: 1 }}>
                 <SearchBar placeholder="Search"
+                           ref="searchBar"
                            style={{ marginTop: 64, height: 44, backgroundColor: 'green' }}
-                           onChangeText={this.onSearch}
-                           onSearchButtonPress={this.onSearch}
+                           onChangeText={this.onChangeText}
+                           enablesReturnKeyAutomatically={true}
+                           onSearchButtonPress={this.onSearchButtonPress}
+                           onCancelButtonPress={this.onCancelButtonPress}
                 />
                 <ListView style={{ backgroundColor: 'white' }}
                           dataSource={this.state.dataSource}
                           automaticallyAdjustContentInsets={false}
                           enableEmptySections={true}
-                          renderRow={(station) => this.renderRow(station)}
+                          renderRow={this.renderRow}
+                          keyboardDismissMode="on-drag"
+                          refreshControl={
+                              <RefreshControl refreshing={this.props.stations.isFetching} onRefresh={this.onRefresh} />
+                          }
                 />
             </View>
         )
     }
 
-    onSearch(value) {
+    onChangeText(value) {
+        this.updateSearch(value);
+    }
 
+    onCancelButtonPress() {
+        this.refs.searchBar.blur();
+    }
+
+    onSearchButtonPress(value) {
+        this.refs.searchBar.blur();
+        this.updateSearch(value);
+    }
+
+    updateSearch(value) {
         this.setState({
             searchText: value,
             dataSource: !value ?
                 this.props.dataSource.cloneWithRows(this.props.stations.data) :
-                this.props.dataSource.cloneWithRows(this.props.stations.data.filter(station => station.name.indexOf(value) >= 0))
+                this.props.dataSource.cloneWithRows(this.props.stations.data.filter(station => station.name.search(new RegExp(this.state.searchText, "i")) >= 0))
         });
     }
 
-    renderRow(station) {
-        console.log('station:', station);
+    renderRow(station, sectionID, rowID, highlightRow) {
         const backgroundSourceUri = `https://s3-eu-west-1.amazonaws.com/image-commute-sh/${station.contract_name}-${station.number}-1-${640}-${60}.jpg`;
 
-        console.log("Photo URL:", backgroundSourceUri);
+        const rowPress = sectionID === this.state.highlightedRow.sectionID && rowID === this.state.highlightedRow.rowID;
+
+        console.log("--- Row[sectionID: ", sectionID, "/", this.state.highlightedRow.sectionID , ", rowID:", rowID, "/", this.state.highlightedRow.rowID , "] is Pressed:", rowPress);
 
         return (
-            <View style={{ height: 64, flexDirection: 'row' }}>
-                <Image defaultSource={require('../images/map_placeholder.jpg')} source={{ uri: backgroundSourceUri }} style={{ width: 96, height: 64 }} />
-                <View style={{ padding: 10, flexDirection: 'column' }}>
-                    <Text style={{ fontFamily: 'System', fontSize: 14, fontWeight: '500' }}>{station.name}</Text>
-                    <Text  style={{ fontFamily: 'System', fontSize: 11, fontWeight: '500', color: 'white' }}>{station.address}</Text>
+            <TouchableHighlight onPressIn={() => {
+                this.pressRowIn(sectionID, rowID);
+                highlightRow(sectionID, rowID);
+            }} onPressOut={() => {
+                this.pressRowOut(sectionID, rowID);
+            }} onPress={() => {
+                this.pressRow(sectionID, rowID);
+                highlightRow(null);
+            }}>
+                <View style={{ flexDirection: 'row', padding: 10 }}>
+                    <Image defaultSource={require('../images/map_placeholder.jpg')} source={{ uri: backgroundSourceUri }} style={{ width: 96, height: 64 }} />
+                    <View style={{ flexDirection: 'column', flex: 1, paddingLeft: 10 }}>
+                        <Text style={{ fontFamily: 'System', fontSize: 14, fontWeight: '500', color: rowPress ? '#fff' : '#000' }}>{station.name}</Text>
+                        <Text  style={{ fontFamily: 'System', fontSize: 11, fontWeight: '500', color: rowPress ? '#fff' : '#000' }}>{station.address}</Text>
+                    </View>
                 </View>
-            </View>
+            </TouchableHighlight>
         );
+    }
+
+    onRefresh() {
+        const search = this.props.stations.search;
+        if (search) {
+            this.props.actions.fetchStations(search.position, search.distance, search.contractName);
+        }
+    }
+
+    pressRowIn(sectionID, rowID) {
+        console.log("--- On Row pressed In [sectionID: ", sectionID, ", rowID:", rowID, "]");
+        this.setState({ highlightedRow: { sectionID: sectionID, rowID: rowID } });
+    }
+
+    pressRowOut(sectionID, rowID) {
+        console.log("--- On Row pressed Out [sectionID: ", sectionID, ", rowID:", rowID, "]");
+        this.setState({ highlightedRow: { sectionID: undefined, rowID: undefined } });
+    }
+
+    pressRow(sectionID, rowID) {
+        console.log("--- On Row pressed [sectionID: ", sectionID, ", rowID:", rowID, "]");
+        this.props.navigator.push({ id: 'StationDetails', station: this.props.stations.data[rowID] });
     }
 
 }

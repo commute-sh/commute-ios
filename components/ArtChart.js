@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { ART, Dimensions, LayoutAnimation, StyleSheet, Text, View } from 'react-native';
+import { ART, Dimensions, LayoutAnimation, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import _ from 'lodash';
 
 const { Group, Shape, Surface, LinearGradient } = ART;
@@ -51,7 +51,8 @@ export default class ArtChart extends Component {
         subTitleStyle: PropTypes.object,
         subTitleValueStyle: PropTypes.object,
         headerStyle: PropTypes.object,
-        linearGrandientColors: PropTypes.array
+        linearGradientColors: PropTypes.array,
+        onPress: PropTypes.func.isRequired
 
     };
 
@@ -232,24 +233,24 @@ export default class ArtChart extends Component {
         const { graphWidth, graphHeight, linePath, ticks, allTicks } = this.state;
 
         return (
-            <RNLinearGradient colors={this.props.linearGradientColors} style={{ borderRadius: 5, borderWidth: 0 }}>
+            <TouchableOpacity onPress={this.props.onPress}>
+                <RNLinearGradient colors={this.props.linearGradientColors} style={{ borderRadius: 5, borderWidth: 0 }}>
+                    <View style={{ paddingLeft: 15, paddingRight: 15, paddingTop: 5, paddingBottom: 5 }}>
+                        {this.renderHeader()}
+                    </View>
 
-                <View style={{ paddingLeft: 15, paddingRight: 15, paddingTop: 5, paddingBottom: 5 }}>
-                    {this.renderHeader()}
-                </View>
-
-                <View style={{
-                    width: this.props.width,
-                    height: this.props.height + 10,
-                    padding: this.props.paddingSize
-                }}>
-                    {this.renderChart(linePath, graphWidth, graphHeight)}
-                    {this.renderTicksX(ticks)}
-                    {this.renderTicksY(allTicks, yAccessor)}
-                    {this.renderTickDots(allTicks)}
-                </View>
-
-            </RNLinearGradient>
+                    <View style={{
+                        width: this.props.width,
+                        height: this.props.height + 10,
+                        padding: this.props.paddingSize
+                    }}>
+                        {this.renderChart(linePath, graphWidth, graphHeight)}
+                        {this.renderTicksX(ticks)}
+                        {this.renderTicksY(allTicks, yAccessor)}
+                        {this.renderTickDots(allTicks)}
+                    </View>
+                </RNLinearGradient>
+            </TouchableOpacity>
         );
     }
 

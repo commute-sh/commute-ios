@@ -51,7 +51,7 @@ export default class MapTab extends Component {
                 onPress={this.props.onPress}
             >
                 <Navigator
-                    initialRoute={{id: 'map', title: 'Plan' }}
+                    initialRoute={{id: 'Map', title: 'Plan' }}
                     renderScene={(route, navigator) => {
                         if (route.id == 'StationDetails') {
                             return (
@@ -60,7 +60,7 @@ export default class MapTab extends Component {
                                     navigator={navigator}
                                 />
                             );
-                        } else {
+                        } else if (route.id === 'Map') {
                             return (
                                 <MapTabScene
                                     navigator={navigator}

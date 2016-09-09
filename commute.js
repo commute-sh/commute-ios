@@ -30,10 +30,6 @@ let windowHeight = Dimensions.get('window').height;
 
 class Commute extends Component {
 
-    static propTypes = {
-      eventEmitter: PropTypes.object
-    };
-
     constructor(props) {
         super(props);
 
@@ -87,8 +83,8 @@ class Commute extends Component {
     renderTabs() {
         return (
             <TabBarIOS style={{ zIndex: 1 }}>
-                <MapTab globalEventEmitter={this.eventEmitter} selectedTab={this.state.selectedTab} onPress={this.onTabIconPress.bind(this, 'map')} />
-                <FavoriteTab globalEventEmitter={this.eventEmitter} selectedTab={this.state.selectedTab} onPress={this.onTabIconPress.bind(this, 'favorites')} />
+                <MapTab selectedTab={this.state.selectedTab} onPress={this.onTabIconPress.bind(this, 'map')} />
+                <FavoriteTab selectedTab={this.state.selectedTab} onPress={this.onTabIconPress.bind(this, 'favorites')} />
                 <SearchTab selectedTab={this.state.selectedTab} onPress={this.onTabIconPress.bind(this, 'search')} />
             </TabBarIOS>
         );
