@@ -14,11 +14,9 @@ import Morph from 'art/morph/path';
 
 import * as graphUtils from './graph-utils';
 
-import Color from '../services/color';
-
 const dimensionWindow = Dimensions.get('window');
 
-export default class ArtChart extends Component {
+export default class LineChart extends Component {
 
     static propTypes = {
         data: PropTypes.array.isRequired,
@@ -59,9 +57,9 @@ export default class ArtChart extends Component {
     static defaultProps = {
         width: Math.round(dimensionWindow.width * 0.9),
         height: Math.round(dimensionWindow.height * 0.5),
-        strokeColor: Color.White,
+        strokeColor: '#fff',
         strokeWidth: 2,
-        iconColor: Color.White,
+        iconColor: '#fff',
         iconSize: 32,
         backgroundColor: "rgba(0, 0, 0, 0)",
         title: 'Title',

@@ -2,10 +2,12 @@ import React, { Component, PropTypes } from 'react';
 import {
     MapView,
     View,
-    SegmentedControlIOS
+    Button,
+    SegmentedControlIOS,
+    TouchableOpacity
 } from 'react-native';
 
-import FaIcon from 'react-native-vector-icons/FontAwesome';
+import IconButton from './IconButton';
 
 export default class Map extends Component {
 
@@ -161,7 +163,7 @@ export default class Map extends Component {
 
         return (
             <View style={{ flex: 1 }}>
-                <View style={{ zIndex: 100, position: 'absolute', left: 0, right: 0, bottom: 64 }}>
+                <View style={{ zIndex: 100, position: 'absolute', left: 24, right: 24, bottom: 72 }}>
                     <View style={{
                         flex: 1,
                         flexDirection: 'row',
@@ -175,33 +177,9 @@ export default class Map extends Component {
                             tintColor="#325d7a"
                             onChange={this.onChange}
                         />
-
-                        <View style={{
-                            position: 'absolute',
-                            right: 24,
-                            top: 0
-                        }}>
-                            <FaIcon.Button
-                                name="location-arrow"
-                                size={20}
-                                color="white"
-                                onPress={this.onCenterOnLocation}
-                                style={{
-                                    backgroundColor: '#325d7a',
-                                    borderRadius: 5,
-                                    paddingTop: 3,
-                                    paddingBottom: 3,
-                                    paddingLeft: 5,
-                                    paddingRight: 5
-                                }}
-                                iconStyle={{
-                                    marginRight: 0
-                                }}
-                            />
-                        </View>
-
                     </View>
                 </View>
+                <IconButton iconName="location-arrow" onPress={this.onCenterOnLocation} style={{ zIndex: 100, position: 'absolute', right: 24, bottom: 64 }} />
                 <MapView
                     style={{ flex: 1, zIndex: 2 }}
                     showsUserLocation={true}

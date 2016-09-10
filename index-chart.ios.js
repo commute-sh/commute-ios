@@ -21,7 +21,7 @@ import { fetchDataByDateAndStationNumber } from './services/StationService';
 
 import moment from 'moment';
 
-import ArtChart from './components/ArtChart';
+import LineChart from './components/LineChart';
 
 var screen = require('Dimensions').get('window');
 
@@ -82,7 +82,7 @@ class App extends Component {
 
         return (
             <View style={{ padding: 20 }}>
-                <ArtChart
+                <LineChart
                     icon="ios-bicycle"
                     title="Vélos disponibles"
                     titleValue={2}

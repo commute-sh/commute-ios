@@ -35,12 +35,7 @@ export function fetchStations(position, distance = 1000, contractName = 'Paris')
 
         return axios.get(url, {
             timeout: 30000,
-            headers: {
-                'Accept': 'application/json'
-            },
-            validateStatus: function (status) {
-                return status >= 200 && status < 300; // default
-            }
+            headers: { 'Accept': 'application/json' }
         }).then(response => {
 
             let data = response.data;

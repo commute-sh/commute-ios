@@ -21,12 +21,17 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import moment from 'moment';
 
-import ArtChart from './ArtChart';
+import LineChart from './LineChart';
 import PageControl from 'react-native-page-control';
 
 import { fetchDataByDateAndStationNumber } from '../services/StationService';
 
 import NetworkImage from './NetworkImage';
+
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+
+import * as locationActionCreators from '../actions/location'
 
 var screen = require('Dimensions').get('window');
 
@@ -45,6 +50,21 @@ class StationDetailsScene extends Component {
         this.onChartPress = this.onChartPress.bind(this);
     }
 
+    componentDidMount() {
+        this.fetchHistory(this.props.station);
+        this.updateDistance(this.props.geoLocation, this.props.station);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.updateDistance(nextProps.geoLocation, nextProps.station);
+    }
+
+    updateDistance(geoLocation, station) {
+        if (geoLocation && station) {
+            this.setState({ distance: (geoLocation.distanceTo(station.geoLocation, true) * 1000).toFixed(0) });
+        }
+    }
+
     render() {
         console.log('--- [StationDetailsScene] Render -------------------------------------------------------------------------------------');
 
@@ -60,10 +80,6 @@ class StationDetailsScene extends Component {
                 </View>
             </View>
         );
-    }
-
-    componentDidMount() {
-        this.fetchHistory(this.props.station);
     }
 
     getPinColor() {
@@ -232,15 +248,23 @@ class StationDetailsScene extends Component {
                         borderBottomWidth: 1,
                         borderBottomColor: '#E4E4E4'
                     }}>
-                        <View style={{ flex: 1, flexDirection: 'column' }}>
+                        <View style={{ flex: 0.6, flexDirection: 'column' }}>
                             <Text style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Vélos Dispos.</Text>
                             <Text style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: this.getColor(station.available_bikes) }}>{station.available_bikes !== undefined ? station.available_bikes : '-'}</Text>
                         </View>
-                        <View style={{ flex: 1, flexDirection: 'column' }}>
+                        <View style={{ flex: 0.6, flexDirection: 'column', paddingLeft: 20 }}>
                             <Text style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Places Dispos.</Text>
                             <Text style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: this.getColor(station.available_bike_stands) }}>{station.available_bike_stands !== undefined ? station.available_bike_stands : '-'}</Text>
                         </View>
-                        <View style={{ paddingRight: 16, width: 32, flex: 1, flexDirection: 'column', alignItems: "flex-end" }}>
+                        <View style={{ flex: 0.6, flexDirection: 'column', paddingLeft: 20 }}>
+                            <Text style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Distance</Text>
+
+                            <Text numberOfLines={1} style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: '#000' }}>
+                                {this.state.distance !== undefined ? (this.state.distance >= 1000 ? (this.state.distance / 1000).toFixed(1) : this.state.distance) : '-'}
+                                <Text style={{ fontSize: 20 }}>{this.state.distance !== undefined ? (this.state.distance >= 1000 ? ' km' : ' m') : ''}</Text>
+                            </Text>
+                        </View>
+                        <View style={{ paddingRight: 16, width: 48, flexDirection: 'column', alignItems: "flex-end" }}>
                             { station.banking && (<Icon name='ios-card' size={24} color='#7ED321' style={{  }} />) }
                             { station.bonus && (<Icon name='ios-thumbs-up-outline' size={24} color='#50E3C2' style={{  }} />) }
                         </View>
@@ -284,7 +308,7 @@ class StationDetailsScene extends Component {
 
         return (
             <View style={{ padding: 20 }}>
-                <ArtChart
+                <LineChart
                     icon="ios-bicycle"
                     title={ this.state.dataToShow === 'AVAILABLE_BIKES' ? "Vélos disponibles" : "Places disponibles" }
                     titleValue={ this.state.dataToShow === 'AVAILABLE_BIKES' ? station.available_bikes : station.available_bike_stands }
@@ -350,4 +374,20 @@ var styles = EStyleSheet.create({
 // calculate styles
 EStyleSheet.build();
 
-export default StationDetailsScene;
+
+const mapStateToProps = (state) => Object.assign({}, {
+    position: state.location.position,
+    geoLocation: state.location.geoLocation
+});
+
+const mapDispatchToProps = (dispatch) => ({
+    actions: bindActionCreators(
+        Object.assign({}, locationActionCreators),
+        dispatch
+    )
+});
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(StationDetailsScene);

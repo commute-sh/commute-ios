@@ -26,6 +26,9 @@ import { bindActionCreators } from 'redux'
 
 import * as toastActionCreators from './actions/toast'
 
+import { initGeoLocation, disposeGeoLocation } from './actions/location';
+
+
 let windowHeight = Dimensions.get('window').height;
 
 class Commute extends Component {
@@ -38,6 +41,15 @@ class Commute extends Component {
         this.state = {
             selectedTab: 'map'
         };
+    }
+
+    componentWillMount() {
+        const { dispatch } = this.props;
+        this.watchID = initGeoLocation(dispatch);
+    }
+
+    componentWillUnmount() {
+        disposeGeoLocation(this.watchID);
     }
 
     onTabIconPress(selectedTab) {
@@ -132,6 +144,7 @@ const mapStateToProps = (state) => Object.assign({}, {
 });
 
 const mapDispatchToProps = (dispatch) => ({
+    dispatch: dispatch,
     actions: bindActionCreators(
         Object.assign({}, toastActionCreators),
         dispatch

@@ -10,6 +10,7 @@
 #import <UIKit/UIKit.h>
 #import "CTAnnotationView.h"
 #import "RCTConvert.h"
+#import "RCTFont.h"
 
 @implementation CTAnnotationView
 
@@ -45,7 +46,7 @@
     NSMutableParagraphStyle* style = [[NSMutableParagraphStyle alloc] init];
     [style setAlignment:NSTextAlignmentCenter];
     
-    UIFont * font = [RCTConvert UIFont: [UIFont fontWithName:@"System" size: self.fontSize] withWeight: self.fontWeight];
+    UIFont * font = [RCTFont updateFont: [UIFont fontWithName:@"System" size: self.fontSize] withWeight: self.fontWeight];
     
     NSDictionary *textAttributes = @{
                                      NSFontAttributeName: font,

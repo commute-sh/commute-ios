@@ -85,14 +85,16 @@ export default class MapTab extends Component {
                                                 </TouchableHighlight>
                                             </View>)
                                     }
-                                    else { return null }
+                                    else {
+                                        return (null);
+                                    }
                                 },
                                 RightButton: (route, navigator, index, navState) =>
-                                    <View style={{ paddingTop: 0, paddingRight: 16 }}>
+{ return null /*                                    <View style={{ paddingTop: 0, paddingRight: 16 }}>
                                         <TouchableHighlight underlayColor="transparent" onPress={this.onRightButtonPress}>
-                                            <Icon name="ios-more-outline" size={40} color="white" />
+                                            <Icon name="ios-refresh-outline" size={40} color="white" />
                                         </TouchableHighlight>
-                                    </View>
+                                    </View>*/}
                                 ,
                                 Title: (route, navigator, index, navState) =>
                                     <View style={{ paddingTop: 2 }}>

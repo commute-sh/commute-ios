@@ -24,7 +24,7 @@ import EvilIcon from 'react-native-vector-icons/EvilIcons';
 import SearchTabScene from './SearchTabScene';
 import StationDetailsScene from './StationDetailsScene';
 
-export default class SearchTab extends Component {
+class SearchTab extends Component {
 
     static propTypes = {
         selectedTab: PropTypes.string,

@@ -11,7 +11,38 @@ import reactMixin from 'react-mixin';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+
+import * as locationActionCreators from '../actions/location'
+
 class StationToast extends Component {
+
+    static propTypes = {
+
+    };
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            distance: undefined
+        };
+    }
+
+    componentDidMount() {
+        this.updateDistance(this.props.geoLocation, this.props.station);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.updateDistance(nextProps.geoLocation, nextProps.station);
+    }
+
+    updateDistance(geoLocation, station) {
+        if (geoLocation && station) {
+            this.setState({ distance: (geoLocation.distanceTo(station.geoLocation, true) * 1000).toFixed(0) });
+        }
+    }
 
     render() {
         console.log('--- [StationToast] Render -------------------------------------------------------------------------------------');
@@ -33,15 +64,23 @@ class StationToast extends Component {
 
                 { station.status != 'CLOSED' && (
                     <View style={{ paddingTop: 10, flexDirection: 'row' }}>
-                        <View style={{ flex: 1, flexDirection: 'column' }}>
+                        <View style={{ flex: 0.6, flexDirection: 'column' }}>
                             <Text style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Vélos Dispos.</Text>
                             <Text style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: this.getColor(station.available_bikes) }}>{station.available_bikes !== undefined ? station.available_bikes : '-'}</Text>
                         </View>
-                        <View style={{ flex: 1, flexDirection: 'column' }}>
+                        <View style={{ flex: 0.6, flexDirection: 'column', paddingLeft: 20 }}>
                             <Text style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Places Dispos.</Text>
                             <Text style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: this.getColor(station.available_bike_stands) }}>{station.available_bike_stands !== undefined ? station.available_bike_stands : '-'}</Text>
                         </View>
-                        <View style={{ paddingRight: 16, width: 32, flex: 1, flexDirection: 'column', alignItems: "flex-end" }}>
+                        <View style={{ flex: 1, flexDirection: 'column', paddingLeft: 20 }}>
+                            <Text style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Distance</Text>
+
+                            <Text numberOfLines={1} style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: '#000' }}>
+                                {this.state.distance !== undefined ? (this.state.distance >= 1000 ? (this.state.distance / 1000).toFixed(1) : this.state.distance) : '-'}
+                                <Text style={{ fontSize: 20 }}>{this.state.distance !== undefined ? (this.state.distance >= 1000 ? ' km' : ' m') : ''}</Text>
+                            </Text>
+                        </View>
+                        <View style={{ paddingRight: 16, width: 48, flexDirection: 'column', alignItems: "flex-end" }}>
                             { station.banking && (<Icon name='ios-card' size={24} color='#7ED321' style={{  }} />) }
                             { station.bonus && (<Icon name='ios-thumbs-up-outline' size={24} color='#50E3C2' style={{  }} />) }
                         </View>
@@ -69,5 +108,20 @@ class StationToast extends Component {
 
 reactMixin(StationToast.prototype, NativeMethodsMixin);
 
-export default StationToast;
 
+const mapStateToProps = (state) => Object.assign({}, {
+    position: state.location.position,
+    geoLocation: state.location.geoLocation
+});
+
+const mapDispatchToProps = (dispatch) => ({
+    actions: bindActionCreators(
+        Object.assign({}, locationActionCreators),
+        dispatch
+    )
+});
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(StationToast);

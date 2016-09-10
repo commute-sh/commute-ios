@@ -18,7 +18,7 @@ import {
 
 import Icon from 'react-native-vector-icons/Ionicons';
 
-export default class FavoriteTab extends Component {
+class FavoriteTab extends Component {
 
     static propTypes = {
         selectedTab: PropTypes.string,
@@ -83,4 +83,4 @@ export default class FavoriteTab extends Component {
 
 }
 
-export default FavoriteTab
+export default FavoriteTab;
