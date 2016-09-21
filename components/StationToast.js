@@ -16,6 +16,10 @@ import { bindActionCreators } from 'redux'
 
 import * as locationActionCreators from '../actions/location'
 
+import moment from 'moment'
+
+import { getColor } from '../utils';
+
 class StationToast extends Component {
 
     static propTypes = {
@@ -52,7 +56,7 @@ class StationToast extends Component {
         return (
             <View style={{ flex: 1, paddingLeft: 16, paddingTop: 5, paddingBottom: 5 }}>
                 <View style={{ paddingTop: 5, paddingBottom: 5, borderBottomWidth: 1, borderBottomColor: '#E4E4E4' }}>
-                    <Text style={{ fontFamily: 'System', fontSize: 17, fontWeight: '500', color: '#4A4A4A' }}>{station.name || ' '}</Text>
+                    <Text style={{ fontFamily: 'System', fontSize: 17, fontWeight: '500', color: '#4A4A4A' }}>{station.number || ' '} - {station.name || ' '}</Text>
                     <Text style={{ fontFamily: 'System', fontSize: 12, color: '#325d7a', paddingTop: 5, paddingBottom: 5 }}>{station.address || ' '}</Text>
                 </View>
 
@@ -66,11 +70,11 @@ class StationToast extends Component {
                     <View style={{ paddingTop: 10, flexDirection: 'row' }}>
                         <View style={{ flex: 0.6, flexDirection: 'column' }}>
                             <Text style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Vélos Dispos.</Text>
-                            <Text style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: this.getColor(station.available_bikes) }}>{station.available_bikes !== undefined ? station.available_bikes : '-'}</Text>
+                            <Text style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: getColor(station.available_bikes) }}>{station.available_bikes !== undefined ? station.available_bikes : '-'}</Text>
                         </View>
                         <View style={{ flex: 0.6, flexDirection: 'column', paddingLeft: 20 }}>
                             <Text style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Places Dispos.</Text>
-                            <Text style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: this.getColor(station.available_bike_stands) }}>{station.available_bike_stands !== undefined ? station.available_bike_stands : '-'}</Text>
+                            <Text style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: getColor(station.available_bike_stands) }}>{station.available_bike_stands !== undefined ? station.available_bike_stands : '-'}</Text>
                         </View>
                         <View style={{ flex: 1, flexDirection: 'column', paddingLeft: 20 }}>
                             <Text style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Distance</Text>
@@ -86,24 +90,30 @@ class StationToast extends Component {
                         </View>
                     </View>
                 )}
+
+                <Text style={{ fontFamily: 'System', fontSize: 12, color: '#9A9A9A', textAlign: 'center', padding: 5 }}>
+                    {this.renderUpdateDate()}
+                </Text>
             </View>
         );
     }
 
-    getColor(items) {
+    renderUpdateDate() {
+        const station = this.props.station;
 
-        let pinColor = '#2ecc71';
-
-        if (items === 0) {
-            pinColor = '#e74c3c';
-        } else if (items <= 3) {
-            pinColor = '#d35400';
-        } else if (items <= 5) {
-            pinColor = '#f39c12';
+        if (!station) {
+            return undefined;
         }
 
-        return pinColor;
+        if (moment().startOf('day').isSame(moment(station.last_update).startOf('day'))) {
+            return `Mis à jour à ${moment(station.last_update).format("HH:mm")}`;
+        } else if (moment().subtract(1, 'days').startOf('day').isSame(moment(station.last_update).startOf('day'))) {
+            return `Mis à jour hier à ${moment(station.last_update).format("HH:mm")}`;
+        } else {
+            return `Mis à jour le ${moment(station.last_update).format("DD/MM/YYYY")} à ${moment(station.last_update).format("HH:mm")}`;
+        }
     }
+
 }
 
 reactMixin(StationToast.prototype, NativeMethodsMixin);

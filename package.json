@@ -25,7 +25,9 @@
     "react-chartist": "^0.10.2",
     "react-mixin": "^3.0.5",
     "react-native": "^0.33.0",
+    "react-native-animated-swipeout": "^2.0.14",
     "react-native-blur": "^1.0.1",
+    "react-native-drop-refresh": "^2.1.0",
     "react-native-extended-stylesheet": "^0.3.0",
     "react-native-linear-gradient": "^1.5.12",
     "react-native-page-control": "^1.0.7",
@@ -38,7 +40,8 @@
     "redux": "^3.6.0",
     "redux-logger": "^2.6.1",
     "redux-thunk": "^2.1.0",
-    "stream": "0.0.2"
+    "stream": "0.0.2",
+    "undefined": "^0.1.0"
   },
   "devDependencies": {
     "flow-bin": "^0.32.0"

@@ -14,7 +14,8 @@ import {
     Text,
     View,
     Image,
-    Dimensions
+    Dimensions,
+    NetInfo
 } from 'react-native';
 
 import MapTab from './components/MapTab';
@@ -25,9 +26,13 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
 import * as toastActionCreators from './actions/toast'
+import * as stationActionCreators from './actions/stations'
 
 import { initGeoLocation, disposeGeoLocation } from './actions/location';
+import { initFavoriteStations } from './actions/favoriteStations';
+import { fetchStations } from './actions/stations';
 
+import moment from 'moment';
 
 let windowHeight = Dimensions.get('window').height;
 
@@ -44,8 +49,31 @@ class Commute extends Component {
     }
 
     componentWillMount() {
+
         const { dispatch } = this.props;
+        initFavoriteStations(dispatch);
         this.watchID = initGeoLocation(dispatch);
+
+        const self = this;
+
+        NetInfo.addEventListener('change', (reach) => {
+            console.log('[Commute] Net state change: ' + reach);
+
+            if (!self.props.stations.isFetching && reach !== 'none' && self.props.location.position && moment(self.props.stations.lastUpdate).add(5, 'minutes').isBefore(moment())) {
+                console.log("[Commute] Loading stations as last update (", self.props.stations.lastUpdate.format('YYYY-MM-dd HH:mm:ss'), ") was at least 5 minutes before now and server is reachable");
+                dispatch(fetchStations(self.props.location.position));
+            } else {
+                if (self.props.stations.isFetching) {
+                    console.log("[Commute] Does not attempt to load stations as app is already fetching stations");
+                } else if (reach === 'none') {
+                    console.log("[Commute] Does not attempt to load stations as device is offline");
+                } else if (!self.props.location.position) {
+                    console.log("[Commute] Does not attempt to load stations as position is not currently known");
+                } else {
+                    console.log("[Commute] Does not attempt to load stations as last update (", self.props.stations.lastUpdate.format('YYYY-MM-dd HH:mm:ss'), ") is not at least 5 minutes before now");
+                }
+            }
+        });
     }
 
     componentWillUnmount() {
@@ -58,7 +86,7 @@ class Commute extends Component {
 
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.stations.modalShown !== this.props.modalShown) {
+        if (nextProps.stations && nextProps.stations.modalShown !== this.props.modalShown) {
             if (this.props.modalShown) {
                 Animated.timing(this.animatedValue, { toValue: 1, duration: 350 }).start(/*() => {
                     setTimeout(this.props.toast.hideToast, 2000);
@@ -140,13 +168,15 @@ class Commute extends Component {
 }
 
 const mapStateToProps = (state) => Object.assign({}, {
-    toast: state.toast
+    toast: state.toast,
+    location: state.location,
+    stations: state.stations
 });
 
 const mapDispatchToProps = (dispatch) => ({
     dispatch: dispatch,
     actions: bindActionCreators(
-        Object.assign({}, toastActionCreators),
+        Object.assign({}, toastActionCreators, stationActionCreators),
         dispatch
     )
 });

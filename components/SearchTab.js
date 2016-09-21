@@ -14,8 +14,7 @@ import {
     Text,
     View,
     Image,
-    ListView,
-
+    ListView
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';

@@ -32,6 +32,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
 import * as locationActionCreators from '../actions/location'
+import * as favoriteStationActionCreators from '../actions/favoriteStations'
 
 var screen = require('Dimensions').get('window');
 
@@ -57,6 +58,16 @@ class StationDetailsScene extends Component {
 
     componentWillReceiveProps(nextProps) {
         this.updateDistance(nextProps.geoLocation, nextProps.station);
+    }
+
+    onFavoriteStarPress(station) {
+        const favoriteStations = this.props.favoriteStations.data;
+
+        if (favoriteStations.map(fs => fs.number).indexOf(station.number) >= 0) {
+            this.props.actions.removeFavoriteStation(station);
+        } else {
+            this.props.actions.addFavoriteStation(station);
+        }
     }
 
     updateDistance(geoLocation, station) {
@@ -135,8 +146,9 @@ class StationDetailsScene extends Component {
     renderHeader() {
 
         const station = this.props.station;
-
+        const favoriteStations = (this.props.favoriteStations || { data: []}).data;
         console.log("screen:", screen);
+        console.log("favoriteStations:", favoriteStations);
 
         return (
 
@@ -144,13 +156,16 @@ class StationDetailsScene extends Component {
                 width: screen.width,
                 height: screen.width * 240 / 320
             }}>
+                <View style={{ position: 'absolute', right: 10, top: 10, backgroundColor: 'transparent', zIndex: 100 }}>
+                    <Icon name={favoriteStations.map(fs => fs.number).indexOf(station.number) >= 0 ? 'ios-star' : 'ios-star-outline'} color="#f1c40f" size={32} onPress={this.onFavoriteStarPress.bind(this, station)} />
+                </View>
                 <ScrollView pagingEnabled={true} horizontal={true} showsHorizontalScrollIndicator={false} bounces={false} onScroll={this.onScroll} scrollEventThrottle={16}>
                     {this.renderPhotoHeader()}
                     {this.renderMapHeader()}
                 </ScrollView>
                 <PageControl style={{position:'absolute', left:0, right:0, bottom:64}} numberOfPages={2} currentPage={this.state.currentPage} hidesForSinglePage={true} pageIndicatorTintColor='grey' indicatorSize={{width:8, height:8}} currentPageIndicatorTintColor='black' onPageIndicatorPress={this.onItemTap} />
                 <View style={{ padding: 5, paddingLeft: 12, backgroundColor: 'rgba(0, 0, 0, 0.6)', position: 'absolute', left: 0, right: 0, bottom: 0 }}>
-                    <Text style={{ fontFamily: 'System', fontSize: 17, fontWeight: '500', color: 'white' }}>{station.name || ' '}</Text>
+                    <Text style={{ fontFamily: 'System', fontSize: 17, fontWeight: '500', color: 'white' }}>{station.number || ' '} - {station.name || ' '}</Text>
                     <Text style={{ fontFamily: 'System', fontSize: 12, color: 'white', paddingTop: 5, paddingBottom: 5 }}>{station.address || ' '}</Text>
                 </View>
             </View>
@@ -377,12 +392,13 @@ EStyleSheet.build();
 
 const mapStateToProps = (state) => Object.assign({}, {
     position: state.location.position,
-    geoLocation: state.location.geoLocation
+    geoLocation: state.location.geoLocation,
+    favoriteStations: state.favoriteStations
 });
 
 const mapDispatchToProps = (dispatch) => ({
     actions: bindActionCreators(
-        Object.assign({}, locationActionCreators),
+        Object.assign({}, locationActionCreators, favoriteStationActionCreators),
         dispatch
     )
 });

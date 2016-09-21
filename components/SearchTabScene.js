@@ -4,9 +4,14 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
 import * as stationActionCreators from '../actions/stations'
+import * as favoriteStationActionCreators from '../actions/favoriteStations'
 
 import GeoPoint from 'geopoint';
 import _ from 'lodash';
+
+import Swipeout from 'react-native-animated-swipeout';
+
+import { getColor } from '../utils';
 
 import {
     Animated,
@@ -19,7 +24,13 @@ import {
     RefreshControl
 } from 'react-native';
 
+import Icon from 'react-native-vector-icons/Ionicons';
+
 import SearchBar from 'react-native-search-bar';
+
+var LISTVIEW = 'ListView';
+
+var DropRefreshControl = require('react-native-drop-refresh');
 
 class SearchTabScene extends Component {
 
@@ -63,20 +74,24 @@ class SearchTabScene extends Component {
                 alert(error.message);
             }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
         );
+
+        DropRefreshControl.configure({
+            node: this.refs[LISTVIEW]
+        }, () => {
+            setTimeout(() => {
+                DropRefreshControl.endRefreshing(this.refs[LISTVIEW]);
+            }, 2000);
+        });
     }
 
     componentWillReceiveProps(nextProps) {
+        const stations = nextProps.stations;
 
-        if (nextProps.stations.data) {
-
-            const stations = nextProps.stations;
-
-            this.setState({
-                dataSource: !this.state.searchText ?
-                    nextProps.dataSource.cloneWithRows(stations.data) :
-                    nextProps.dataSource.cloneWithRows(stations.data.filter(station => station.name.search(new RegExp(this.state.searchText, "i")) >= 0))
-            });
-        }
+        this.setState({
+            dataSource: !this.state.searchText ?
+                nextProps.dataSource.cloneWithRows(stations.data) :
+                nextProps.dataSource.cloneWithRows(stations.data.filter(station => station.name.search(new RegExp(this.state.searchText, "i")) >= 0))
+        });
     }
 
     loadNearbyStations(position, distance = 1000) {
@@ -107,13 +122,15 @@ class SearchTabScene extends Component {
     }
 
     render() {
-        console.log('--- [SearchTabScene] Render -------------------------------------------------------------------------------------');
-
         return (
             <View style={{ flex: 1 }}>
                 <SearchBar placeholder="Search"
                            ref="searchBar"
-                           style={{ marginTop: 64, height: 44, backgroundColor: 'green' }}
+
+                           tintColor="#edeef2"
+                           barTintColor="#edeef2"
+
+                           style={{ marginTop: 64, height: 44, backgroundColor: '#edeef2' }}
                            onChangeText={this.onChangeText}
                            enablesReturnKeyAutomatically={true}
                            onSearchButtonPress={this.onSearchButtonPress}
@@ -125,12 +142,13 @@ class SearchTabScene extends Component {
                           enableEmptySections={true}
                           renderRow={this.renderRow}
                           keyboardDismissMode="on-drag"
-                          refreshControl={
-                              <RefreshControl refreshing={this.props.stations.isFetching} onRefresh={this.onRefresh} />
-                          }
+                          renderSeparator={this.renderSeparator}
+                          ref={LISTVIEW}
                 />
             </View>
         )
+
+        console.log('--- [SearchTabScene] Render -------------------------------------------------------------------------------------');
     }
 
     onChangeText(value) {
@@ -155,6 +173,16 @@ class SearchTabScene extends Component {
         });
     }
 
+    onFavoriteStarPress(station) {
+        const favoriteStations = this.props.favoriteStations.data;
+
+        if (favoriteStations.map(fs => fs.number).indexOf(station.number) >= 0) {
+            this.props.actions.removeFavoriteStation(station);
+        } else {
+            this.props.actions.addFavoriteStation(station);
+        }
+    }
+
     renderRow(station, sectionID, rowID, highlightRow) {
         const backgroundSourceUri = `https://s3-eu-west-1.amazonaws.com/image-commute-sh/${station.contract_name}-${station.number}-1-${640}-${60}.jpg`;
 
@@ -162,24 +190,59 @@ class SearchTabScene extends Component {
 
         console.log("--- Row[sectionID: ", sectionID, "/", this.state.highlightedRow.sectionID , ", rowID:", rowID, "/", this.state.highlightedRow.rowID , "] is Pressed:", rowPress);
 
+        const favoriteStations = this.props.favoriteStations.data;
+
+        let swipeBtns = [
+            {
+                component:
+                    <View style={{ flex: 1, backgroundColor: 'transparent', zIndex: 100, alignItems: 'center', justifyContent: 'center' }}>
+                        <Icon name={ favoriteStations.map(fs => fs.number).indexOf(station.number) >= 0 ? 'ios-star' : 'ios-star-outline' } color="#fff" size={44} />
+                    </View>,
+                backgroundColor: 'red',
+                underlayColor: 'rgba(0, 0, 0, 0.6)',
+                onPress: () => { this.onFavoriteStarPress(station) }
+            }
+        ];
+
         return (
-            <TouchableHighlight onPressIn={() => {
-                this.pressRowIn(sectionID, rowID);
-                highlightRow(sectionID, rowID);
-            }} onPressOut={() => {
-                this.pressRowOut(sectionID, rowID);
-            }} onPress={() => {
-                this.pressRow(sectionID, rowID);
-                highlightRow(null);
-            }}>
-                <View style={{ flexDirection: 'row', padding: 10 }}>
-                    <Image defaultSource={require('../images/map_placeholder.jpg')} source={{ uri: backgroundSourceUri }} style={{ width: 96, height: 64 }} />
-                    <View style={{ flexDirection: 'column', flex: 1, paddingLeft: 10 }}>
-                        <Text style={{ fontFamily: 'System', fontSize: 14, fontWeight: '500', color: rowPress ? '#fff' : '#000' }}>{station.name}</Text>
-                        <Text  style={{ fontFamily: 'System', fontSize: 11, fontWeight: '500', color: rowPress ? '#fff' : '#000' }}>{station.address}</Text>
+            <Swipeout right={swipeBtns}
+                      autoClose={true}
+                      backgroundColor= 'transparent'>
+                <TouchableHighlight underlayColor='#EBECF0' onPressIn={() => {
+                    this.pressRowIn(sectionID, rowID);
+                    highlightRow(sectionID, rowID);
+                }} onPressOut={() => {
+                    this.pressRowOut(sectionID, rowID);
+                }} onPress={() => {
+                    this.pressRow(sectionID, rowID);
+                    highlightRow(null);
+                }}>
+                    <View style={{ flexDirection: 'row', height: 96 }}>
+                        <Image defaultSource={require('../images/map_placeholder.jpg')} source={{ uri: backgroundSourceUri }} resizeMode='cover' style={{ width: 96, height: 96 }} />
+                        <View style={{ flexDirection: 'column', flex: 1, padding: 20, paddingRight: 10 }}>
+                            <Text style={{ fontFamily: 'System', fontSize: 14, fontWeight: '500', color: rowPress ? '#325d7a' : '#325d7a' }}>{station.number} - {station.name}</Text>
+                            <Text  style={{ fontFamily: 'System', fontSize: 12, fontWeight: '500', color: rowPress ? '#9d9d9d' : '#9d9d9d' }}>{station.address}</Text>
+                        </View>
+
+                        <View style={{ width: 80, padding: 20, paddingTop: 20, paddingBottom: 20, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end' }}>
+                            <Text style={{ fontFamily: 'System', fontSize: 18, fontWeight: '500', color: rowPress ? getColor(station.available_bikes) : getColor(station.available_bikes) }}>{station.available_bikes}</Text>
+                            <Text style={{ fontFamily: 'System', fontSize: 12, fontWeight: '500', color: rowPress ? '#c2c2c2' : '#c2c2c2' }}>{(station.distance / 1000).toFixed(1)} km</Text>
+                        </View>
                     </View>
-                </View>
-            </TouchableHighlight>
+                </TouchableHighlight>
+            </Swipeout>
+        );
+    }
+
+    renderSeparator(sectionID, rowID, adjacentRowHighlighted) {
+        return (
+            <View
+                key={`${sectionID}-${rowID}`}
+                style={{
+                    height: adjacentRowHighlighted ? 1 : 1,
+                    backgroundColor: adjacentRowHighlighted ? '#E9E8ED' : '#E9E8ED',
+                }}
+            />
         );
     }
 
@@ -208,12 +271,13 @@ class SearchTabScene extends Component {
 }
 
 const mapStateToProps = (state) => Object.assign({}, {
-    stations: state.stations
+    stations: state.stations,
+    favoriteStations: state.favoriteStations
 });
 
 const mapDispatchToProps = (dispatch) => ({
     actions: bindActionCreators(
-        Object.assign({}, stationActionCreators),
+        Object.assign({}, stationActionCreators, favoriteStationActionCreators),
         dispatch
     )
 });
