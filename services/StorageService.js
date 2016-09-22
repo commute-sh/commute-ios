@@ -8,6 +8,7 @@ export function fetchFavoriteStationNumbers() {
     const start = moment();
 
     return AsyncStorage.getItem(FAVORITE_STATIONS).then(favoriteStationNumbersStr => {
+        console.log("favoriteStationNumbersStr:", favoriteStationNumbersStr);
         const favoriteStationNumbers = JSON.parse(favoriteStationNumbersStr || '[]');
 
         console.log('[', moment().format('HH:mm:ss.SSS'), '][StorageService][FetchFavoriteStations] Favorite stations:', favoriteStationNumbers);
@@ -18,7 +19,7 @@ export function fetchFavoriteStationNumbers() {
         console.log('[', moment().format('HH:mm:ss.SSS'), '][StorageService][FetchFavoriteStations] Favorite stations loaded in', duration, "ms");
 //        console.log("*** Stations", stations);
 
-        return favoriteStationNumbers;
+        return favoriteStationNumbers.filter(fsn => fsn);
     })
 }
 

@@ -9,6 +9,9 @@ const initialState = {
 
 export default createReducer(initialState, {
     [constants.FETCH_FAVORITE_STATIONS_SUCCEED]: (state, payload) => {
+
+        console.log("FETCH_FAVORITE_STATIONS_SUCCEED:", payload);
+
         return Object.assign({}, state, {
             data: payload,
             isFetching: false,

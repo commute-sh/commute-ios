@@ -1,11 +1,15 @@
 import moment from 'moment';
 import axios from 'axios';
-
+import Promise from 'bluebird';
 
 export function fetchStationsByNumbers(stationNumbers) {
 
+    if (stationNumbers.length === 0) {
+        return Promise.resolve([]);
+    }
+
     const start = moment();
-    let url = `http://api.commute.sh/stations?numbers=${stationNumbers}`;
+    let url = `http://api.commute.sh/stations?numbers=${stationNumbers.join(',')}`;
 
     console.log('[', start.format('HH:mm:ss.SSS'), '][StationService][FetchStationsByNumbers] Get Stations Nearby URL:', url);
 

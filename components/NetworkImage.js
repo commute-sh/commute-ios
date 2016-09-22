@@ -44,10 +44,9 @@ class NetworkImage extends Component {
                 <Spinner color="#000000" type="Pulse" />
             </View> : null;
 
-        console.log('*-*-*-*-*-*-*-*-*-*-*-* this.state.error:', this.state.error);
-
         if (this.state.error) {
-            console.log('this.props.errorSource:', this.props.errorSource);
+            console.log('*-*-* this.state.error:', this.state.error);
+            console.log('*-*-* this.props.errorSource:', this.props.errorSource);
         }
 
         return this.state.error ? (

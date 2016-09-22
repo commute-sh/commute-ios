@@ -76,8 +76,10 @@ export function fetchFavoriteStations() {
         dispatch(fetchFavoriteStationsRequest());
 
         return StorageService.fetchFavoriteStationNumbers().then((favoriteStationNumbers) => {
+            console.log("favoriteStationNumbers:", favoriteStationNumbers);
             return StationService.fetchStationsByNumbers(favoriteStationNumbers);
         }).then((favoriteStations) => {
+            console.log("favoriteStations:", favoriteStations);
             dispatch(fetchFavoriteStationsSucceed(favoriteStations));
         }).catch((err) => {
 

@@ -265,7 +265,7 @@ class SearchTabScene extends Component {
 
     pressRow(sectionID, rowID) {
         console.log("--- On Row pressed [sectionID: ", sectionID, ", rowID:", rowID, "]");
-        this.props.navigator.push({ id: 'StationDetails', station: this.props.stations.data[rowID] });
+        this.props.navigator.push({ id: 'StationDetails', station: this.state.dataSource.getRowData(0, rowID) });
     }
 
 }
