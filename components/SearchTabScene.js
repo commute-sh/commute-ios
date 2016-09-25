@@ -75,6 +75,13 @@ class SearchTabScene extends Component {
     componentWillReceiveProps(nextProps) {
         const stations = nextProps.contractStations[nextProps.contractName];
 
+        if (
+            this.props.contractStations[this.props.contractName].isFetching &&
+            !nextProps.contractStations[nextProps.contractName].isFetching
+        ) {
+            DropRefreshControl.endRefreshing(this.refs[LISTVIEW]);
+        }
+
         this.setState({
             dataSource: !this.state.searchText ?
                 nextProps.dataSource.cloneWithRows(stations.data) :

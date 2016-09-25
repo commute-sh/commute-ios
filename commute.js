@@ -141,7 +141,7 @@ class Commute extends Component {
 
         let messagePrefix = 'Info';
 
-        if (this.state.toast.type == 'ERROR') {
+        if (this.props.toast.type === 'ERROR') {
             messagePrefix = 'Erreur';
         }
 
@@ -158,10 +158,10 @@ class Commute extends Component {
                 justifyContent:  'center'
             }}>
                 <Text style={{ marginLeft: 10,  color: 'white',  fontSize: 16, fontWeight: '500', fontFamily: 'System'  }}>
-                    { this.state.toast.title }
+                    { this.props.toast.title }
                 </Text>
                 <Text style={{ marginLeft: 10,  color: 'white',  fontSize: 12, fontWeight: '300', fontFamily: 'System' }}>
-                    { messagePrefix }: { this.state.toast.message }
+                    { messagePrefix }: { this.props.toast.message }
                 </Text>
             </Animated.View>
         );

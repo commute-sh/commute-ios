@@ -337,7 +337,6 @@ class MapTabScene extends Component {
             return ;
         }
 
-        console.log("isFetching: true");
         this.setState({
             lastPosition: currentPosition,
             lastDistance: distance,

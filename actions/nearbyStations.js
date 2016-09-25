@@ -28,6 +28,12 @@ export function fetchNearbyStations(position, distance = 1000, contractName = 'P
     const search = { position, distance, contractName };
 
     return (dispatch, state) => {
+        console.log('state:', state());
+        if (state().nearbyStations.isFetching) {
+            console.log("Nearby Stations are already fetching - Avoid new call ...");
+            return;
+        }
+
         dispatch(fetchNearbyStationsRequest(search));
         StationService.fetchStationsNearby(position, distance, contractName).then((stations) => {
             dispatch(fetchNearbyStationsSucceed(search, stations));
