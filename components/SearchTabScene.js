@@ -3,11 +3,8 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
-import * as stationActionCreators from '../actions/stations'
+import * as contractStationActionCreators from '../actions/contractStations'
 import * as favoriteStationActionCreators from '../actions/favoriteStations'
-
-import GeoPoint from 'geopoint';
-import _ from 'lodash';
 
 import Swipeout from 'react-native-animated-swipeout';
 
@@ -28,9 +25,9 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import SearchBar from 'react-native-search-bar';
 
-var LISTVIEW = 'ListView';
+var LISTVIEW = 'SearchListView';
 
-var DropRefreshControl = require('react-native-drop-refresh');
+import DropRefreshControl from 'react-native-drop-refresh';
 
 class SearchTabScene extends Component {
 
@@ -64,28 +61,19 @@ class SearchTabScene extends Component {
     }
 
     componentDidMount() {
-        navigator.geolocation.getCurrentPosition((position) => {
-                console.log('navigator.geolocation.getCurrentPosition - position:', position);
-                this.setState({position, geoLocation: new GeoPoint(position.coords.latitude, position.coords.longitude)});
+        const self = this;
 
-
-                this.loadNearbyStations(position, 60000);
-            }, (error) => {
-                alert(error.message);
-            }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-        );
+        this.loadContractStations(this.props.contractName);
 
         DropRefreshControl.configure({
             node: this.refs[LISTVIEW]
         }, () => {
-            setTimeout(() => {
-                DropRefreshControl.endRefreshing(this.refs[LISTVIEW]);
-            }, 2000);
+            self.onRefresh();
         });
     }
 
     componentWillReceiveProps(nextProps) {
-        const stations = nextProps.stations;
+        const stations = nextProps.contractStations[nextProps.contractName];
 
         this.setState({
             dataSource: !this.state.searchText ?
@@ -94,59 +82,58 @@ class SearchTabScene extends Component {
         });
     }
 
-    loadNearbyStations(position, distance = 1000) {
+    loadContractStations(contractName) {
 
-        if (!position) {
-            console.info('No position available');
+        if (!contractName) {
+            console.info('No contract name defined');
             return ;
         }
 
-        if (this.props.stations.isFetching) {
+        if (this.props.contractStations[contractName].isFetching) {
             console.info('Already fetching nearest stations');
             return ;
         }
 
-        const currentPosition = { latitude: position.coords.latitude.toFixed(3), longitude: position.coords.longitude.toFixed(3) };
-
-        if (_.isEqual(currentPosition, this.state.lastPosition) && (distance / 100).toFixed(0) === (this.state.lastDistance / 100).toFixed(0)) {
-            console.info('Current position did not changed:', currentPosition, 'with distance:', distance, '~=', this.state.lastDistance);
-            return ;
-        }
-
-        this.props.actions.fetchStations(position.coords, distance);
-
-        this.setState({
-            lastPosition: currentPosition,
-            lastDistance: distance
-        });
+        this.props.actions.fetchContractStations(contractName);
     }
 
     render() {
+
+        console.log('*********************** this.props.dataSource.getRowCount():', this.state.dataSource.getRowCount());
+
         return (
-            <View style={{ flex: 1 }}>
+            <View style={{flex: 1}}>
                 <SearchBar placeholder="Search"
                            ref="searchBar"
 
                            tintColor="#edeef2"
                            barTintColor="#edeef2"
 
-                           style={{ marginTop: 64, height: 44, backgroundColor: '#edeef2' }}
+                           style={{marginTop: 64, height: 44, backgroundColor: '#edeef2'}}
                            onChangeText={this.onChangeText}
                            enablesReturnKeyAutomatically={true}
                            onSearchButtonPress={this.onSearchButtonPress}
                            onCancelButtonPress={this.onCancelButtonPress}
                 />
-                <ListView style={{ backgroundColor: 'white' }}
-                          dataSource={this.state.dataSource}
-                          automaticallyAdjustContentInsets={false}
-                          enableEmptySections={true}
-                          renderRow={this.renderRow}
-                          keyboardDismissMode="on-drag"
-                          renderSeparator={this.renderSeparator}
-                          ref={LISTVIEW}
-                />
+                <View style={{ flex: 1 }}>
+                    <ListView style={{backgroundColor: 'white'}}
+                              dataSource={this.state.dataSource}
+                              automaticallyAdjustContentInsets={false}
+                              enableEmptySections={true}
+                              renderRow={this.renderRow}
+                              keyboardDismissMode="on-drag"
+                              renderSeparator={this.renderSeparator}
+                              ref={LISTVIEW}
+                    />
+
+                    { this.state.dataSource.getRowCount() <= 0 && (
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', position: 'absolute', top: 0, left: 0, bottom: 0, right: 0, zIndex: 10, backgroundColor: 'white' }}>
+                            <Text>Aucune station ne correspond à la recherche ...</Text>
+                        </View>
+                    ) }
+                </View>
             </View>
-        )
+        );
 
         console.log('--- [SearchTabScene] Render -------------------------------------------------------------------------------------');
     }
@@ -168,8 +155,8 @@ class SearchTabScene extends Component {
         this.setState({
             searchText: value,
             dataSource: !value ?
-                this.props.dataSource.cloneWithRows(this.props.stations.data) :
-                this.props.dataSource.cloneWithRows(this.props.stations.data.filter(station => station.name.search(new RegExp(this.state.searchText, "i")) >= 0))
+                this.props.dataSource.cloneWithRows(this.props.contractStations[this.props.contractName].data) :
+                this.props.dataSource.cloneWithRows(this.props.contractStations[this.props.contractName].data.filter(station => station.name.search(new RegExp(this.state.searchText, "i")) >= 0))
         });
     }
 
@@ -188,7 +175,7 @@ class SearchTabScene extends Component {
 
         const rowPress = sectionID === this.state.highlightedRow.sectionID && rowID === this.state.highlightedRow.rowID;
 
-        console.log("--- Row[sectionID: ", sectionID, "/", this.state.highlightedRow.sectionID , ", rowID:", rowID, "/", this.state.highlightedRow.rowID , "] is Pressed:", rowPress);
+//        console.log("--- Row[sectionID: ", sectionID, "/", this.state.highlightedRow.sectionID , ", rowID:", rowID, "/", this.state.highlightedRow.rowID , "] is Pressed:", rowPress);
 
         const favoriteStations = this.props.favoriteStations.data;
 
@@ -218,7 +205,13 @@ class SearchTabScene extends Component {
                     highlightRow(null);
                 }}>
                     <View style={{ flexDirection: 'row', height: 96 }}>
-                        <Image defaultSource={require('../images/map_placeholder.jpg')} source={{ uri: backgroundSourceUri }} resizeMode='cover' style={{ width: 96, height: 96 }} />
+                        <Image
+                            defaultSource={require('../images/map_placeholder.jpg')}
+                            source={{ uri: backgroundSourceUri }}
+                            onError={(e) => { e.target.source = require('../images/map_placeholder.jpg'); }}
+                            resizeMode='cover'
+                            style={{ width: 96, height: 96 }}
+                        />
                         <View style={{ flexDirection: 'column', flex: 1, padding: 20, paddingRight: 10 }}>
                             <Text style={{ fontFamily: 'System', fontSize: 14, fontWeight: '500', color: rowPress ? '#325d7a' : '#325d7a' }}>{station.number} - {station.name}</Text>
                             <Text  style={{ fontFamily: 'System', fontSize: 12, fontWeight: '500', color: rowPress ? '#9d9d9d' : '#9d9d9d' }}>{station.address}</Text>
@@ -226,7 +219,7 @@ class SearchTabScene extends Component {
 
                         <View style={{ width: 80, padding: 20, paddingTop: 20, paddingBottom: 20, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end' }}>
                             <Text style={{ fontFamily: 'System', fontSize: 18, fontWeight: '500', color: rowPress ? getColor(station.available_bikes) : getColor(station.available_bikes) }}>{station.available_bikes}</Text>
-                            <Text style={{ fontFamily: 'System', fontSize: 12, fontWeight: '500', color: rowPress ? '#c2c2c2' : '#c2c2c2' }}>{(station.distance / 1000).toFixed(1)} km</Text>
+                            { station.distance && <Text style={{ fontFamily: 'System', fontSize: 12, fontWeight: '500', color: rowPress ? '#c2c2c2' : '#c2c2c2' }}>{(station.distance / 1000).toFixed(1)} km</Text>}
                         </View>
                     </View>
                 </TouchableHighlight>
@@ -247,10 +240,7 @@ class SearchTabScene extends Component {
     }
 
     onRefresh() {
-        const search = this.props.stations.search;
-        if (search) {
-            this.props.actions.fetchStations(search.position, search.distance, search.contractName);
-        }
+        this.props.actions.fetchContractStations(this.props.contractName);
     }
 
     pressRowIn(sectionID, rowID) {
@@ -271,13 +261,14 @@ class SearchTabScene extends Component {
 }
 
 const mapStateToProps = (state) => Object.assign({}, {
-    stations: state.stations,
-    favoriteStations: state.favoriteStations
+    contractStations: state.contractStations,
+    favoriteStations: state.favoriteStations,
+    contractName: state.contract.name
 });
 
 const mapDispatchToProps = (dispatch) => ({
     actions: bindActionCreators(
-        Object.assign({}, stationActionCreators, favoriteStationActionCreators),
+        Object.assign({}, contractStationActionCreators, favoriteStationActionCreators),
         dispatch
     )
 });

@@ -1,33 +1,36 @@
-import constants from '../constants/stations'
+import constants from '../constants/nearbyStations'
 import * as StationService from '../services/StationService'
 import { notifyError } from './toast'
 
-export function receiveStations(stations, position, distance, contractName) {
+export function fetchNearbyStationsSucceed(search, stations) {
     return {
-        type: constants.RECEIVE_STATIONS,
-        payload: { stations, position, distance, contractName }
+        type: constants.FETCH_NEARBY_STATIONS_SUCCEED,
+        payload: { search, stations }
     };
 }
 
-export function fetchStationsRequest(search) {
+export function fetchNearbyStationsRequest(search) {
     return {
-        type: constants.FETCH_STATIONS_REQUEST,
+        type: constants.FETCH_NEARBY_STATIONS_REQUEST,
         payload: { search }
     }
 }
 
-export function fetchStationsFailed(err) {
+export function fetchNearbyStationsFailed(search, err) {
     return {
-        type: constants.FETCH_STATIONS_FAILED,
-        payload: { err }
+        type: constants.FETCH_NEARBY_STATIONS_FAILED,
+        payload: { search, err }
     }
 }
 
-export function fetchStations(position, distance = 1000, contractName = 'Paris') {
+export function fetchNearbyStations(position, distance = 1000, contractName = 'Paris') {
+
+    const search = { position, distance, contractName };
+
     return (dispatch, state) => {
-        dispatch(fetchStationsRequest({ position, distance, contractName }));
+        dispatch(fetchNearbyStationsRequest(search));
         StationService.fetchStationsNearby(position, distance, contractName).then((stations) => {
-            dispatch(receiveStations(stations, position, distance, contractName));
+            dispatch(fetchNearbyStationsSucceed(search, stations));
         }).catch((err) => {
             console.error('Error:', err, 'Stack:', err.stack);
 
@@ -39,7 +42,7 @@ export function fetchStations(position, distance = 1000, contractName = 'Paris')
                 errorMessage = 'La requête a expiré';
             }
 
-            dispatch(fetchStationsFailed(err));
+            dispatch(fetchNearbyStationsFailed(search, err));
             dispatch(notifyError('Impossible de charger la liste des stations', errorMessage));
         });
     }

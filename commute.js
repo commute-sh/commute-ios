@@ -26,11 +26,12 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
 import * as toastActionCreators from './actions/toast'
-import * as stationActionCreators from './actions/stations'
+import * as nearbyStationActionCreators from './actions/nearbyStations'
 
 import { initGeoLocation, disposeGeoLocation } from './actions/location';
 import { initFavoriteStations } from './actions/favoriteStations';
-import { fetchStations } from './actions/stations';
+import { initContractStations } from './actions/contractStations';
+import { fetchNearbyStations } from './actions/nearbyStations';
 
 import moment from 'moment';
 
@@ -52,6 +53,7 @@ class Commute extends Component {
 
         const { dispatch } = this.props;
         initFavoriteStations(dispatch);
+        initContractStations(dispatch, 'Paris');
         this.watchID = initGeoLocation(dispatch);
 
         const self = this;
@@ -59,18 +61,18 @@ class Commute extends Component {
         NetInfo.addEventListener('change', (reach) => {
             console.log('[Commute] Net state change: ' + reach);
 
-            if (!self.props.stations.isFetching && reach !== 'none' && self.props.location.position && moment(self.props.stations.lastUpdate).add(5, 'minutes').isBefore(moment())) {
-                console.log("[Commute] Loading stations as last update (", self.props.stations.lastUpdate.format('YYYY-MM-dd HH:mm:ss'), ") was at least 5 minutes before now and server is reachable");
-                dispatch(fetchStations(self.props.location.position));
+            if (!self.props.nearbyStations.isFetching && reach !== 'none' && self.props.location.position && moment(self.props.nearbyStations.lastUpdate).add(5, 'minutes').isBefore(moment())) {
+                console.log("[Commute] Loading stations as last update (", self.props.nearbyStations.lastUpdate.format('YYYY-MM-dd HH:mm:ss'), ") was at least 5 minutes before now and server is reachable");
+                dispatch(fetchNearbyStations(self.props.location.position));
             } else {
-                if (self.props.stations.isFetching) {
+                if (self.props.nearbyStations.isFetching) {
                     console.log("[Commute] Does not attempt to load stations as app is already fetching stations");
                 } else if (reach === 'none') {
                     console.log("[Commute] Does not attempt to load stations as device is offline");
                 } else if (!self.props.location.position) {
                     console.log("[Commute] Does not attempt to load stations as position is not currently known");
                 } else {
-                    console.log("[Commute] Does not attempt to load stations as last update (", self.props.stations.lastUpdate.format('YYYY-MM-dd HH:mm:ss'), ") is not at least 5 minutes before now");
+                    console.log("[Commute] Does not attempt to load stations as last update (", self.props.nearbyStations.lastUpdate.format('YYYY-MM-dd HH:mm:ss'), ") is not at least 5 minutes before now");
                 }
             }
         });
@@ -86,7 +88,7 @@ class Commute extends Component {
 
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.stations && nextProps.stations.modalShown !== this.props.modalShown) {
+        if (nextProps.nearbyStations && nextProps.nearbyStations.modalShown !== this.props.modalShown) {
             if (this.props.modalShown) {
                 Animated.timing(this.animatedValue, { toValue: 1, duration: 350 }).start(/*() => {
                     setTimeout(this.props.toast.hideToast, 2000);
@@ -170,13 +172,13 @@ class Commute extends Component {
 const mapStateToProps = (state) => Object.assign({}, {
     toast: state.toast,
     location: state.location,
-    stations: state.stations
+    nearbyStations: state.nearbyStations
 });
 
 const mapDispatchToProps = (dispatch) => ({
     dispatch: dispatch,
     actions: bindActionCreators(
-        Object.assign({}, toastActionCreators, stationActionCreators),
+        Object.assign({}, toastActionCreators, nearbyStationActionCreators),
         dispatch
     )
 });

@@ -34,7 +34,7 @@ import _ from 'lodash';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
-import * as stationActionCreators from '../actions/stations'
+import * as nearbyStationActionCreators from '../actions/nearbyStations'
 
 class MapTabScene extends Component {
 
@@ -133,7 +133,7 @@ class MapTabScene extends Component {
         this.state.annotationTextInfo = event.nativeEvent.selectedSegmentIndex === 0 ? 'STANDS' : 'BIKES';
         this.setState({
             selectedIndex: event.nativeEvent.selectedSegmentIndex,
-            annotations: this.mapStationsToAnnotations(this.props.stations.data, {
+            annotations: this.mapStationsToAnnotations(this.props.nearbyStations.data, {
                 region: this.state.region,
                 pinSize: this.state.pinSize,
                 selectedIndex: event.nativeEvent.selectedSegmentIndex
@@ -214,9 +214,9 @@ class MapTabScene extends Component {
 
     componentWillReceiveProps(nextProps) {
 
-        if (nextProps.stations.data) {
+        if (nextProps.nearbyStations.data) {
 
-            const stations = nextProps.stations.data;
+            const stations = nextProps.nearbyStations.data;
 
             this.setState({
                 annotations: this.mapStationsToAnnotations(stations, {
@@ -343,7 +343,7 @@ class MapTabScene extends Component {
             lastDistance: distance,
         });
 
-        this.props.actions.fetchStations(position.coords, distance);
+        this.props.actions.fetchNearbyStations(position.coords, distance);
     }
 
     mapStationsToAnnotations(stations, opts) {
@@ -455,8 +455,8 @@ class MapTabScene extends Component {
         } else if (this.state.pinSize !== nextState.pinSize) {
             console.log('[MapTabScene][Updating] pinSize changed (', this.state.pinSize, ', ', nextState.pinSize, ')');
             return true;
-        } else if (this.props.stations.data.length !== nextProps.stations.data.length) {
-            console.log('[MapTabScene][Updating] stations length changed (', this.props.stations.data.length, ', ', nextProps.stations.data.length, ')');
+        } else if (this.props.nearbyStations.data.length !== nextProps.nearbyStations.data.length) {
+            console.log('[MapTabScene][Updating] stations length changed (', this.props.nearbyStations.data.length, ', ', nextProps.nearbyStations.data.length, ')');
             return true;
         } else if (this.state.center && nextState.center && (
                 this.state.center.latitude() !== nextState.center.latitude() ||
@@ -545,12 +545,12 @@ var styles = EStyleSheet.create({
 EStyleSheet.build();
 
 const mapStateToProps = (state) => Object.assign({}, {
-    stations: state.stations
+    nearbyStations: state.nearbyStations
 });
 
 const mapDispatchToProps = (dispatch) => ({
     actions: bindActionCreators(
-        Object.assign({}, stationActionCreators),
+        Object.assign({}, nearbyStationActionCreators),
         dispatch
     )
 });

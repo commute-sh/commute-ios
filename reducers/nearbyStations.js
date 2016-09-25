@@ -1,5 +1,5 @@
 import { createReducer } from '../utils';
-import constants from '../constants/stations';
+import constants from '../constants/nearbyStations';
 import _ from 'lodash';
 import GeoPoint from 'geopoint';
 import moment from 'moment';
@@ -13,7 +13,9 @@ const initialState = {
 };
 
 export default createReducer(initialState, {
-    [constants.RECEIVE_STATIONS]: (state, { stations, distance, position, contractName }) => {
+    [constants.FETCH_NEARBY_STATIONS_SUCCEED]: (state, { search, stations }) => {
+
+        const { distance, position, contractName } = search;
 
         console.log("Found", stations.length, "matching position", position, ", distance", distance, "and contract name", contractName);
 
@@ -24,8 +26,10 @@ export default createReducer(initialState, {
                 station.geoLocation = new GeoPoint(station.position.lat, station.position.lng);
             }
 
-            if (station.name.indexOf(station.number + ' - ') === 0) {
-                station.name = station.name.substring((station.number + ' - ').length);
+            const paddedStationNumber = ("00000" + station.number).slice(-5);
+
+            if (station.name.indexOf(paddedStationNumber + ' - ') === 0) {
+                station.name = station.name.substring((paddedStationNumber + ' - ').length);
             }
 
         });
@@ -37,17 +41,17 @@ export default createReducer(initialState, {
             err: undefined
         })
     },
-    [constants.FETCH_STATIONS_REQUEST]: (state, payload) => {
+    [constants.FETCH_NEARBY_STATIONS_REQUEST]: (state, { search }) => {
         return Object.assign({}, state, {
             isFetching: true,
             err: undefined,
-            search: payload.search
+            search: search
         })
     },
-    [constants.FETCH_STATIONS_FAILED]: (state, payload) => {
+    [constants.FETCH_NEARBY_STATIONS_FAILED]: (state, { search, err }) => {
         return Object.assign({}, state, {
             isFetching: false,
-            err: payload.err
+            err: err
         })
     }
 })
