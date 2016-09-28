@@ -1,6 +1,9 @@
 import constants from '../constants/nearbyStations'
 import * as StationService from '../services/StationService'
 import { notifyError } from './toast'
+import _ from 'lodash'
+
+import { computeRegionRadiusInMeters } from '../utils'
 
 export function fetchNearbyStationsSucceed(search, stations) {
     return {
@@ -23,12 +26,38 @@ export function fetchNearbyStationsFailed(search, err) {
     }
 }
 
+export function fetchNearbyStationsFromCurrentRegion() {
+
+    return (dispatch, state) => {
+        const currentState = state();
+
+        console.log("currentState:", JSON.stringify(currentState));
+        const position = currentState.location.position.coords;
+        const distance = computeRegionRadiusInMeters(currentState.map.region);
+        dispatch(fetchNearbyStations(position, distance));
+    };
+}
+
 export function fetchNearbyStations(position, distance = 1000, contractName = 'Paris') {
 
     const search = { position, distance, contractName };
 
     return (dispatch, state) => {
-        console.log('state:', state());
+
+        const currentState = state();
+
+        console.log('state:', currentState);
+
+        const currentPosition = {
+            latitude: position.latitude.toFixed(3),
+            longitude: position.longitude.toFixed(3)
+        };
+
+        if (_.isEqual(currentPosition, currentState.location.lastPosition) && (distance / 100).toFixed(0) === (currentState.location.lastDistance / 100).toFixed(0)) {
+            console.info('Current position did not changed:', currentPosition, 'with distance:', distance, '~=', currentState.location.lastDistance);
+            return;
+        }
+
         if (state().nearbyStations.isFetching) {
             console.log("Nearby Stations are already fetching - Avoid new call ...");
             return;

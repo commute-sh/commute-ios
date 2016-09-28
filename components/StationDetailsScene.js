@@ -32,7 +32,6 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
 import * as locationActionCreators from '../actions/location'
-import * as favoriteStationActionCreators from '../actions/favoriteStations'
 
 var screen = require('Dimensions').get('window');
 
@@ -58,16 +57,6 @@ class StationDetailsScene extends Component {
 
     componentWillReceiveProps(nextProps) {
         this.updateDistance(nextProps.geoLocation, nextProps.station);
-    }
-
-    onFavoriteStarPress(station) {
-        const favoriteStations = this.props.favoriteStations.data;
-
-        if (favoriteStations.map(fs => fs.number).indexOf(station.number) >= 0) {
-            this.props.actions.removeFavoriteStation(station);
-        } else {
-            this.props.actions.addFavoriteStation(station);
-        }
     }
 
     updateDistance(geoLocation, station) {
@@ -98,7 +87,7 @@ class StationDetailsScene extends Component {
         const station = this.props.station;
 
         const showStands = false;
-        const showBikes = ! showStands;
+        const showBikes = !showStands;
 
         let pinColor = '#2ecc71'; // GREEN
 
@@ -146,9 +135,7 @@ class StationDetailsScene extends Component {
     renderHeader() {
 
         const station = this.props.station;
-        const favoriteStations = (this.props.favoriteStations || { data: []}).data;
         console.log("screen:", screen);
-        console.log("favoriteStations:", favoriteStations);
 
         return (
 
@@ -156,9 +143,6 @@ class StationDetailsScene extends Component {
                 width: screen.width,
                 height: screen.width * 240 / 320
             }}>
-                <View style={{ position: 'absolute', right: 10, top: 10, backgroundColor: 'transparent', zIndex: 100 }}>
-                    <Icon name={favoriteStations.map(fs => fs.number).indexOf(station.number) >= 0 ? 'ios-star' : 'ios-star-outline'} color="#f1c40f" size={32} onPress={this.onFavoriteStarPress.bind(this, station)} />
-                </View>
                 <ScrollView pagingEnabled={true} horizontal={true} showsHorizontalScrollIndicator={false} bounces={false} onScroll={this.onScroll} scrollEventThrottle={16}>
                     {this.renderPhotoHeader()}
                     {this.renderMapHeader()}
@@ -392,13 +376,12 @@ EStyleSheet.build();
 
 const mapStateToProps = (state) => Object.assign({}, {
     position: state.location.position,
-    geoLocation: state.location.geoLocation,
-    favoriteStations: state.favoriteStations
+    geoLocation: state.location.geoLocation
 });
 
 const mapDispatchToProps = (dispatch) => ({
     actions: bindActionCreators(
-        Object.assign({}, locationActionCreators, favoriteStationActionCreators),
+        Object.assign({}, locationActionCreators),
         dispatch
     )
 });

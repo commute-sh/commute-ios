@@ -9,7 +9,8 @@ const initialState = {
     isFetching: false,
     err: undefined,
     lastUpdate: moment(0),
-    search: undefined
+    search: undefined,
+    version: 0
 };
 
 export default createReducer(initialState, {
@@ -38,7 +39,8 @@ export default createReducer(initialState, {
             data: mergedStations,
             isFetching: false,
             lastUpdate: moment(),
-            err: undefined
+            err: undefined,
+            version: state.version + 1
         })
     },
     [constants.FETCH_NEARBY_STATIONS_REQUEST]: (state, { search }) => {

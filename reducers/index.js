@@ -5,6 +5,7 @@ import contractStations from './contractStations';
 import favoriteStations from './favoriteStations';
 import location from './location';
 import toast from './toast';
+import map from './map';
 
 export default combineReducers({
     nearbyStations,
@@ -12,5 +13,6 @@ export default combineReducers({
     favoriteStations,
     location,
     contract,
-    toast
+    toast,
+    map
 });

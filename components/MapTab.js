@@ -22,25 +22,35 @@ import StationDetailsScene from './StationDetailsScene';
 import Icon from 'react-native-vector-icons/Ionicons';
 import EvilIcon from 'react-native-vector-icons/EvilIcons';
 
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 
-export default class MapTab extends Component {
+import * as favoriteStationActionCreators from '../actions/favoriteStations'
+import * as nearbyStationActionCreators from '../actions/nearbyStations'
+
+class MapTab extends Component {
 
     static propTypes = {
         selectedTab: PropTypes.string,
         onPress: PropTypes.func
     };
 
-    constructor(props) {
-        super(props);
+    onFavoriteStarPress(station) {
+        const favoriteStations = this.props.favoriteStations.data;
 
-        this.onRightButtonPress = this.onRightButtonPress.bind(this);
+        if (favoriteStations.map(fs => fs.number).indexOf(station.number) >= 0) {
+            this.props.actions.removeFavoriteStation(station);
+        } else {
+            this.props.actions.addFavoriteStation(station);
+        }
     }
 
-    onRightButtonPress() {
-        // Do Something
+    onRefresh() {
+        this.props.actions.fetchNearbyStationsFromCurrentRegion();
     }
 
     render() {
+        const favoriteStations = (this.props.favoriteStations || { data: []}).data;
 
         return (
             <Icon.TabBarItemIOS
@@ -55,7 +65,7 @@ export default class MapTab extends Component {
                     renderScene={(route, navigator) => {
                         if (route.id == 'StationDetails') {
                             return (
-                                <StationDetailsScene
+                                <StationDetailsScene ref="StationDetailsScene"
                                     station={route.station}
                                     navigator={navigator}
                                 />
@@ -67,7 +77,6 @@ export default class MapTab extends Component {
                                 />
                             );
                         }
-
                     }}
                     style={{ flex: 1 }}
                     navigationBar={
@@ -86,16 +95,36 @@ export default class MapTab extends Component {
                                             </View>)
                                     }
                                     else {
-                                        return (null);
+                                        return null;
                                     }
                                 },
-                                RightButton: (route, navigator, index, navState) =>
-{ return null /*                                    <View style={{ paddingTop: 0, paddingRight: 16 }}>
-                                        <TouchableHighlight underlayColor="transparent" onPress={this.onRightButtonPress}>
-                                            <Icon name="ios-refresh-outline" size={40} color="white" />
-                                        </TouchableHighlight>
-                                    </View>*/}
-                                ,
+                                RightButton: (route, navigator, index, navState) => {
+                                    if (route.id ===  'StationDetails') {
+                                        return (
+                                            <View style={{paddingTop: 4, paddingRight: 12}}>
+                                                <TouchableHighlight underlayColor="transparent" onPress={this.onFavoriteStarPress.bind(this, route.station)}>
+                                                    <Icon
+                                                        name={ favoriteStations.map(fs => fs.number).indexOf(route.station.number) >= 0 ? 'ios-star' : 'ios-star-outline' }
+                                                        size={32}
+                                                        color="white" />
+                                                </TouchableHighlight>
+                                            </View>
+                                        );
+                                    } else if (route.id === 'Map') {
+                                        return (
+                                            <View style={{paddingTop: 6, paddingRight: 16}}>
+                                                <TouchableHighlight underlayColor="transparent" onPress={this.onRefresh.bind(this)}>
+                                                    <Icon
+                                                        name="ios-refresh-outline"
+                                                        size={32}
+                                                        color="white" />
+                                                </TouchableHighlight>
+                                            </View>
+                                        );
+                                    } else {
+                                        return null;
+                                    }
+                                },
                                 Title: (route, navigator, index, navState) =>
                                     <View style={{ paddingTop: 2 }}>
                                         <Image source={require('../images/commute-icon.png')} style={{ width: 32, height: 32 }}/>
@@ -112,3 +141,21 @@ export default class MapTab extends Component {
     }
 
 }
+
+
+const mapStateToProps = (state) => Object.assign({}, {
+    favoriteStations: state.favoriteStations,
+    map: state.map
+});
+
+const mapDispatchToProps = (dispatch) => ({
+    actions: bindActionCreators(
+        Object.assign({}, favoriteStationActionCreators, nearbyStationActionCreators),
+        dispatch
+    )
+});
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(MapTab);

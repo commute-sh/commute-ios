@@ -55,9 +55,7 @@ export default class Map extends Component {
     }
 
     onCenterOnLocation() {
-
         if (this.state.region) {
-
             let region = Object.assign({}, this.state.region);
 
             region.latitude = this.props.geoLocation.latitude();
@@ -101,8 +99,8 @@ export default class Map extends Component {
 
     componentWillReceiveProps(nextProps) {
         if (!this.props.geoLocation && nextProps.geoLocation) {
-            if (this.state.region) {
 
+            if (this.state.region) {
                 this.setState({
                     region: {
                         latitude: nextProps.geoLocation.latitude(),
