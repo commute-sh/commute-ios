@@ -43,8 +43,8 @@
 #ifndef DEBUG
   RCTSetLogThreshold(RCTLogLevelInfo);
   RCTSetLogFunction(CrashlyticsReactLogFunction);
-#endif  
-  
+#endif
+
   return YES;
 }
 
@@ -57,14 +57,14 @@ RCTLogFunction CrashlyticsReactLogFunction = ^(
                                                )
 {
   NSString *log = RCTFormatLog([NSDate date], level, fileName, lineNumber, message);
-  
+
 #ifdef DEBUG
   fprintf(stderr, "%s\n", log.UTF8String);
   fflush(stderr);
 #else
   CLS_LOG(@"REACT LOG: %s", log.UTF8String);
 #endif
-  
+
   int aslLevel;
   switch(level) {
     case RCTLogLevelTrace:
@@ -84,8 +84,8 @@ RCTLogFunction CrashlyticsReactLogFunction = ^(
       break;
   }
   asl_log(NULL, NULL, aslLevel, "%s", message.UTF8String);
-  
-  
+
+
 };
 
 @end

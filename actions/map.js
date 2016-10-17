@@ -24,6 +24,6 @@ export function updatePinSize(pinSize) {
 export function updateAnnotationType(annotationType) {
     return {
         type: constants.ANNOTATION_TYPE_CHANGE,
-        payload: annotationType
+        payload: { annotationType }
     }
 }

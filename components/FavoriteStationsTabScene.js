@@ -13,7 +13,8 @@ import {
     Text,
     View,
     TouchableHighlight,
-    RefreshControl
+    RefreshControl,
+    Platform
 } from 'react-native';
 
 import Swipeout from 'react-native-animated-swipeout';
@@ -68,16 +69,20 @@ class FavoriteStationsTabScene extends Component {
 
     componentDidMount() {
         const self = this;
-        DropRefreshControl.configure({
-            node: this.refs[LISTVIEW]
-        }, () => {
-            self.onRefresh();
-        });
+
+        if (Platform.OS === 'ios') {
+            DropRefreshControl.configure({
+                node: this.refs[LISTVIEW]
+            }, () => {
+                self.onRefresh();
+            });
+        }
     }
 
     componentWillReceiveProps(nextProps) {
 
         if (
+            Platform.OS === 'ios' &&
             this.props.contractStations[this.props.contractName].isFetching &&
             !nextProps.contractStations[nextProps.contractName].isFetching
         ) {

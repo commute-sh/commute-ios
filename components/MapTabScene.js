@@ -6,7 +6,8 @@ import {
     View,
     Text,
     processColor,
-    TouchableHighlight
+    TouchableHighlight,
+    Platform
 } from 'react-native';
 
 import Map from './Map';
@@ -190,7 +191,7 @@ class MapTabScene extends Component {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     onChange(event) {
-        const annotationType = event.nativeEvent.selectedSegmentIndex === 0 ? 'STANDS' : 'BIKES';
+        const annotationType = (Platform.OS === 'ios' ? event.nativeEvent.selectedSegmentIndex : event.selected) === 0 ? 'STANDS' : 'BIKES';
         this.props.actions.updateAnnotationType(annotationType);
         this.setState({
             annotations: this.mapStationsToAnnotations(this.props.nearbyStations.data)

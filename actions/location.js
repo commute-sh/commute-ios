@@ -13,7 +13,7 @@ export function initGeoLocation(dispatch) {
             console.log('$$$ navigator.geolocation.getCurrentPosition - position:', position);
             locationChanged(position);
         }, (error) => {
-            console.error(error.message);
+            console.debug(error.message);
         }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
     );
 
@@ -24,5 +24,7 @@ export function initGeoLocation(dispatch) {
 }
 
 export function disposeGeoLocation(watchID) {
-    navigator.geolocation.clearWatch(watchID);
+    if (watchID) {
+        navigator.geolocation.clearWatch(watchID);
+    }
 }

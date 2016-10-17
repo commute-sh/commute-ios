@@ -4,10 +4,13 @@ import {
     View,
     Button,
     SegmentedControlIOS,
-    TouchableOpacity
+    TouchableOpacity,
+    Platform
 } from 'react-native';
 
 import IconButton from './IconButton';
+
+import AndroidSegmented from 'react-native-segmented-android';
 
 export default class Map extends Component {
 
@@ -40,7 +43,7 @@ export default class Map extends Component {
     }
 
     onChange(event) {
-        this.setState({selectedIndex: event.nativeEvent.selectedSegmentIndex});
+        this.setState({selectedIndex: Platform.OS === 'ios' ? event.nativeEvent.selectedSegmentIndex : event.selected });
         if (this.props.onChange) {
             this.props.onChange(event);
         }
@@ -153,6 +156,31 @@ export default class Map extends Component {
         return annotationsChanged;
     }
 
+    renderSegmentedControl() {
+        if (Platform.OS === 'ios') {
+            return (
+                <SegmentedControlIOS
+                    values={[ 'Places', 'Bornes' ]}
+                    selectedIndex={this.state.selectedIndex}
+                    style={{ backgroundColor: 'white', width: 160 }}
+                    tintColor="#325d7a"
+                    onChange={this.onChange}
+                />
+            );
+        } else {
+            return (
+                <AndroidSegmented
+                    tintColor={['#325d7a','#ffffff']}
+                    style={{ backgroundColor: 'white', width: 160, height: 30 }}
+                    childText={[ 'Places', 'Bornes' ]}
+                    orientation='horizontal'
+                    selectedPosition={this.state.selectedIndex}
+                    onChange={this.onChange} />
+            );
+        }
+
+    }
+
     render() {
 
         console.log('--- [Map] Render -------------------------------------------------------------------------------------');
@@ -168,13 +196,7 @@ export default class Map extends Component {
                         justifyContent: 'center',
                         alignItems: 'center'
                     }}>
-                        <SegmentedControlIOS
-                            values={[ 'Places', 'Bornes' ]}
-                            selectedIndex={this.state.selectedIndex}
-                            style={{ backgroundColor: 'white', width: 160 }}
-                            tintColor="#325d7a"
-                            onChange={this.onChange}
-                        />
+                    {this.renderSegmentedControl()}
                     </View>
                 </View>
                 <IconButton iconName="location-arrow" onPress={this.onCenterOnLocation} style={{ zIndex: 100, position: 'absolute', right: 24, bottom: 64 }} />

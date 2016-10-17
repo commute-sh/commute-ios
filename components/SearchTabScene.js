@@ -18,7 +18,9 @@ import {
     Text,
     View,
     TouchableHighlight,
-    RefreshControl
+    RefreshControl,
+    Platform,
+    TextInput
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -65,17 +67,20 @@ class SearchTabScene extends Component {
 
         this.loadContractStations(this.props.contractName);
 
-        DropRefreshControl.configure({
-            node: this.refs[LISTVIEW]
-        }, () => {
-            self.onRefresh();
-        });
+        if (Platform.OS === 'ios') {
+            DropRefreshControl.configure({
+                node: this.refs[LISTVIEW]
+            }, () => {
+                self.onRefresh();
+            });
+        }
     }
 
     componentWillReceiveProps(nextProps) {
         const stations = nextProps.contractStations[nextProps.contractName];
 
         if (
+            Platform.OS === 'ios' &&
             this.props.contractStations[this.props.contractName].isFetching &&
             !nextProps.contractStations[nextProps.contractName].isFetching
         ) {
@@ -104,24 +109,57 @@ class SearchTabScene extends Component {
         this.props.actions.fetchContractStations(contractName);
     }
 
+    renderSearchBar() {
+
+        if (Platform.OS === 'ios') {
+            return (<SearchBar placeholder="Search"
+                       ref="searchBar"
+
+                       tintColor="#edeef2"
+                       barTintColor="#edeef2"
+
+                       style={{marginTop: 64, height: 44, backgroundColor: '#edeef2'}}
+                       onChangeText={this.onChangeText}
+                       enablesReturnKeyAutomatically={true}
+                       onSearchButtonPress={this.onSearchButtonPress}
+                       onCancelButtonPress={this.onCancelButtonPress}
+            />);
+        } else {
+            return (<View style={{ height: 44, backgroundColor: "white" }}>
+                <TextInput onChangeText={this.onChangeText} style={{ flex: 1 }} />
+            </View>);
+        }
+    }
+
     render() {
+
+        const CoSearchBar = Platform.select({
+            ios: () => () =>
+                <SearchBar placeholder="Search"
+                                  ref="searchBar"
+
+                                  tintColor="#edeef2"
+                                  barTintColor="#edeef2"
+
+                                  style={{marginTop: 64, height: 44, backgroundColor: '#edeef2'}}
+                                  onChangeText={this.onChangeText}
+                                  enablesReturnKeyAutomatically={true}
+                                  onSearchButtonPress={this.onSearchButtonPress}
+                                  onCancelButtonPress={this.onCancelButtonPress}
+                />,
+            android: () => () =>
+                <View style={{ height: 44, backgroundColor: "white" }}>
+                    <TextInput onChangeText={this.onChangeText} style={{ flex: 1 }} />
+                </View>
+        })();
 
         console.log('*********************** this.props.dataSource.getRowCount():', this.state.dataSource.getRowCount());
 
         return (
             <View style={{flex: 1}}>
-                <SearchBar placeholder="Search"
-                           ref="searchBar"
 
-                           tintColor="#edeef2"
-                           barTintColor="#edeef2"
+                {this.renderSearchBar()}
 
-                           style={{marginTop: 64, height: 44, backgroundColor: '#edeef2'}}
-                           onChangeText={this.onChangeText}
-                           enablesReturnKeyAutomatically={true}
-                           onSearchButtonPress={this.onSearchButtonPress}
-                           onCancelButtonPress={this.onCancelButtonPress}
-                />
                 <View style={{ flex: 1 }}>
                     <ListView style={{backgroundColor: 'white'}}
                               dataSource={this.state.dataSource}

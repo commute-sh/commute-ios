@@ -2,15 +2,6 @@ import React, { Component, PropTypes } from 'react';
 
 import {
     Animated,
-    AppRegistry,
-    StyleSheet,
-    NavigatorIOS,
-    Navigator,
-    TabBarIOS,
-    ScrollView,
-    MapView,
-    TouchableHighlight,
-    TouchableOpacity,
     Text,
     View,
     Image,
@@ -18,9 +9,7 @@ import {
     NetInfo
 } from 'react-native';
 
-import MapTab from './components/MapTab';
-import FavoriteTab from './components/FavoritesTab';
-import SearchTab from './components/SearchTab';
+import Root from './components/Root';
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -43,14 +32,9 @@ class Commute extends Component {
         super(props);
 
         this.animatedValue = new Animated.Value(0);
-
-        this.state = {
-            selectedTab: 'map'
-        };
     }
 
     componentWillMount() {
-
         const { dispatch } = this.props;
         initFavoriteStations(dispatch);
         initContractStations(dispatch, 'Paris');
@@ -82,11 +66,6 @@ class Commute extends Component {
         disposeGeoLocation(this.watchID);
     }
 
-    onTabIconPress(selectedTab) {
-        this.setState({ selectedTab: selectedTab });
-    }
-
-
     componentWillReceiveProps(nextProps) {
         if (nextProps.nearbyStations && nextProps.nearbyStations.modalShown !== this.props.modalShown) {
             if (this.props.modalShown) {
@@ -100,7 +79,7 @@ class Commute extends Component {
         }
     }
 
-    static getToastBackgroundColor(type) {
+    getToastBackgroundColor(type) {
         // INFO
         let color = '#2980b9';
 
@@ -116,21 +95,12 @@ class Commute extends Component {
     render() {
         return (
             <View style={{ flex: 1 }}>
-                {this.renderTabs()}
+                <Root />
                 {this.props.toast.modalShown && this.renderToast()}
             </View>
         );
     }
 
-    renderTabs() {
-        return (
-            <TabBarIOS style={{ zIndex: 1 }}>
-                <MapTab selectedTab={this.state.selectedTab} onPress={this.onTabIconPress.bind(this, 'map')} />
-                <FavoriteTab selectedTab={this.state.selectedTab} onPress={this.onTabIconPress.bind(this, 'favorites')} />
-                <SearchTab selectedTab={this.state.selectedTab} onPress={this.onTabIconPress.bind(this, 'search')} />
-            </TabBarIOS>
-        );
-    }
 
     renderToast() {
 
@@ -150,7 +120,7 @@ class Commute extends Component {
                 zIndex: 2,
                 transform: [{ translateY: animation }],
                 height: 70,
-                backgroundColor: Commute.getToastBackgroundColor(this.props.toast.type),
+                backgroundColor: this.getToastBackgroundColor(this.props.toast.type),
                 position: 'absolute',
                 left: 0,
                 top: windowHeight - 70,
