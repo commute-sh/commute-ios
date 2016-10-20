@@ -69,15 +69,15 @@ class StationToast extends Component {
                 { station.status != 'CLOSED' && (
                     <View style={{ paddingTop: 10, flexDirection: 'row' }}>
                         <View style={{ flex: 0.6, flexDirection: 'column' }}>
-                            <Text style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Vélos Dispos.</Text>
+                            <Text numberOfLines={1} ellipsizeMode="tail" style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Vélos Dispos.</Text>
                             <Text style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: getColor(station.available_bikes) }}>{station.available_bikes !== undefined ? station.available_bikes : '-'}</Text>
                         </View>
                         <View style={{ flex: 0.6, flexDirection: 'column', paddingLeft: 20 }}>
-                            <Text style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Places Dispos.</Text>
+                            <Text numberOfLines={1} ellipsizeMode="tail" style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Places Dispos.</Text>
                             <Text style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: getColor(station.available_bike_stands) }}>{station.available_bike_stands !== undefined ? station.available_bike_stands : '-'}</Text>
                         </View>
                         <View style={{ flex: 1, flexDirection: 'column', paddingLeft: 20 }}>
-                            <Text style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Distance</Text>
+                            <Text numberOfLines={1} ellipsizeMode="tail" style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Distance</Text>
 
                             <Text numberOfLines={1} style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: '#000' }}>
                                 {this.state.distance !== undefined ? (this.state.distance >= 1000 ? (this.state.distance / 1000).toFixed(1) : this.state.distance) : '-'}

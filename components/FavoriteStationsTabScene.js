@@ -105,7 +105,7 @@ class FavoriteStationsTabScene extends Component {
 
         return (
             <View style={{ flex: 1 }}>
-                <ListView style={{ marginTop: 64, backgroundColor: 'white' }}
+                <ListView style={{ marginTop: Platform.OS === 'ios' ? 64 : 0, backgroundColor: 'white' }}
                           dataSource={this.state.dataSource}
                           automaticallyAdjustContentInsets={false}
                           enableEmptySections={true}

@@ -1,12 +1,13 @@
 import React, { Component, PropTypes } from 'react';
 import {
-    MapView,
     View,
     Button,
     SegmentedControlIOS,
     TouchableOpacity,
     Platform
 } from 'react-native';
+
+import MapView from 'react-native-maps';
 
 import IconButton from './IconButton';
 
@@ -18,7 +19,6 @@ export default class Map extends Component {
         annotations: PropTypes.array,
         center: PropTypes.object,
         geoLocation: PropTypes.object,
-        onAnnotationPress: PropTypes.func,
         onRegionChange: PropTypes.func,
         onRegionChangeComplete: PropTypes.func,
         onChange: PropTypes.func,
@@ -67,7 +67,7 @@ export default class Map extends Component {
             region.longitudeDelta = region.longitudeDelta +  (Math.random() + 0.0001) * 0.0001;
 
             this.setState({ region: region, centerOnLocation: true });
-        } else {
+        } else if (this.props.geoLocation) {
             let region = this.computeRegionFromLocation(this.props.geoLocation);
 
             this.setState({ region: region, centerOnLocation: true });
@@ -189,7 +189,7 @@ export default class Map extends Component {
 
         return (
             <View style={{ flex: 1 }}>
-                <View style={{ zIndex: 100, position: 'absolute', left: 24, right: 24, bottom: 72 }}>
+                <View style={{ zIndex: 100, position: 'absolute', left: 24, right: 24, bottom: Platform.OS === 'ios' ? 72 : 32 }}>
                     <View style={{
                         flex: 1,
                         flexDirection: 'row',
@@ -199,15 +199,35 @@ export default class Map extends Component {
                     {this.renderSegmentedControl()}
                     </View>
                 </View>
-                <IconButton iconName="location-arrow" onPress={this.onCenterOnLocation} style={{ zIndex: 100, position: 'absolute', right: 24, bottom: 64 }} />
+                <IconButton iconName="location-arrow" onPress={this.onCenterOnLocation} style={{ zIndex: 100, position: 'absolute', right: 24, bottom: Platform.OS === 'ios' ? 64 : 24 }} />
                 <MapView
                     style={{ flex: 1, zIndex: 2 }}
                     showsUserLocation={true}
+                    showsMyLocationButton={false}
+                    showsCompass={false}
                     onRegionChangeComplete={this.onRegionChangeComplete}
                     onRegionChange={this.onRegionChange}
                     region={this.state.region}
-                    annotations={this.props.annotations}
-                 />
+                 >
+                    { this.props.annotations.map(annotation => {
+                        return Platform.OS == 'ios' ? (
+                            <MapView.Marker
+                                key={annotation.id}
+                                onSelect={annotation.onFocus}
+                                onDeselect={annotation.onBlur}
+                                draggable
+                                coordinate={annotation}
+                            />
+                        ) : (
+                            <MapView.Marker
+                                key={annotation.id}
+                                onPress={annotation.onPress}
+                                draggable
+                                coordinate={annotation}
+                            />
+                        )
+                    }) }
+                </MapView>
             </View>
         )
     }

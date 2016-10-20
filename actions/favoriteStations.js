@@ -83,7 +83,7 @@ export function fetchFavoriteStations() {
             dispatch(fetchFavoriteStationsSucceed(favoriteStations));
         }).catch((err) => {
 
-            console.error('[', moment().format('HH:mm:ss.SSS'), '][FavoriteStations][FetchFavoriteStations] Error:', err, 'Stack:', err.stack);
+            console.debug('[', moment().format('HH:mm:ss.SSS'), '][FavoriteStations][FetchFavoriteStations] Error:', err, 'Stack:', err.stack);
 
             dispatch(fetchFavoriteStationsFailed(err));
             dispatch(notifyError('Impossible de charger la liste des identifiants des stations favories', err.message));
@@ -101,7 +101,7 @@ export function addFavoriteStation(station) {
                 dispatch(fetchFavoriteStations());
             }).catch((err) => {
 
-            console.error('[', moment().format('HH:mm:ss.SSS'), '][FavoriteStations][AddFavoriteStation] Error:', err, 'Stack:', err.stack);
+            console.debug('[', moment().format('HH:mm:ss.SSS'), '][FavoriteStations][AddFavoriteStation] Error:', err, 'Stack:', err.stack);
 
             dispatch(addFavoriteStationFailed(err, station));
             dispatch(notifyError('Impossible de charger la liste des identifiants des stations favories', err.message));
@@ -120,7 +120,7 @@ export function removeFavoriteStation(station) {
             dispatch(fetchFavoriteStations());
         }).catch((err) => {
 
-            console.error('[', moment().format('HH:mm:ss.SSS'), '][FavoriteStations][RemoveFavoriteStation] Error:', err, 'Stack:', err.stack);
+            console.debug('[', moment().format('HH:mm:ss.SSS'), '][FavoriteStations][RemoveFavoriteStation] Error:', err, 'Stack:', err.stack);
 
             dispatch(removeFavoriteStationFailed(err, station));
             dispatch(notifyError('Impossible de charger la liste des identifiants des stations favories', err.message));

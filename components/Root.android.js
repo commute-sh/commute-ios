@@ -15,9 +15,13 @@ class Root extends Component {
     render() {
         return (
             <ScrollableTabView
-                style={{ marginTop: 20 }}
+                style={{ marginTop: 0 }}
                 initialPage={0}
-                renderTabBar={() => <DefaultTabBar />}
+                tabBarBackgroundColor="white"
+                tabBarActiveTextColor="#325d7a"
+                tabBarInactiveTextColor="#325d7a"
+                under
+                renderTabBar={() => <DefaultTabBar underlineStyle={{ backgroundColor: '#325d7a' }} tabStyle={{ height: 56 }} />}
             >
                 <MapTabScene tabLabel='Plan' />
                 <FavoriteStationsTabScene tabLabel='Favoris' />

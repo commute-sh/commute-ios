@@ -120,7 +120,7 @@ class MapTabScene extends Component {
 
         Animated.parallel([
             Animated.timing(this.state.fadeAnim, {  duration: 300, toValue: 1 }),
-            Animated.timing(this.state.stationToaster, { duration: 300, toValue: { x: 0, y: 0 } })
+            Animated.timing(this.state.stationToaster, { duration: 300, toValue: { x: 0, y: Platform.OS === 'ios' ? 0 : -64 } })
         ]).start(() => {
             this.stationToasterVisible = true;
             // if (stationToast && stationToast.measure) {
@@ -198,6 +198,14 @@ class MapTabScene extends Component {
         });
     }
 
+    onStationPress(station) {
+        this.enqueueAnimation((animCb) => {
+            console.log('On Focus - Station:', station.number);
+            this.props.actions.selectStation(station);
+            this.stationToasterAppear(animCb);
+        });
+    }
+
     onStationBlur(station) {
         this.enqueueAnimation((animCb) => {
             console.log('On Blur - Station:', station.number);
@@ -234,7 +242,7 @@ class MapTabScene extends Component {
 
         let distance = computeRegionRadiusInMeters(region);
 
-//        console.log("[onRegionChangeComplete] regionToCenterDistance:", regionToCenterDistance, ", distance:", distance);
+//        console.log("[onRegionChange] regionToCenterDistance:", regionToCenterDistance, ", distance:", distance);
 
         if (distance <= 100000) {
             console.log("Region radius (", distance, ") <= 100000 - Fetching stations inside perimeter");
@@ -328,6 +336,7 @@ class MapTabScene extends Component {
             latitude: station.position.lat,
             longitude: station.position.lng,
             viewIndex: stationNumber,
+            onPress: this.onStationPress.bind(this, station),
             onFocus: this.onStationFocus.bind(this, station),
             onBlur: this.onStationBlur.bind(this, station),
             view: <CTAnnotationView

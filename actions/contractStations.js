@@ -36,7 +36,7 @@ export function fetchContractStations(contractName = 'Paris') {
         StationService.fetchStationsByContractName(contractName).then((stations) => {
             dispatch(fetchContractStationsSucceed(contractName, stations));
         }).catch((err) => {
-            console.error('Error:', err, 'Stack:', err.stack);
+            console.debug('Error:', err, 'Stack:', err.stack);
 
             let errorMessage = err.message;
 

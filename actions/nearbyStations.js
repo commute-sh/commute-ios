@@ -67,7 +67,7 @@ export function fetchNearbyStations(position, distance = 1000, contractName = 'P
         StationService.fetchStationsNearby(position, distance, contractName).then((stations) => {
             dispatch(fetchNearbyStationsSucceed(search, stations));
         }).catch((err) => {
-            console.error('Error:', err, 'Stack:', err.stack);
+            console.debug('Error:', err, 'Stack:', err.stack);
 
             let errorMessage = err.message;
 

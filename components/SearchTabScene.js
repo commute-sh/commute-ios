@@ -118,7 +118,7 @@ class SearchTabScene extends Component {
                        tintColor="#edeef2"
                        barTintColor="#edeef2"
 
-                       style={{marginTop: 64, height: 44, backgroundColor: '#edeef2'}}
+                       style={{ marginTop: 64, height: 44, backgroundColor: '#edeef2' }}
                        onChangeText={this.onChangeText}
                        enablesReturnKeyAutomatically={true}
                        onSearchButtonPress={this.onSearchButtonPress}
@@ -141,7 +141,7 @@ class SearchTabScene extends Component {
                                   tintColor="#edeef2"
                                   barTintColor="#edeef2"
 
-                                  style={{marginTop: 64, height: 44, backgroundColor: '#edeef2'}}
+                                  style={{ marginTop: 64, height: 44, backgroundColor: '#edeef2' }}
                                   onChangeText={this.onChangeText}
                                   enablesReturnKeyAutomatically={true}
                                   onSearchButtonPress={this.onSearchButtonPress}
@@ -161,7 +161,7 @@ class SearchTabScene extends Component {
                 {this.renderSearchBar()}
 
                 <View style={{ flex: 1 }}>
-                    <ListView style={{backgroundColor: 'white'}}
+                    <ListView style={{ backgroundColor: 'white' }}
                               dataSource={this.state.dataSource}
                               automaticallyAdjustContentInsets={false}
                               enableEmptySections={true}
