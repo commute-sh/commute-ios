@@ -31,10 +31,13 @@ export function fetchNearbyStationsFromCurrentRegion() {
     return (dispatch, state) => {
         const currentState = state();
 
-        console.log("currentState:", JSON.stringify(currentState));
-        const position = currentState.location.position.coords;
-        const distance = computeRegionRadiusInMeters(currentState.map.region);
-        dispatch(fetchNearbyStations(position, distance));
+//        console.log("currentState:", JSON.stringify(currentState));
+
+        if (currentState.location.position) {
+            const position = currentState.location.position.coords;
+            const distance = computeRegionRadiusInMeters(currentState.map.region);
+            dispatch(fetchNearbyStations(position, distance));
+        }
     };
 }
 
@@ -46,7 +49,7 @@ export function fetchNearbyStations(position, distance = 1000, contractName = 'P
 
         const currentState = state();
 
-        console.log('state:', currentState);
+//        console.log('state:', currentState);
 
         const currentPosition = {
             latitude: position.latitude.toFixed(3),

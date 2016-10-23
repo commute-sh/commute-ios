@@ -15,7 +15,7 @@ import StationToast from './StationToast';
 
 import { computeRegionRadiusInMeters, isPositionEqual } from '../utils';
 
-import CTAnnotationView from "./CTAnnotationView";
+//import CTAnnotationView from "./CTAnnotationView";
 
 import moment from 'moment';
 
@@ -39,10 +39,10 @@ class MapTabScene extends Component {
         this.animationQueue = [];
 
         this.state = {
+            version: 0,
             stationToaster: new Animated.ValueXY(0, -500),
             fadeAnim: new Animated.Value(0),
-            stationToasterVisible: true,
-            annotations: []
+            stationToastVisible: true
         };
     }
 
@@ -69,9 +69,10 @@ class MapTabScene extends Component {
         }
 
         if (this.props.nearbyStations.version !== nextProps.nearbyStations.version) {
-            this.setState({
-                annotations: this.mapStationsToAnnotations(nextProps.nearbyStations.data)
-            });
+            this.setState({ version: this.state.version + 1 });
+        }
+        if (this.props.annotationType !== nextProps.annotationType) {
+            this.setState({ version: this.state.version + 1 });
         }
     }
 
@@ -122,7 +123,7 @@ class MapTabScene extends Component {
             Animated.timing(this.state.fadeAnim, {  duration: 300, toValue: 1 }),
             Animated.timing(this.state.stationToaster, { duration: 300, toValue: { x: 0, y: Platform.OS === 'ios' ? 0 : -64 } })
         ]).start(() => {
-            this.stationToasterVisible = true;
+            this.stationToastVisible = true;
             // if (stationToast && stationToast.measure) {
             //     stationToast.measure((fx, fy, width, height, px, py) => {
             //     });
@@ -143,7 +144,7 @@ class MapTabScene extends Component {
                     Animated.timing(this.state.fadeAnim, {  duration: duration, toValue: 0 }),
                     Animated.timing(this.state.stationToaster, { duration: duration, toValue: { x: 0, y: -height } })
                 ]).start((() => {
-                    this.stationToasterVisible = false;
+                    this.stationToastVisible = false;
                     cb && cb.bind(self)();
                 }));
             });
@@ -152,7 +153,7 @@ class MapTabScene extends Component {
                 Animated.timing(this.state.fadeAnim, {  duration: duration, toValue: 0 }),
                 Animated.timing(this.state.stationToaster, { duration: duration, toValue: { x: 0, y: -160 } })
             ]).start((() => {
-                this.stationToasterVisible = false;
+                this.stationToastVisible = false;
                 cb && cb.bind(self)();
             }));
         }
@@ -160,19 +161,11 @@ class MapTabScene extends Component {
 
     shouldComponentUpdate(nextProps, nextState) {
 
-        /*if (nextState.isFetching) {
-         return false;
-         } else */if (this.props.station !== nextProps.station) {
-            console.log('[MapTabScene][Updating] selected station changed');
+        if (this.state.version !== nextState.version) {
+            console.log('[MapTabScene][Updating][0] state version changed (', this.state.version, ', ', nextState.version, ')');
             return true;
-        } else if (this.props.annotationType !== nextProps.annotationType) {
-            console.log('[MapTabScene][Updating] annotationType changed (', this.props.annotationType, ', ', nextProps.annotationType, ')');
-            return true;
-        } else if (this.props.pinSize !== nextProps.pinSize) {
-            console.log('[MapTabScene][Updating] pinSize changed (', this.props.pinSize, ', ', nextProps.pinSize, ')');
-            return true;
-        } else if (this.props.nearbyStations.version !== nextProps.nearbyStations.version) {
-            console.log('[MapTabScene][Updating] stations version changed (', this.props.nearbyStations.version, ', ', nextProps.nearbyStations.version, ')');
+        } else if (this.props.station !== nextProps.station) {
+            console.log('[MapTabScene][Updating][1] selected station changed (', this.props.station ? this.props.station.number : '<undefined />', ', ', nextProps.station ? nextProps.station.number : '<undefined />', ')');
             return true;
         } else if (this.props.center && nextProps.center && (
                 this.props.center.latitude() !== nextProps.center.latitude() ||
@@ -193,22 +186,27 @@ class MapTabScene extends Component {
     onChange(event) {
         const annotationType = (Platform.OS === 'ios' ? event.nativeEvent.selectedSegmentIndex : event.selected) === 0 ? 'STANDS' : 'BIKES';
         this.props.actions.updateAnnotationType(annotationType);
-        this.setState({
-            annotations: this.mapStationsToAnnotations(this.props.nearbyStations.data)
-        });
+        this.setState({ version: this.state.version + 1 });
+    }
+
+    onPress() {
+        console.log('[MapTabScene] onPress');
+        this.onStationBlur(undefined);
     }
 
     onStationPress(station) {
-        this.enqueueAnimation((animCb) => {
-            console.log('On Focus - Station:', station.number);
-            this.props.actions.selectStation(station);
-            this.stationToasterAppear(animCb);
-        });
+        if (!this.props.station) {
+            this.onStationFocus(station);
+        } else if (station.number !== this.props.station.number) {
+            this.onStationFocus(station);
+        } else {
+            this.onStationBlur(station);
+        }
     }
 
     onStationBlur(station) {
         this.enqueueAnimation((animCb) => {
-            console.log('On Blur - Station:', station.number);
+            console.log('On Blur - Station:', station ? station.number : undefined);
             this.stationToasterDisappear(300, () => {
                 this.props.actions.selectStation(undefined);
                 animCb.bind(this)();
@@ -227,18 +225,26 @@ class MapTabScene extends Component {
     onRegionChange(region) { }
 
     onRegionChangeComplete(region) {
-        console.log('[MapTabScene] onRegionChangeComplete:', region, '*************************************************');
 
         if (!region) {
-           console.log('No region defined. Abort trying to load stations ...');
+//            console.debug('[MapTabScene] onRegionChangeComplete - No region defined. Abort trying to load stations ...');
+            return ;
+        } else if ( region && this.props.region &&
+            region.latitude == this.props.region.latitude &&
+            region.longitude == this.props.region.longitude &&
+            region.latitudeDelta == this.props.region.latitudeDelta &&
+            region.longitudeDelta == this.props.region.longitudeDelta
+        ) {
+            console.debug('[MapTabScene] onRegionChangeComplete - Region did not changed (region: ', JSON.stringify(region), ', this.props.region: ', JSON.stringify(this.props.region), ')');
+            return ;
         }
+
+        console.log('[MapTabScene] onRegionChangeComplete:', region, '*************************************************');
 
         this.props.actions.updateMapRegion(region);
         this.props.actions.updatePinSize(region.longitudeDelta > 0.1 ? 16 : (region.longitudeDelta < 0.025 ? 32 : 24));
 
-        this.setState({
-            annotations: this.mapStationsToAnnotations(this.props.nearbyStations.data)
-        });
+        this.setState({ version: this.state.version + 1 });
 
         let distance = computeRegionRadiusInMeters(region);
 
@@ -253,7 +259,9 @@ class MapTabScene extends Component {
     }
 
     onStationToastPress() {
-        this.props.navigator.push({ id: 'StationDetails', station: this.props.station });
+        if (this.state.stationToastVisible) {
+            this.props.navigator.push({ id: 'StationDetails', station: this.props.station });
+        }
     }
 
 
@@ -309,6 +317,8 @@ class MapTabScene extends Component {
         const showStands = annotationType === 'STANDS';
         const showBikes = !showStands;
 
+//        console.log(`///////////////////// annotationType: ${annotationType} - showStands: ${showStands} - value: ${showStands ? station.available_bike_stands : station.available_bikes}`);
+
         let pinColor = '#2ecc71'; // GREEN
 
         if (station.status === 'CLOSED') {
@@ -326,35 +336,27 @@ class MapTabScene extends Component {
         const distanceToRegion = center ? station.geoLocation.distanceTo(center, true) * 1000 : -1;
 
         const distanceToPosition = geoLocation ? station.geoLocation.distanceTo(geoLocation, true) * 1000 : -1;
-        // if (distanceToRegion < 1000 || distanceToPosition < 1000) {
-        //     console.log('Station[', station.number, ' / ', station.name , '] distanceToRegion:', distanceToRegion, ', distanceToPosition:', distanceToPosition);
-        // }
 
         return {
-            id: this.uid + '-' + stationNumber,
-//            id: stationNumber,
+            id: stationNumber,
+            station: station,
+            distance: station.distance,
             latitude: station.position.lat,
             longitude: station.position.lng,
-            viewIndex: stationNumber,
+
+            number: station.number,
+            pinSize: pinSize,
+            value: showStands ? station.available_bike_stands : station.available_bikes,
+            strokeColor: pinColor,
+            bgColor: 'white',
+            lineWidth: pinSize <= 16 ? 0 : (pinSize <= 24 ? 3 : 4),
+            fontSize: (pinSize <= 24 ? 10 : 14),
+            fontWeight: '900',
+            opacity: (distanceToPosition > 1000 && distanceToRegion > 1000) ? 0.33 : 1,
+
             onPress: this.onStationPress.bind(this, station),
             onFocus: this.onStationFocus.bind(this, station),
-            onBlur: this.onStationBlur.bind(this, station),
-            view: <CTAnnotationView
-//                key={stationNumber}
-                key={this.uid + '-' + stationNumber}
-                number={station.number}
-                pinSize={pinSize}
-                value={showStands ? station.available_bike_stands : station.available_bikes}
-                strokeColor={processColor(pinColor)}
-                bgColor={processColor('white')}
-                lineWidth={pinSize <= 16 ? 0 : (pinSize <= 24 ? 3 : 4)}
-                fontSize={(pinSize <= 24 ? 10 : 14)}
-                fontWeight='900'
-                opacity={(distanceToPosition > 1000 && distanceToRegion > 1000) ? 0.33 : 1}
-                style={{
-                    width: pinSize,
-                    height: pinSize,
-                }} />
+            onBlur: this.onStationBlur.bind(this, station)
         };
     }
 
@@ -365,6 +367,10 @@ class MapTabScene extends Component {
 
     render() {
         console.log('--- [MapTabScene] Render -------------------------------------------------------------------------------------');
+
+        const annotations = this.mapStationsToAnnotations(this.props.nearbyStations.data);
+
+        const onRegionCompleteDebounce = _.debounce(this.onRegionChangeComplete.bind(this), 300);
 
         return (
             <View style={{flex: 1}}>
@@ -387,13 +393,14 @@ class MapTabScene extends Component {
                     {this.props.atLeastOneStationAlreadyShown && this.renderStationToast()}
                 </Animated.View>
                 <Map
-                    annotations={this.state.annotations}
+                    version={this.state.version}
+                    annotations={annotations}
                     center={this.props.center}
                     geoLocation={this.props.geoLocation}
-                    pinSize={this.props.pinSize}
-                    onRegionChange={this.onRegionChange.bind(this)}
-                    onRegionChangeComplete={this.onRegionChangeComplete.bind(this)}
+                    onRegionChange={onRegionCompleteDebounce}
+                    onRegionChangeComplete={onRegionCompleteDebounce}
                     onChange={this.onChange.bind(this)}
+                    onPress={this.onPress.bind(this)}
                 />
             </View>
         )

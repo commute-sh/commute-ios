@@ -79752,7 +79752,7 @@ props));
 
 _this.state={
 stationToaster:new _reactNative.Animated.ValueXY(),
-stationToasterVisible:true,
+stationToastVisible:true,
 annotations:[]};
 
 
@@ -79811,7 +79811,7 @@ navigator.geolocation.clearWatch(this.watchID);}},{key:'stationToasterAppear',va
 cb){var _this4=this;
 var stationToast=this.refs.stationToast;
 _reactNative.Animated.timing(this.state.stationToaster,{duration:150,toValue:{x:0,y:0}}).start(function(){
-_this4.stationToasterVisible=true;
+_this4.stationToastVisible=true;
 if(stationToast&&stationToast.measure){
 stationToast.measure(function(fx,fy,width,height,px,py){
 console.log('Component width is: '+width);
@@ -79829,7 +79829,7 @@ cb&&cb();});}},{key:'stationToasterDisappear',value:function stationToasterDisap
 
 cb){var _this5=this;
 _reactNative.Animated.timing(this.state.stationToaster,{duration:150,toValue:{x:0,y:-160}}).start(function(){
-_this5.stationToasterVisible=false;
+_this5.stationToastVisible=false;
 cb&&cb();});}},{key:'onRegionChangeComplete',value:function onRegionChangeComplete(
 
 

@@ -13,16 +13,19 @@ import IconButton from './IconButton';
 
 import AndroidSegmented from 'react-native-segmented-android';
 
-export default class Map extends Component {
+import StationMarkerView from './StationMarkerView';
+
+class Map extends Component {
 
     static propTypes = {
         annotations: PropTypes.array,
+        version: PropTypes.number,
         center: PropTypes.object,
         geoLocation: PropTypes.object,
         onRegionChange: PropTypes.func,
         onRegionChangeComplete: PropTypes.func,
         onChange: PropTypes.func,
-        pinSize: PropTypes.number
+        onPress: PropTypes.func
     };
 
     static defaultProps = {
@@ -40,12 +43,27 @@ export default class Map extends Component {
         this.onRegionChange = this.onRegionChange.bind(this);
         this.onRegionChangeComplete = this.onRegionChangeComplete.bind(this);
         this.onChange = this.onChange.bind(this);
+        this.onPress = this.onPress.bind(this);
+    }
+
+    onPanDrap(event) {
+        console.log('[Map] onPanDrag');
+    }
+
+    onLongPress(event) {
+        console.log('[Map] onLongPress');
     }
 
     onChange(event) {
         this.setState({selectedIndex: Platform.OS === 'ios' ? event.nativeEvent.selectedSegmentIndex : event.selected });
         if (this.props.onChange) {
             this.props.onChange(event);
+        }
+    }
+
+    onPress(event) {
+        if (this.props.onPress) {
+            this.props.onPress(event);
         }
     }
 
@@ -88,22 +106,12 @@ export default class Map extends Component {
         };
     }
 
-    componentDidMount() {
-        // if (this.props.geoLocation) {
-        //     this.state.region = this.computeRegionFromLocation(this.props.geoLocation, 0.5);
-        //
-        //     console.log('[Map] ------------------ Current location region from geoLocation[1]:', this.state.region);
-        // } else if (this.props.center) {
-        //     this.state.region = this.computeRegionFromLocation(this.props.center, 0.5);
-        //
-        //     console.log('[Map] ------------------ Current location region from center[1]:', this.state.region);
-        // }
-    }
+    componentDidMount() { }
 
     componentWillReceiveProps(nextProps) {
         if (!this.props.geoLocation && nextProps.geoLocation) {
-
             if (this.state.region) {
+                console.log('[Map][1][a] !this.props.geoLocation && nextProps.geoLocation');
                 this.setState({
                     region: {
                         latitude: nextProps.geoLocation.latitude(),
@@ -113,6 +121,7 @@ export default class Map extends Component {
                     }
                 });
             } else {
+                console.log('[Map][1][b} !this.props.geoLocation && nextProps.geoLocation');
                 this.setState({
                     region: this.computeRegionFromLocation(nextProps.geoLocation, 0.5)
                 });
@@ -120,6 +129,8 @@ export default class Map extends Component {
 
             console.log('[Map] ------------------ Current location region from geoLocation[2]:', this.state.region);
         } else if (!this.props.geoLocation && !nextProps.geoLocation && nextProps.center) {
+            console.log('[Map][2] !this.props.geoLocation && !nextProps.geoLocation && nextProps.center');
+
             this.setState({
                 region: this.computeRegionFromLocation(nextProps.center, 0.5)
             });
@@ -129,38 +140,26 @@ export default class Map extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (this.props.pinSize !== nextProps.pinSize) {
-            console.log('[Map][Updating] pinSize changed (', this.props.pinSize, ', ', nextProps.pinSize, ')');
-            return true;
-        } else if (this.state.selectedIndex !== nextState.selectedIndex) {
-            console.log('[Map][Updating] selectedIndex changed (', this.state.selectedIndex, ', ', nextState.selectedIndex, ')');
-            return true;
-        } /*else if ((this.state.region && nextState && nextState.region && (nextState.region.latitude != this.state.region.latitude || nextState.region.longitude != this.state.region.longitude))) {
-            console.log('shouldComponentUpdate - centerOnLocation');
 
-            return true;
-        }*/ else if (nextState.centerOnLocation) {
-            this.state.centerOnLocation = false;
+        console.log(`--- selectedIndex: ${this.state.selectedIndex}, ${nextState.selectedIndex}`);
+
+        if (nextState.centerOnLocation) {
             console.log('[Map][Updating] center on location');
 
             return true;
+        } else if (this.props.version !== nextProps.version) {
+            console.log('[Map][Updating] props version changed (', this.props.version, ', ', nextProps.version, ')');
+            return true;
         }
 
-        const annotationsChanged = this.props.annotations.length !== nextProps.annotations.length;
-
-        if (annotationsChanged) {
-            console.log('[Map][Updating] annotation changed (', this.props.annotations.length, ', ', nextProps.annotations.length, ')');
-        }
-
- //       console.log('Received annotations are:', annotationsAreEqual ? 'equal' : 'not equal - should update component');
-        return annotationsChanged;
+        return false;
     }
 
     renderSegmentedControl() {
         if (Platform.OS === 'ios') {
             return (
                 <SegmentedControlIOS
-                    values={[ 'Places', 'Bornes' ]}
+                    values={[ 'Places', 'Vélos' ]}
                     selectedIndex={this.state.selectedIndex}
                     style={{ backgroundColor: 'white', width: 160 }}
                     tintColor="#325d7a"
@@ -172,7 +171,7 @@ export default class Map extends Component {
                 <AndroidSegmented
                     tintColor={['#325d7a','#ffffff']}
                     style={{ backgroundColor: 'white', width: 160, height: 30 }}
-                    childText={[ 'Places', 'Bornes' ]}
+                    childText={[ 'Places', 'Vélos' ]}
                     orientation='horizontal'
                     selectedPosition={this.state.selectedIndex}
                     onChange={this.onChange} />
@@ -186,6 +185,14 @@ export default class Map extends Component {
         console.log('--- [Map] Render -------------------------------------------------------------------------------------');
 
         console.log('[Map] -------------- Region:', this.state.region);
+
+        console.log('[Map] -------------- centerOnLocation:', this.state.centerOnLocation);
+
+        const centerOnLocation = this.state.centerOnLocation;
+
+        if (centerOnLocation) {
+            this.state.centerOnLocation = false;
+        }
 
         return (
             <View style={{ flex: 1 }}>
@@ -205,9 +212,14 @@ export default class Map extends Component {
                     showsUserLocation={true}
                     showsMyLocationButton={false}
                     showsCompass={false}
+                    toolbarEnabled={false}
                     onRegionChangeComplete={this.onRegionChangeComplete}
                     onRegionChange={this.onRegionChange}
-                    region={this.state.region}
+                    onPress={this.onPress}
+                    onPanDrag={this.onPanDrap}
+                    onLongPress={this.onLongPress}
+                    initialRegion={this.state.region}
+                    region={centerOnLocation ? this.state.region : undefined}
                  >
                     { this.props.annotations.map(annotation => {
                         return Platform.OS == 'ios' ? (
@@ -217,14 +229,18 @@ export default class Map extends Component {
                                 onDeselect={annotation.onBlur}
                                 draggable
                                 coordinate={annotation}
-                            />
+                            >
+                                <StationMarkerView {...annotation} />
+                            </MapView.Marker>
                         ) : (
                             <MapView.Marker
                                 key={annotation.id}
                                 onPress={annotation.onPress}
                                 draggable
                                 coordinate={annotation}
-                            />
+                            >
+                                <StationMarkerView {...annotation} />
+                            </MapView.Marker>
                         )
                     }) }
                 </MapView>
@@ -233,3 +249,5 @@ export default class Map extends Component {
     }
 
 }
+
+export default Map;

@@ -2,7 +2,8 @@ import moment from 'moment';
 import axios from 'axios';
 import Promise from 'bluebird';
 
-const apiBaseUrl = `http://api.commute.sh`;
+const apiBaseUrl = `http://172.20.10.2:3001`;
+// const apiBaseUrl = `http://api.commute.sh`;
 
 export function fetchStationsByContractName(contractName) {
 

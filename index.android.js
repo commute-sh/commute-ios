@@ -13,7 +13,8 @@ import Commute from './commute';
 import thunk from 'redux-thunk';
 import createLogger from 'redux-logger';
 
-let middleware = __DEV__ ? applyMiddleware(thunk, createLogger()) : applyMiddleware(thunk);
+//let middleware = __DEV__ ? applyMiddleware(thunk, createLogger()) : applyMiddleware(thunk);
+let middleware = applyMiddleware(thunk);
 
 let store = createStore(reducers, {}, middleware);
 
