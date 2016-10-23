@@ -184,6 +184,7 @@ class SearchTabScene extends Component {
     }
 
     onChangeText(value) {
+        console.log("[SearchtabScene] onChangeText:", value);
         this.updateSearch(value);
     }
 
@@ -201,7 +202,7 @@ class SearchTabScene extends Component {
             searchText: value,
             dataSource: !value ?
                 this.props.dataSource.cloneWithRows(this.props.contractStations[this.props.contractName].data) :
-                this.props.dataSource.cloneWithRows(this.props.contractStations[this.props.contractName].data.filter(station => station.name.search(new RegExp(this.state.searchText, "i")) >= 0))
+                this.props.dataSource.cloneWithRows(this.props.contractStations[this.props.contractName].data.filter(station => station.name.search(new RegExp(value, "i")) >= 0))
         });
     }
 
