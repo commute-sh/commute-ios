@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
-import CTAnnotationView from './CTAnnotationView';
+import StationMarkerView from './StationMarkerView';
 
 import EStyleSheet from 'react-native-extended-stylesheet';
 
@@ -10,7 +10,8 @@ import {
     View,
     Text,
     ScrollView,
-    processColor
+    processColor,
+    Platform
 } from 'react-native';
 
 import NativeMethodsMixin from 'react/lib/NativeMethodsMixin';
@@ -36,6 +37,10 @@ import * as locationActionCreators from '../actions/location'
 var screen = require('Dimensions').get('window');
 
 class StationDetailsScene extends Component {
+
+    static propTypes = {
+        station: PropTypes.object
+    };
 
     constructor(props) {
         super(props);
@@ -147,7 +152,16 @@ class StationDetailsScene extends Component {
                     {this.renderPhotoHeader()}
                     {this.renderMapHeader()}
                 </ScrollView>
-                <PageControl style={{position:'absolute', left:0, right:0, bottom:64}} numberOfPages={2} currentPage={this.state.currentPage} hidesForSinglePage={true} pageIndicatorTintColor='grey' indicatorSize={{width:8, height:8}} currentPageIndicatorTintColor='black' onPageIndicatorPress={this.onItemTap} />
+                <PageControl
+                    style={{position:'absolute', left:0, right:0, bottom:64}}
+                    numberOfPages={2}
+                    currentPage={this.state.currentPage}
+                    hidesForSinglePage={true}
+                    pageIndicatorTintColor='grey'
+                    indicatorSize={{width:8, height:8}}
+                    currentPageIndicatorTintColor='black'
+                    onPageIndicatorPress={this.onItemTap}
+                />
                 <View style={{ padding: 5, paddingLeft: 12, backgroundColor: 'rgba(0, 0, 0, 0.6)', position: 'absolute', left: 0, right: 0, bottom: 0 }}>
                     <Text style={{ fontFamily: 'System', fontSize: 17, fontWeight: '500', color: 'white' }}>{station.number || ' '} - {station.name || ' '}</Text>
                     <Text style={{ fontFamily: 'System', fontSize: 12, color: 'white', paddingTop: 5, paddingBottom: 5 }}>{station.address || ' '}</Text>
@@ -184,9 +198,6 @@ class StationDetailsScene extends Component {
         const imageSize = { w: 640, h: 400 };
         const zoom = 17;
 
-        const pinSize = 16;
-        const pinColor = this.getPinColor();
-
         const backgroundSourceUri = `https://maps.googleapis.com/maps/api/staticmap?center=${station.position.lat},${station.position.lng}&zoom=${zoom}&size=${imageSize.w}x${imageSize.h}&path=weight:3%7Ccolor:blue%7Cenc:{coaHnetiVjM??_SkM??~R`;
 
         console.log("Map URL:", backgroundSourceUri);
@@ -195,25 +206,21 @@ class StationDetailsScene extends Component {
             <NetworkImage source={{ uri: backgroundSourceUri }} style={{
                 width: screen.width,
                 height: screen.width * 240 / 320,
-                flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center'
             }}>
-                <CTAnnotationView
+                <StationMarkerView
                     number={station.number}
-                    pinSize={pinSize}
                     value={station.available_bikes}
-                    strokeColor={processColor(pinColor)}
-                    bgColor={processColor('white')}
-                    lineWidth={pinSize <= 16 ? 0 : (pinSize <= 24 ? 3 : 4)}
-                    fontSize={(pinSize <= 24 ? 10 : 14)}
+                    station={station}
+                    pinSize={32}
+                    strokeColor={this.getPinColor()}
+                    bgColor="white"
+                    lineWidth={3}
+                    fontSize={14}
                     fontWeight='900'
                     opacity={1}
-                    style={{
-                        width: pinSize,
-                        height: pinSize,
-                        backgroundColor: 'rgba(0, 0, 0, 0)'
-                    }}
+                    style={{ width: 32, height: 32 }}
                 />
             </NetworkImage>
     );
@@ -362,7 +369,7 @@ var styles = EStyleSheet.create({
         alignSelf: 'stretch',
         width: '100%',
         height: '100%',
-        top: 64,
+        top: Platform.OS === 'ios' ? 64 : 56,
         left: 0,
         position: 'absolute',
         zIndex: 1000,

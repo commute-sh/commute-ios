@@ -2,9 +2,9 @@ import moment from 'moment';
 import axios from 'axios';
 import Promise from 'bluebird';
 
-const apiBaseUrl = `http://192.168.4.10:3001`;
+//const apiBaseUrl = `http://192.168.4.10:3001`;
 // const apiBaseUrl = `http://172.20.10.2:3001`;
-// const apiBaseUrl = `http://api.commute.sh`;
+ const apiBaseUrl = `http://api.commute.sh`;
 
 export function fetchStationsByContractName(contractName) {
 
@@ -102,7 +102,7 @@ export function fetchDataByDateAndStationNumber(contractName, date, stationNumbe
 
     const start = moment();
     const targetDate = date.subtract(1, 'days');
-    let url = `http://api.commute.sh/stations/${contractName}/${stationNumber}/${targetDate.format('YYYYMMDD-HHmm')}/data`;
+    let url = `${apiBaseUrl}/stations/${contractName}/${stationNumber}/${targetDate.format('YYYYMMDD-HHmm')}/data`;
 
     console.log('[', start.format('HH:mm:ss.SSS'), '][StationService][FetchDataByDateAndStationNumber] Get Data for station:', stationNumber, ', contract name:', contractName, ', Nearby URL:', url);
 

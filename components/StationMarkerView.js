@@ -40,7 +40,6 @@ class StationMarkerView extends Component {
                 borderRadius: 100,
                 borderWidth: this.props.lineWidth,
                 borderColor: this.props.strokeColor,
-                flex: 1,
                 justifyContent: 'center',
                 alignItems: 'center'
             }}>
