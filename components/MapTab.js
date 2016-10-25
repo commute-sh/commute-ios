@@ -4,9 +4,7 @@ import {
     Animated,
     AppRegistry,
     StyleSheet,
-    NavigatorIOS,
     Navigator,
-    TabBarIOS,
     ScrollView,
     MapView,
     TouchableHighlight,
@@ -30,11 +28,6 @@ import * as nearbyStationActionCreators from '../actions/nearbyStations'
 
 class MapTab extends Component {
 
-    static propTypes = {
-        selectedTab: PropTypes.string,
-        onPress: PropTypes.func
-    };
-
     onFavoriteStarPress(station) {
         const favoriteStations = this.props.favoriteStations.data;
 
@@ -50,21 +43,6 @@ class MapTab extends Component {
     }
 
     render() {
-
-        return (
-            <Icon.TabBarItemIOS
-                title="Plan"
-                iconName="ios-globe-outline"
-                selectedIconName="ios-globe"
-                selected={this.props.selectedTab === 'map'}
-                onPress={this.props.onPress}
-            >
-                {this.renderNavigator()}
-            </Icon.TabBarItemIOS>
-        );
-    }
-
-    renderNavigator() {
 
         const favoriteStations = (this.props.favoriteStations || { data: []}).data;
 
