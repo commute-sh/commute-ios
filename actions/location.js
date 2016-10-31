@@ -20,7 +20,7 @@ export function initGeoLocation(dispatch) {
 
     console.log('$$$ Watching Geolocation ...');
     return navigator.geolocation.watchPosition((position) => {
-        console.log(`[watchPosition][locationChanged] position: ${position}`);
+        console.log('[watchPosition][locationChanged] position:', position);
         dispatch(locationChanged(position));
     });
 }
