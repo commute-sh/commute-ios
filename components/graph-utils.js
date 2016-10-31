@@ -56,10 +56,18 @@ export function createLineGraph({
     width,
     height,
 }) {
+    if (!data || data.length < 2) {
+        data = [
+            { time: moment() },
+            { time: moment() }
+        ];
+    }
+
+    const firstDatum = data[0];
     const lastDatum = data[data.length - 1];
 
     const scaleX = createScaleX(
-        data[0].time.unix(),
+        firstDatum.time.unix(),
         lastDatum.time.unix(),
         width - 20
     );
@@ -78,7 +86,6 @@ export function createLineGraph({
         .x((d) => 10 + scaleX(xAccessor(d)))
         .y((d) => 10 + scaleY(yAccessor(d)));
 
-    const firstDatum = data[0];
     const firstDate = moment(firstDatum.time);
     const lastDate = moment(lastDatum.time);
     const deltaFirstLast = moment.duration(lastDate.diff(firstDate)).asMinutes() / 2;

@@ -223,7 +223,7 @@ class StationDetailsScene extends Component {
                     style={{ width: 32, height: 32 }}
                 />
             </NetworkImage>
-    );
+        );
 
     }
 
@@ -306,7 +306,7 @@ class StationDetailsScene extends Component {
         if (this.state.dataToShow === 'AVAILABLE_BIKES') {
             graphProps.yAccessor = (d) => {
                 // console.log('d.available_bikes:', d.available_bikes);
-                return d.available_bikes;
+                return d ? (d.available_bikes || 0) : 0;
             }
         } else {
             graphProps.yAccessor = (d) => d.available_bike_stands;
