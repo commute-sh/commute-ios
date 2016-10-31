@@ -48,7 +48,10 @@ export function fetchStationsByNumbers(stationNumbers) {
 
     return axios.get(url, {
         timeout: 30000,
-        headers: { 'Accept': 'application/json' }
+        headers: {
+            'Accept': 'application/json',
+            'Cache-Control': 'no-cache'
+        }
     }).then(response => {
 
         let data = response.data;
@@ -71,13 +74,16 @@ export function fetchStationsByNumbers(stationNumbers) {
 export function fetchStationsNearby(position, distance = 1000, contractName = 'Paris') {
 
     const start = moment();
-    let url = `${apiBaseUrl}/stations/nearby?lat=${position.latitude}&lng=${position.longitude}&distance=${distance}&city=${contractName}`;
+    let url = `${apiBaseUrl}/stations/nearby?lat=${position.latitude}&lng=${position.longitude}&distance=${distance}&city=${contractName}}`;
 
     console.log('[', start.format('HH:mm:ss.SSS'), '][StationService][FetchStationsNearby] Get Stations Nearby URL:', url);
 
     return axios.get(url, {
         timeout: 30000,
-        headers: { 'Accept': 'application/json' }
+        headers: {
+            'Accept': 'application/json',
+            'Cache-Control': 'no-cache'
+        }
     }).then(response => {
 
         let data = response.data;
@@ -109,7 +115,8 @@ export function fetchDataByDateAndStationNumber(contractName, date, stationNumbe
     return axios.get(url, {
         timeout: 30000,
         headers: {
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'Cache-Control': 'no-cache'
         },
         validateStatus: function (status) {
             return status >= 200 && status < 300; // default
