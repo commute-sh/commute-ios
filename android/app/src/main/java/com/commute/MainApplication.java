@@ -2,6 +2,7 @@ package com.commute;
 
 import android.app.Application;
 
+import com.BV.LinearGradient.LinearGradientPackage;
 import com.facebook.react.ReactApplication;
 import com.higo.zhangyp.segmented.AndroidSegmentedPackage;
 import com.react.rnspinkit.RNSpinkitPackage;
@@ -28,6 +29,7 @@ public class MainApplication extends Application implements ReactApplication {
           new RNSpinkitPackage(),
           new MainReactPackage(),
           new VectorIconsPackage(),
+          new LinearGradientPackage(),
           new AndroidSegmentedPackage(),
           new MapsPackage()
       );
