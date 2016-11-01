@@ -11,6 +11,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.airbnb.android.react.maps.MapsPackage;
+import com.smixx.fabric.FabricPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +32,7 @@ public class MainApplication extends Application implements ReactApplication {
           new VectorIconsPackage(),
           new LinearGradientPackage(),
           new AndroidSegmentedPackage(),
+          new FabricPackage(),
           new MapsPackage()
       );
     }

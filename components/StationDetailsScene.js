@@ -2,8 +2,6 @@ import React, { Component, PropTypes } from 'react';
 
 import StationMarkerView from './StationMarkerView';
 
-import EStyleSheet from 'react-native-extended-stylesheet';
-
 import {
     Animated,
     Image,
@@ -74,16 +72,12 @@ class StationDetailsScene extends Component {
         console.log('--- [StationDetailsScene] Render -------------------------------------------------------------------------------------');
 
        return (
-            <View style={styles.container}>
-
-                <View style={{ flex: 1 }}>
-                    {this.renderHeader()}
-                    <ScrollView>
-                        {this.renderContent()}
-                        {this.renderHistory()}
-                    </ScrollView>
-                </View>
-            </View>
+            <ScrollView style={{ backgroundColor: '#fff' }}>
+                <View style={{ height: Platform.OS === 'ios' ? 64 : 56 }}></View>
+                {this.renderHeader()}
+                {this.renderContent()}
+                {this.renderHistory()}
+            </ScrollView>
         );
     }
 
@@ -362,23 +356,6 @@ class StationDetailsScene extends Component {
 }
 
 reactMixin(StationDetailsScene.prototype, NativeMethodsMixin);
-
-var styles = EStyleSheet.create({
-    container: {
-        flexDirection:'row',
-        alignSelf: 'stretch',
-        width: '100%',
-        height: '100%',
-        top: Platform.OS === 'ios' ? 64 : 56,
-        left: 0,
-        position: 'absolute',
-        zIndex: 1000,
-        backgroundColor: 'white'
-    }
-});
-
-// calculate styles
-EStyleSheet.build();
 
 
 const mapStateToProps = (state) => Object.assign({}, {

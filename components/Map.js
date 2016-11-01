@@ -11,8 +11,6 @@ import MapView from 'react-native-maps';
 
 import IconButton from './IconButton';
 
-import AndroidSegmented from 'react-native-segmented-android';
-
 import StationMarkerView from './StationMarkerView';
 
 class Map extends Component {
@@ -167,6 +165,8 @@ class Map extends Component {
                 />
             );
         } else {
+            var AndroidSegmented = require('react-native-segmented-android');
+
             return (
                 <AndroidSegmented
                     tintColor={['#325d7a','#ffffff']}

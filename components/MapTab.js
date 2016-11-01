@@ -28,6 +28,11 @@ import * as nearbyStationActionCreators from '../actions/nearbyStations'
 
 class MapTab extends Component {
 
+    static propTypes = {
+        onTabIconPress: PropTypes.func,
+        selectedTab: PropTypes.string
+    };
+
     onFavoriteStarPress(station) {
         const favoriteStations = this.props.favoriteStations.data;
 
@@ -43,6 +48,20 @@ class MapTab extends Component {
     }
 
     render() {
+       return (
+            <Icon.TabBarItemIOS
+                title="Plan"
+                iconName="ios-globe-outline"
+                selectedIconName="ios-globe"
+                selected={this.props.selectedTab === 'map'}
+                onPress={this.props.onTabIconPress}
+            >
+                {this.renderTab()}
+            </Icon.TabBarItemIOS>
+        );
+    }
+
+    renderTab() {
 
         const favoriteStations = (this.props.favoriteStations || { data: []}).data;
 
@@ -122,7 +141,6 @@ class MapTab extends Component {
                     />
                 }
             />
-
         );
     }
 

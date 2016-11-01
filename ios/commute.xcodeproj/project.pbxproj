@@ -30,6 +30,7 @@
 		544CBD1E1D53A49100C5BF62 /* CTAnnotationViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 544CBD1D1D53A49100C5BF62 /* CTAnnotationViewManager.m */; };
 		544CBD201D53B43C00C5BF62 /* CTAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 544CBD1F1D53B43C00C5BF62 /* CTAnnotationView.m */; };
 		544CBD871D5E167200C5BF62 /* libART.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 544CBD761D5E163100C5BF62 /* libART.a */; };
+		54CCCE5D1DC81167005E4E37 /* libSMXCrashlytics.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 54CCCE5C1DC8113F005E4E37 /* libSMXCrashlytics.a */; };
 		54EF4A911D92143F0065EA89 /* libDropRefreshControl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 54EF4A901D9214390065EA89 /* libDropRefreshControl.a */; };
 		54EF4A951D947EB40065EA89 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54EF4A931D947EB40065EA89 /* Fabric.framework */; };
 		54EF4A981D9481570065EA89 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54EF4A971D9481570065EA89 /* Crashlytics.framework */; };
@@ -151,6 +152,13 @@
 			remoteGlobalIDString = D42CB3511B2538DE00FD0AE2;
 			remoteInfo = RNSpinkit;
 		};
+		54CCCE5B1DC8113F005E4E37 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 54CCCE441DC8113F005E4E37 /* SMXCrashlytics.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D8D9DB831C6D03DB009FBC0E;
+			remoteInfo = SMXCrashlytics;
+		};
 		54EF4A8F1D9214390065EA89 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 54EF4A8B1D9214390065EA89 /* DropRefreshControl.xcodeproj */;
@@ -217,6 +225,7 @@
 		544CBD1F1D53B43C00C5BF62 /* CTAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CTAnnotationView.m; path = commute/CTAnnotationView.m; sourceTree = "<group>"; };
 		544CBD231D53D9C700C5BF62 /* CTAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CTAnnotationView.h; path = commute/CTAnnotationView.h; sourceTree = "<group>"; };
 		544CBD711D5E163000C5BF62 /* ART.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ART.xcodeproj; path = "../node_modules/react-native/Libraries/ART/ART.xcodeproj"; sourceTree = "<group>"; };
+		54CCCE441DC8113F005E4E37 /* SMXCrashlytics.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SMXCrashlytics.xcodeproj; path = "../node_modules/react-native-fabric/ios/SMXCrashlytics.xcodeproj"; sourceTree = "<group>"; };
 		54EF4A8B1D9214390065EA89 /* DropRefreshControl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DropRefreshControl.xcodeproj; path = "../node_modules/react-native-drop-refresh/DropRefreshControl.xcodeproj"; sourceTree = "<group>"; };
 		54EF4A931D947EB40065EA89 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 		54EF4A971D9481570065EA89 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
@@ -253,6 +262,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				54CCCE5D1DC81167005E4E37 /* libSMXCrashlytics.a in Frameworks */,
 				146834051AC3E58100842450 /* libReact.a in Frameworks */,
 				54EF4A911D92143F0065EA89 /* libDropRefreshControl.a in Frameworks */,
 				00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */,
@@ -424,6 +434,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		54CCCE451DC8113F005E4E37 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				54CCCE5C1DC8113F005E4E37 /* libSMXCrashlytics.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		54EF4A8C1D9214390065EA89 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -474,6 +492,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				54CCCE441DC8113F005E4E37 /* SMXCrashlytics.xcodeproj */,
 				5415C7151DB57E840038E212 /* AirMaps.xcodeproj */,
 				54EF4A971D9481570065EA89 /* Crashlytics.framework */,
 				54EF4A931D947EB40065EA89 /* Fabric.framework */,
@@ -676,6 +695,10 @@
 					ProductGroup = 54FA15801D4D443F00872BA4 /* Products */;
 					ProjectRef = EF939F4DF22E43828BAF4DA3 /* RNVectorIcons.xcodeproj */;
 				},
+				{
+					ProductGroup = 54CCCE451DC8113F005E4E37 /* Products */;
+					ProjectRef = 54CCCE441DC8113F005E4E37 /* SMXCrashlytics.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -782,6 +805,13 @@
 			fileType = archive.ar;
 			path = libRNSpinkit.a;
 			remoteRef = 545B08241D7F698400D8157D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		54CCCE5C1DC8113F005E4E37 /* libSMXCrashlytics.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libSMXCrashlytics.a;
+			remoteRef = 54CCCE5B1DC8113F005E4E37 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		54EF4A901D9214390065EA89 /* libDropRefreshControl.a */ = {
