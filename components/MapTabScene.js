@@ -189,10 +189,10 @@ class MapTabScene extends Component {
         this.setState({ version: this.state.version + 1 });
     }
 
-    onPress() {
-        console.log('[MapTabScene] onPress');
-        this.onStationBlur(undefined);
-    }
+    // onPress() {
+    //     console.log('[MapTabScene] onPress');
+    //     this.onStationBlur(undefined);
+    // }
 
     onStationPress(station) {
         if (!this.props.station) {
@@ -400,7 +400,7 @@ class MapTabScene extends Component {
                     onRegionChange={onRegionCompleteDebounce}
                     onRegionChangeComplete={onRegionCompleteDebounce}
                     onChange={this.onChange.bind(this)}
-                    onPress={this.onPress.bind(this)}
+                    // onPress={this.onPress.bind(this)}
                 />
             </View>
         )
