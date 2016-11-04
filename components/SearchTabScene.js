@@ -112,7 +112,7 @@ class SearchTabScene extends Component {
     renderSearchBar() {
 
         if (Platform.OS === 'ios') {
-            return (<SearchBar placeholder="Search"
+            return (<SearchBar placeholder="Recherche"
                        ref="searchBar"
 
                        tintColor="#edeef2"
@@ -132,26 +132,6 @@ class SearchTabScene extends Component {
     }
 
     render() {
-
-        const CoSearchBar = Platform.select({
-            ios: () => () =>
-                <SearchBar placeholder="Search"
-                                  ref="searchBar"
-
-                                  tintColor="#edeef2"
-                                  barTintColor="#edeef2"
-
-                                  style={{ marginTop: 64, height: 44, backgroundColor: '#edeef2' }}
-                                  onChangeText={this.onChangeText}
-                                  enablesReturnKeyAutomatically={true}
-                                  onSearchButtonPress={this.onSearchButtonPress}
-                                  onCancelButtonPress={this.onCancelButtonPress}
-                />,
-            android: () => () =>
-                <View style={{ height: 44, backgroundColor: "white" }}>
-                    <TextInput onChangeText={this.onChangeText} style={{ flex: 1 }} />
-                </View>
-        })();
 
         console.log('*********************** this.props.dataSource.getRowCount():', this.state.dataSource.getRowCount());
 
