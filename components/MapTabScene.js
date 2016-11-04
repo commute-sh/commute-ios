@@ -183,28 +183,39 @@ class MapTabScene extends Component {
     /// Events
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    onStationToggle(fn, value) {
+        console.log("--- onStationToggle:", fn, ", value:", value);
+        fn(value);
+    }
+
+    onStationToggleDebounce = _.debounce(this.onStationToggle.bind(this), 300, {leading:true, trailing:false});
+
+
     onChange(event) {
         const annotationType = (Platform.OS === 'ios' ? event.nativeEvent.selectedSegmentIndex : event.selected) === 0 ? 'STANDS' : 'BIKES';
         this.props.actions.updateAnnotationType(annotationType);
         this.setState({ version: this.state.version + 1 });
     }
 
-    // onPress() {
-    //     console.log('[MapTabScene] onPress');
-    //     this.onStationBlur(undefined);
-    // }
+    onPress() {
+        console.log('--------------- [MapTabScene] onPress (onStationBlur)');
+
+        this.onStationToggleDebounce(this.onStationBlur.bind(this), undefined);
+    }
 
     onStationPress(station) {
+        console.log('--------------- [MapTabScene] onStationPress');
         if (!this.props.station) {
-            this.onStationFocus(station);
+            this.onStationToggleDebounce(this.onStationFocus.bind(this), station);
         } else if (station.number !== this.props.station.number) {
-            this.onStationFocus(station);
+            this.onStationToggleDebounce(this.onStationFocus.bind(this), station);
         } else {
-            this.onStationBlur(station);
+            this.onStationToggleDebounce(this.onStationBlur.bind(this), station);
         }
     }
 
     onStationBlur(station) {
+        console.log('--------------- [MapTabScene] onStationBlur');
         this.enqueueAnimation((animCb) => {
             console.log('On Blur - Station:', station ? station.number : undefined);
             this.stationToasterDisappear(300, () => {
@@ -215,6 +226,7 @@ class MapTabScene extends Component {
     }
 
     onStationFocus(station) {
+        console.log('--------------- [MapTabScene] onStationFocus');
         this.enqueueAnimation((animCb) => {
             console.log('On Focus - Station:', station.number);
             this.props.actions.selectStation(station);
@@ -355,8 +367,8 @@ class MapTabScene extends Component {
             opacity: (distanceToPosition > 1000 && distanceToRegion > 1000) ? 0.33 : 1,
 
             onPress: this.onStationPress.bind(this, station),
-            onFocus: this.onStationFocus.bind(this, station),
-            onBlur: this.onStationBlur.bind(this, station)
+//            onFocus: this.onStationFocus.bind(this, station),
+//            onBlur: this.onStationBlur.bind(this, station)
         };
     }
 
@@ -400,7 +412,7 @@ class MapTabScene extends Component {
                     onRegionChange={onRegionCompleteDebounce}
                     onRegionChangeComplete={onRegionCompleteDebounce}
                     onChange={this.onChange.bind(this)}
-                    // onPress={this.onPress.bind(this)}
+                    onPress={this.onPress.bind(this)}
                 />
             </View>
         )

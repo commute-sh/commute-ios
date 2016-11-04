@@ -225,12 +225,10 @@ class Map extends Component {
                         return Platform.OS == 'ios' ? (
                             <MapView.Marker
                                 key={annotation.id}
-                                onSelect={annotation.onFocus}
-                                onDeselect={annotation.onBlur}
                                 draggable
                                 coordinate={annotation}
                             >
-                                <StationMarkerView {...annotation} />
+                                <StationMarkerView {...annotation} onPress={annotation.onPress} />
                             </MapView.Marker>
                         ) : (
                             <MapView.Marker

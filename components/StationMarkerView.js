@@ -2,7 +2,8 @@ import React, { Component, PropTypes } from 'react';
 import {
     View,
     Text,
-    Platform
+    Platform,
+    TouchableWithoutFeedback
 } from 'react-native';
 
 class StationMarkerView extends Component {
@@ -18,7 +19,8 @@ class StationMarkerView extends Component {
         lineWidth: PropTypes.number,
         fontSize: PropTypes.number,
         fontWeight: PropTypes.string,
-        opacity: PropTypes.number
+        opacity: PropTypes.number,
+        onPress: PropTypes.func
     };
 
     static defaultProps = {
@@ -31,25 +33,33 @@ class StationMarkerView extends Component {
         fontWeight: 900
     };
 
+    onPress(e) {
+        if (this.props.onPress) {
+            this.props.onPress(e);
+        }
+    }
+
     render() {
         return (
-            <View style={{
-                width: this.props.pinSize,
-                height: this.props.pinSize,
-                backgroundColor: 'white',
-                borderRadius: 100,
-                borderWidth: this.props.lineWidth,
-                borderColor: this.props.strokeColor,
-                justifyContent: 'center',
-                alignItems: 'center'
-            }}>
-                <Text style={{
-                    fontSize: this.props.fontSize,
-                    fontWeight: this.props.fontWeight,
-                    color: this.props.strokeColor }}>
-                    {this.props.value}
-                </Text>
-            </View>
+            <TouchableWithoutFeedback onPress={this.onPress.bind(this)}>
+                <View style={{
+                    width: this.props.pinSize,
+                    height: this.props.pinSize,
+                    backgroundColor: 'white',
+                    borderRadius: 100,
+                    borderWidth: this.props.lineWidth,
+                    borderColor: this.props.strokeColor,
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}>
+                    <Text style={{
+                        fontSize: this.props.fontSize,
+                        fontWeight: this.props.fontWeight,
+                        color: this.props.strokeColor }}>
+                        {this.props.value}
+                    </Text>
+                </View>
+            </TouchableWithoutFeedback>
         )
     }
 
