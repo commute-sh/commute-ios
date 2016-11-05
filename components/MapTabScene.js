@@ -64,7 +64,11 @@ class MapTabScene extends Component {
 
     componentWillReceiveProps(nextProps) {
 
-        if (!isPositionEqual(this.props.position, nextProps.position)) {
+        if (
+            nextProps.position &&
+            nextProps.position.coords &&
+            !isPositionEqual(this.props.position, nextProps.position)
+        ) {
             this.props.actions.fetchNearbyStations(nextProps.position.coords);
         }
 
