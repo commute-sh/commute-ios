@@ -133,7 +133,7 @@ export function fetchDataByDateAndStationNumber(contractName, date, stationNumbe
         const duration = moment.duration(end.diff(start)).asMilliseconds();
 
         console.log('[', end.format('HH:mm:ss.SSS'), '][StationService][FetchDataByDateAndStationNumber] Status: ', response.status, ' - Data loaded in', duration, "ms");
-        console.log("*** Data:", data);
+//        console.log("*** Data:", data);
 
         return data;
     });
