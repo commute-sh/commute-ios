@@ -105,7 +105,7 @@ class MapTab extends Component {
                                 }
                             },
                             RightButton: (route, navigator, index, navState) => {
-                                if (route.id ===  'StationDetails') {
+                                if (route.id === 'StationDetails') {
                                     return (
                                         <View style={{paddingTop: 4, paddingRight: 12}}>
                                             <TouchableHighlight underlayColor="transparent" onPress={this.onFavoriteStarPress.bind(this, route.station)}>

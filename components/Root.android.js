@@ -126,7 +126,7 @@ class Root extends Component {
 
                                 console.log(`Right Button [route id: ${route.id}, index: ${index}, this.state.currentPage: ${this.state.currentPage}]`);
 
-                                if (route.id ===  'StationDetails') {
+                                if (route.id === 'StationDetails') {
                                     return (
                                         <View style={{paddingTop: 10, paddingRight: 12}}>
                                             <TouchableHighlight underlayColor="transparent" onPress={this.onFavoriteStarPress.bind(this, route.station)}>

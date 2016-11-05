@@ -20,6 +20,11 @@ import EvilIcon from 'react-native-vector-icons/EvilIcons';
 import FavoriteStationsTabScene from './FavoriteStationsTabScene';
 import StationDetailsScene from './StationDetailsScene';
 
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+
+import * as favoriteStationActionCreators from '../actions/favoriteStations'
+
 class FavoriteTab extends Component {
 
     static propTypes = {
@@ -27,7 +32,20 @@ class FavoriteTab extends Component {
         selectedTab: PropTypes.string
     };
 
+    onFavoriteStarPress(station) {
+        const favoriteStations = this.props.favoriteStations.data;
+
+        if (favoriteStations.map(fs => fs.number).indexOf(station.number) >= 0) {
+            this.props.actions.removeFavoriteStation(station);
+        } else {
+            this.props.actions.addFavoriteStation(station);
+        }
+    }
+
     render() {
+
+        const favoriteStations = (this.props.favoriteStations || { data: []}).data;
+
         return (
             <Icon.TabBarItemIOS
                              title="Favoris"
@@ -70,9 +88,23 @@ class FavoriteTab extends Component {
                                     }
                                     else { return null }
                                 },
-                                RightButton: (route, navigator, index, navState) =>
-                                    null
-                                ,
+                                RightButton: (route, navigator, index, navState) => {
+
+                                    console.log(`Right Button [route id: ${route.id}, index: ${index}`);
+
+                                    if (route.id === 'StationDetails') {
+                                        return (
+                                            <View style={{paddingTop: 4, paddingRight: 12}}>
+                                                <TouchableHighlight underlayColor="transparent" onPress={this.onFavoriteStarPress.bind(this, route.station)}>
+                                                    <Icon
+                                                        name={ favoriteStations.map(fs => fs.number).indexOf(route.station.number) >= 0 ? 'ios-star' : 'ios-star-outline' }
+                                                        size={32}
+                                                        color="white" />
+                                                </TouchableHighlight>
+                                            </View>
+                                        );
+                                    } else { return null; }
+                                },
                                 Title: (route, navigator, index, navState) =>
                                     <View style={{ paddingTop: 2 }}>
                                         <Image source={require('../images/commute-icon.png')} style={{ width: 32, height: 32 }}/>
@@ -90,4 +122,20 @@ class FavoriteTab extends Component {
 
 }
 
-export default FavoriteTab;
+
+const mapStateToProps = (state) => Object.assign({}, {
+    favoriteStations: state.favoriteStations,
+    map: state.map
+});
+
+const mapDispatchToProps = (dispatch) => ({
+    actions: bindActionCreators(
+        Object.assign({}, favoriteStationActionCreators),
+        dispatch
+    )
+});
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(FavoriteTab);
