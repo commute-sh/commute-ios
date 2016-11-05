@@ -19,7 +19,9 @@ xcuserdata
 DerivedData
 *.hmap
 *.ipa
+*.dSYM.zip
 *.xcuserstate
+report.xml
 project.xcworkspace
 
 # Android/IJ
