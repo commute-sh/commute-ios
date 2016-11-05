@@ -28,7 +28,7 @@ class Map extends Component {
 
     static defaultProps = {
         annotations: []
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -116,12 +116,14 @@ class Map extends Component {
                         longitude: nextProps.geoLocation.longitude(),
                         latitudeDelta: this.state.region.latitudeDelta,
                         longitudeDelta: this.state.region.longitudeDelta
-                    }
+                    },
+                    centerOnLocation: true
                 });
             } else {
                 console.log('[Map][1][b} !this.props.geoLocation && nextProps.geoLocation');
                 this.setState({
-                    region: this.computeRegionFromLocation(nextProps.geoLocation, 0.5)
+                    region: this.computeRegionFromLocation(nextProps.geoLocation, 0.5),
+                    centerOnLocation: true
                 });
             }
 
@@ -130,7 +132,8 @@ class Map extends Component {
             console.log('[Map][2] !this.props.geoLocation && !nextProps.geoLocation && nextProps.center');
 
             this.setState({
-                region: this.computeRegionFromLocation(nextProps.center, 0.5)
+                region: this.computeRegionFromLocation(nextProps.center, 0.5),
+                centerOnLocation: true
             });
 
             console.log('[Map] ------------------ Current location region from center[1]:', this.state.region);
@@ -191,6 +194,7 @@ class Map extends Component {
         const centerOnLocation = this.state.centerOnLocation;
 
         if (centerOnLocation) {
+            console.log('[Map] -------------- Centering on location', this.state.centerOnLocation, '(Setting centerOnLocation to false)');
             this.state.centerOnLocation = false;
         }
 
