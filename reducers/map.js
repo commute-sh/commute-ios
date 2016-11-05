@@ -3,7 +3,12 @@ import constants from '../constants/map';
 import GeoPoint from 'geopoint';
 
 const initialState = {
-    region: undefined,
+    region: {
+        longitudeDelta: 0.00772,
+        latitude: 48.85319,
+        longitude: 2.34831,
+        latitudeDelta: 0.00819
+    },
     annotationType: 'STANDS',
     pinSize: 32,
     center: new GeoPoint(48.85319, 2.34831),

@@ -18,7 +18,7 @@ class Map extends Component {
     static propTypes = {
         annotations: PropTypes.array,
         version: PropTypes.number,
-        center: PropTypes.object,
+        region: PropTypes.object,
         geoLocation: PropTypes.object,
         onRegionChange: PropTypes.func,
         onRegionChangeComplete: PropTypes.func,
@@ -28,7 +28,7 @@ class Map extends Component {
 
     static defaultProps = {
         annotations: []
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -83,10 +83,12 @@ class Map extends Component {
             region.longitudeDelta = region.longitudeDelta +  (Math.random() + 0.0001) * 0.0001;
 
             this.setState({ region: region, centerOnLocation: true });
+            this.props.onRegionChangeComplete(region);
         } else if (this.props.geoLocation) {
             let region = this.computeRegionFromLocation(this.props.geoLocation);
 
             this.setState({ region: region, centerOnLocation: true });
+            this.props.onRegionChangeComplete(region);
         }
     }
 
@@ -110,28 +112,37 @@ class Map extends Component {
         if (!this.props.geoLocation && nextProps.geoLocation) {
             if (this.state.region) {
                 console.log('[Map][1][a] !this.props.geoLocation && nextProps.geoLocation');
+                const region = {
+                    latitude: nextProps.geoLocation.latitude(),
+                    longitude: nextProps.geoLocation.longitude(),
+                    latitudeDelta: this.state.region.latitudeDelta,
+                    longitudeDelta: this.state.region.longitudeDelta
+                };
                 this.setState({
-                    region: {
-                        latitude: nextProps.geoLocation.latitude(),
-                        longitude: nextProps.geoLocation.longitude(),
-                        latitudeDelta: this.state.region.latitudeDelta,
-                        longitudeDelta: this.state.region.longitudeDelta
-                    }
+                    region: region,
+                    centerOnLocation: true
                 });
+                this.onRegionChangeComplete(region);
             } else {
                 console.log('[Map][1][b} !this.props.geoLocation && nextProps.geoLocation');
+                const region = this.computeRegionFromLocation(nextProps.geoLocation, 0.5);
                 this.setState({
-                    region: this.computeRegionFromLocation(nextProps.geoLocation, 0.5)
+                    region: region,
+                    centerOnLocation: true
                 });
+                this.onRegionChangeComplete(region);
             }
 
             console.log('[Map] ------------------ Current location region from geoLocation[2]:', this.state.region);
-        } else if (!this.props.geoLocation && !nextProps.geoLocation && nextProps.center) {
-            console.log('[Map][2] !this.props.geoLocation && !nextProps.geoLocation && nextProps.center');
+        } else if (!this.props.geoLocation && !nextProps.geoLocation && nextProps.region) {
+            console.log('[Map][2] !this.props.geoLocation && !nextProps.geoLocation && nextProps.region');
 
+            const region = nextProps.region;
             this.setState({
-                region: this.computeRegionFromLocation(nextProps.center, 0.5)
+                region: region,
+                centerOnLocation: true
             });
+            this.onRegionChangeComplete(region);
 
             console.log('[Map] ------------------ Current location region from center[1]:', this.state.region);
         }
@@ -191,6 +202,7 @@ class Map extends Component {
         const centerOnLocation = this.state.centerOnLocation;
 
         if (centerOnLocation) {
+            console.log('[Map] -------------- Centering on location', this.state.centerOnLocation, '(Setting centerOnLocation to false)');
             this.state.centerOnLocation = false;
         }
 

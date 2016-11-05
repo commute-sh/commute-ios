@@ -171,11 +171,13 @@ class MapTabScene extends Component {
         } else if (this.props.station !== nextProps.station) {
             console.log('[MapTabScene][Updating][1] selected station changed (', this.props.station ? this.props.station.number : '<undefined />', ', ', nextProps.station ? nextProps.station.number : '<undefined />', ')');
             return true;
-        } else if (this.props.center && nextProps.center && (
-                this.props.center.latitude() !== nextProps.center.latitude() ||
-                this.props.center.longitude() !== nextProps.center.longitude()
+        } else if (this.props.region && nextProps.region && (
+                this.props.region.latitude !== nextProps.region.latitude ||
+                this.props.region.longitude !== nextProps.region.longitude ||
+                this.props.region.longitudeDelta !== nextProps.region.longitudeDelta ||
+                this.props.region.latitudeDelta !== nextProps.region.latitudeDelta
             )) {
-            console.log('[MapTabScene][Updating][2] position changed (', this.props.center, ', ', nextProps.center, ')');
+            console.log('[MapTabScene][Updating][2] position changed (', this.props.region, ', ', nextProps.region, ')');
             return true;
         }
 
@@ -411,7 +413,7 @@ class MapTabScene extends Component {
                 <Map
                     version={this.state.version}
                     annotations={annotations}
-                    center={this.props.center}
+                    region={this.props.region}
                     geoLocation={this.props.geoLocation}
                     onRegionChange={onRegionCompleteDebounce}
                     onRegionChangeComplete={onRegionCompleteDebounce}
@@ -471,6 +473,7 @@ const mapStateToProps = (state) => Object.assign({}, {
     nearbyStations: state.nearbyStations,
     map: state.map,
     region: state.map.region,
+    center: state.map.center,
     annotationType: state.map.annotationType,
     pinSize: state.map.pinSize,
     station: state.map.station,
