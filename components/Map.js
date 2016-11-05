@@ -44,16 +44,9 @@ class Map extends Component {
         this.onPress = this.onPress.bind(this);
     }
 
-    onPanDrap(event) {
-        console.log('[Map] onPanDrag');
-    }
-
-    onLongPress(event) {
-        console.log('[Map] onLongPress');
-    }
-
     onChange(event) {
         this.setState({selectedIndex: Platform.OS === 'ios' ? event.nativeEvent.selectedSegmentIndex : event.selected });
+
         if (this.props.onChange) {
             this.props.onChange(event);
         }
@@ -66,11 +59,15 @@ class Map extends Component {
     }
 
     onRegionChange(region) {
-        this.props.onRegionChange(region);
+        if (this.props.onRegionChange) {
+            this.props.onRegionChange(region);
+        }
     }
 
     onRegionChangeComplete(region) {
-        this.props.onRegionChangeComplete(region);
+        if (this.props.onRegionChangeComplete) {
+            this.props.onRegionChangeComplete(region);
+        }
     }
 
     onCenterOnLocation() {
@@ -105,8 +102,6 @@ class Map extends Component {
             longitudeDelta: longitudeDelta
         };
     }
-
-    componentDidMount() { }
 
     componentWillReceiveProps(nextProps) {
         if (!this.props.geoLocation && nextProps.geoLocation) {
@@ -228,8 +223,6 @@ class Map extends Component {
                     onRegionChangeComplete={this.onRegionChangeComplete}
                     onRegionChange={this.onRegionChange}
                     onPress={this.onPress}
-                    onPanDrag={this.onPanDrap}
-                    onLongPress={this.onLongPress}
                     initialRegion={this.state.region}
                     region={centerOnLocation ? this.state.region : undefined}
                  >

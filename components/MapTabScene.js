@@ -240,8 +240,6 @@ class MapTabScene extends Component {
         });
     }
 
-    onRegionChange(region) { }
-
     onRegionChangeComplete(region) {
 
         if (!region) {
