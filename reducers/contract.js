@@ -1,3 +1,3 @@
-import { createReducer } from '../utils';
+import { createReducer } from '../utils/Reducers';
 
 export default createReducer({ name: 'Paris' }, {});

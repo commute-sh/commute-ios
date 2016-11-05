@@ -19,7 +19,7 @@ import {
 
 import Swipeout from 'react-native-animated-swipeout';
 
-import { getColor } from '../utils';
+import { stationPinColor } from '../utils/Stations';
 
 var LISTVIEW = 'FavoriteListView';
 
@@ -171,7 +171,7 @@ class FavoriteStationsTabScene extends Component {
                         </View>
 
                         <View style={{ width: 80, padding: 20, paddingTop: 20, paddingBottom: 20, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end' }}>
-                            <Text style={{ fontFamily: 'System', fontSize: 18, fontWeight: '500', color: rowPress ? getColor(station.available_bikes) : getColor(station.available_bikes) }}>{station.available_bikes}</Text>
+                            <Text style={{ fontFamily: 'System', fontSize: 18, fontWeight: '500', color: stationPinColor(station, 'BIKES') }}>{station.available_bikes}</Text>
                             { station.distance && <Text style={{ fontFamily: 'System', fontSize: 12, fontWeight: '500', color: rowPress ? '#c2c2c2' : '#c2c2c2' }}>{(station.distance / 1000).toFixed(1)} km</Text>}
                         </View>
                     </View>

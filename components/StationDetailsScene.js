@@ -32,6 +32,8 @@ import { bindActionCreators } from 'redux'
 
 import * as locationActionCreators from '../actions/location'
 
+import { stationPinColor } from '../utils/Stations';
+
 var screen = require('Dimensions').get('window');
 
 class StationDetailsScene extends Component {
@@ -47,10 +49,6 @@ class StationDetailsScene extends Component {
             currentPage: 0,
             dataToShow: 'AVAILABLE_BIKES'
         };
-
-        this.onScroll = this.onScroll.bind(this);
-        this.onItemTap = this.onItemTap.bind(this);
-        this.onChartPress = this.onChartPress.bind(this);
     }
 
     componentDidMount() {
@@ -81,43 +79,6 @@ class StationDetailsScene extends Component {
         );
     }
 
-    getPinColor() {
-
-        const station = this.props.station;
-
-        const showStands = false;
-        const showBikes = !showStands;
-
-        let pinColor = '#2ecc71'; // GREEN
-
-        if (station.status === 'CLOSED') {
-            pinColor = '#000000';
-        } else if (showStands && station.available_bike_stands === 0 || showBikes && station.available_bikes === 0) {
-            pinColor = '#e74c3c'; // RED
-        } else if (showStands && station.available_bike_stands <= 3 || showBikes && station.available_bikes <= 3) {
-            pinColor = '#d35400'; // ORANGE
-        } else if (showStands && station.available_bike_stands <= 5 || showBikes && station.available_bikes <= 5) {
-            pinColor = '#f39c12'; // YELLOW
-        }
-
-        return pinColor;
-    }
-
-    getColor(items) {
-
-        let pinColor = '#2ecc71';
-
-        if (items === 0) {
-            pinColor = '#e74c3c';
-        } else if (items <= 3) {
-            pinColor = '#d35400';
-        } else if (items <= 5) {
-            pinColor = '#f39c12';
-        }
-
-        return pinColor;
-    }
-
     onScroll(event) {
         var offsetX = event.nativeEvent.contentOffset.x,
             pageWidth = screen.width - 10;
@@ -142,7 +103,7 @@ class StationDetailsScene extends Component {
                 width: screen.width,
                 height: screen.width * 240 / 320
             }}>
-                <ScrollView pagingEnabled={true} horizontal={true} showsHorizontalScrollIndicator={false} bounces={false} onScroll={this.onScroll} scrollEventThrottle={16}>
+                <ScrollView pagingEnabled={true} horizontal={true} showsHorizontalScrollIndicator={false} bounces={false} onScroll={this.onScroll.bind(this)} scrollEventThrottle={16}>
                     {this.renderPhotoHeader()}
                     {this.renderMapHeader()}
                 </ScrollView>
@@ -154,7 +115,7 @@ class StationDetailsScene extends Component {
                     pageIndicatorTintColor='grey'
                     indicatorSize={{width:8, height:8}}
                     currentPageIndicatorTintColor='black'
-                    onPageIndicatorPress={this.onItemTap}
+                    onPageIndicatorPress={this.onItemTap.bind(this)}
                 />
                 <View style={{ padding: 5, paddingLeft: 12, backgroundColor: 'rgba(0, 0, 0, 0.6)', position: 'absolute', left: 0, right: 0, bottom: 0 }}>
                     <Text style={{ fontFamily: 'System', fontSize: 17, fontWeight: '500', color: 'white' }}>{station.number || ' '} - {station.name || ' '}</Text>
@@ -208,7 +169,7 @@ class StationDetailsScene extends Component {
                     value={station.available_bikes}
                     station={station}
                     pinSize={32}
-                    strokeColor={this.getPinColor()}
+                    strokeColor={stationPinColor(station, 'BIKES')}
                     bgColor="white"
                     lineWidth={3}
                     fontSize={14}
@@ -250,11 +211,11 @@ class StationDetailsScene extends Component {
                     }}>
                         <View style={{ flex: 0.6, flexDirection: 'column' }}>
                             <Text style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Vélos Dispos.</Text>
-                            <Text style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: this.getColor(station.available_bikes) }}>{station.available_bikes !== undefined ? station.available_bikes : '-'}</Text>
+                            <Text style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: stationPinColor(station, 'BIKES') }}>{station.available_bikes !== undefined ? station.available_bikes : '-'}</Text>
                         </View>
                         <View style={{ flex: 0.6, flexDirection: 'column', paddingLeft: 20 }}>
                             <Text style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Places Dispos.</Text>
-                            <Text style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: this.getColor(station.available_bike_stands) }}>{station.available_bike_stands !== undefined ? station.available_bike_stands : '-'}</Text>
+                            <Text style={{ fontFamily: 'System', fontSize: 48, fontWeight: '100', color: stationPinColor(station, 'STANDS') }}>{station.available_bike_stands !== undefined ? station.available_bike_stands : '-'}</Text>
                         </View>
                         <View style={{ flex: 0.6, flexDirection: 'column', paddingLeft: 20 }}>
                             <Text style={{ fontFamily: 'System', fontSize: 12, color: '#4A4A4A' }}>Distance</Text>
@@ -330,7 +291,7 @@ class StationDetailsScene extends Component {
                             [ "#fb9757", "#fc6040", "#fb412b" ] :
                             [ "#4295ff", "#2165c6", "#053a9a" ]
                     }
-                    onPress={this.onChartPress}
+                    onPress={this.onChartPress.bind(this)}
                     {...graphProps}
                 />
             </View>

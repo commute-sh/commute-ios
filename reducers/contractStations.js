@@ -1,4 +1,4 @@
-import { createReducer } from '../utils';
+import { createReducer } from '../utils/Reducers';
 import constants from '../constants/contractStations';
 import GeoPoint from 'geopoint';
 import moment from 'moment';

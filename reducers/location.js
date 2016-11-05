@@ -1,4 +1,4 @@
-import { createReducer } from '../utils';
+import { createReducer } from '../utils/Reducers';
 import constants from '../constants/location';
 import GeoPoint from 'geopoint';
 

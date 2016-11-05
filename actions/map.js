@@ -14,13 +14,6 @@ export function updateMapRegion(region) {
     }
 }
 
-export function updatePinSize(pinSize) {
-    return {
-        type: constants.PIN_SIZE_CHANGE,
-        payload: { pinSize }
-    }
-}
-
 export function updateAnnotationType(annotationType) {
     return {
         type: constants.ANNOTATION_TYPE_CHANGE,

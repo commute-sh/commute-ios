@@ -1,4 +1,4 @@
-import { createReducer } from '../utils';
+import { createReducer } from '../utils/Reducers';
 import constants from '../constants/map';
 import GeoPoint from 'geopoint';
 
@@ -20,12 +20,8 @@ export default createReducer(initialState, {
     [constants.MAP_REGION_CHANGE]: (state, { region }) => {
         return Object.assign({}, state, {
             region,
-            center: new GeoPoint(region.latitude, region.longitude)
-        })
-    },
-    [constants.PIN_SIZE_CHANGE]: (state, { pinSize }) => {
-        return Object.assign({}, state, {
-            pinSize
+            center: new GeoPoint(region.latitude, region.longitude),
+            pinSize: region.longitudeDelta > 0.1 ? 16 : (region.longitudeDelta < 0.025 ? 32 : 24)
         })
     },
     [constants.ANNOTATION_TYPE_CHANGE]: (state, { annotationType }) => {
