@@ -55,6 +55,7 @@ class StationMarkerView extends Component {
                     <Text style={{
                         fontSize: this.props.fontSize,
                         fontWeight: this.props.fontWeight,
+                        backgroundColor: 'transparent',
                         color: this.props.strokeColor }}>
                         {this.props.value}
                     </Text>
