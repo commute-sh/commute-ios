@@ -283,6 +283,7 @@ class MapTabScene extends Component {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// Mappings
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     mapStationsToAnnotations(stations) {
@@ -290,8 +291,6 @@ class MapTabScene extends Component {
         const { region } = this.props;
 
         const start = moment();
-
-        this.uid = (this.uid || 0) + 1;
 
         console.log("stations is array:", _.isArray(stations));
         console.log("stations length:", stations.length);
