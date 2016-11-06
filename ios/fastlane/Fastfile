@@ -7,6 +7,9 @@ platform :ios do
   # Learn more here: https://github.com/fastlane/setups/blob/master/samples-ios/distribute-beta-build.md 🚀
   #
   lane :beta do |values|
+    ENV["DATESTAMP"] = Time.now.strftime("%Y%m%d%H%M")
+
+    increment_build_number(build_number: ENV["DATESTAMP"])
     # Fabric generated this lane for deployment to Crashlytics Beta
     # set 'export_method' to 'ad-hoc' if your Crashlytics Beta distribution uses ad-hoc provisioning
     gym(scheme: 'Commute - Release', export_method: 'development')

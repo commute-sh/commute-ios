@@ -10,6 +10,8 @@ import {
     Platform
 } from 'react-native';
 
+import moment from 'moment';
+
 import Map from './Map';
 import StationToast from './StationToast';
 
@@ -286,7 +288,7 @@ class MapTabScene extends Component {
 
         const { region } = this.props;
 
-        console.time('mapStationsToAnnotations');
+        const start = moment();
 
         console.log('stations is array:', _.isArray(stations));
         console.log('stations length:', stations.length);
@@ -306,7 +308,10 @@ class MapTabScene extends Component {
             return this.mapStationToAnnotation(station);
         });
 
-        console.timeEnd('mapStationsToAnnotations');
+        const end = moment();
+        const duration = moment.duration(end.diff(start)).asMilliseconds();
+
+        console.log("*** Annotations mapped in", duration, "ms");
 
         return annotations;
     }
