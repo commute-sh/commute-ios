@@ -23,6 +23,8 @@ import {
     TextInput
 } from 'react-native';
 
+import NetworkImage from './NetworkImage';
+
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import SearchBar from 'react-native-search-bar';
@@ -231,13 +233,12 @@ class SearchTabScene extends Component {
                     highlightRow(null);
                 }}>
                     <View style={{ flexDirection: 'row', height: 96 }}>
-                        <Image
-                            defaultSource={require('../images/map_placeholder.jpg')}
+                        <NetworkImage
                             source={{ uri: backgroundSourceUri }}
-                            onError={(e) => { e.target.source = require('../images/map_placeholder.jpg'); }}
+                            errorSource={require('../images/map_placeholder.jpg')}
                             resizeMode='cover'
-                            style={{ width: 96, height: 96 }}
-                        />
+                            style={{ width: 96, height: 96 }} />
+
                         <View style={{ flexDirection: 'column', flex: 1, padding: 20, paddingRight: 10 }}>
                             <Text style={{ fontFamily: 'System', fontSize: 14, fontWeight: '500', color: rowPress ? '#325d7a' : '#325d7a' }}>{station.number} - {station.name}</Text>
                             <Text  style={{ fontFamily: 'System', fontSize: 12, fontWeight: '500', color: rowPress ? '#9d9d9d' : '#9d9d9d' }}>{station.address}</Text>

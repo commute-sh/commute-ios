@@ -10,12 +10,14 @@ import {
 import Spinner from 'react-native-spinkit';
 
 import EStyleSheet from 'react-native-extended-stylesheet';
+const ImageSourcePropType = require('ImageSourcePropType');
 
 class NetworkImage extends Component {
 
     static propTypes = {
-      source: PropTypes.object.isRequired,
-      errorSource: PropTypes.object,
+      source: ImageSourcePropType.isRequired,
+      resizeMode: PropTypes.string,
+      errorSource: ImageSourcePropType,
       style: PropTypes.object,
       children: PropTypes.oneOfType([
           PropTypes.object,
@@ -24,7 +26,8 @@ class NetworkImage extends Component {
     };
 
     static defaultProps = {
-        style: {}
+        style: {},
+        resizeMode: 'cover'
     };
 
     constructor(props) {
@@ -32,7 +35,9 @@ class NetworkImage extends Component {
 
         this.state = {
             error: false,
+            fallbackError: false,
             loading: false,
+            loaded: false,
             progress: 0
         };
     }
@@ -45,19 +50,81 @@ class NetworkImage extends Component {
             </View> : null;
 
         if (this.state.error) {
-            console.log('*-*-* this.state.error:', this.state.error);
-            console.log('*-*-* this.props.errorSource:', this.props.errorSource);
+//            console.log('*-*-* this.state.error:', this.state.error);
+//            console.log('*-*-* this.props.errorSource:', this.props.errorSource);
         }
 
+        const events = this.state.loaded ? {} : {
+            onLoadStart: (e) => {
+                // console.log("////////////// [Default] onLoadStart:");
+                if (!this.state.loaded) {
+                    this.setState({loading: true})
+                }
+            },
+            onError: (e) => {
+                // console.log("////////////// [Default] onError:");
+                if (!this.state.loaded) {
+                    this.setState({error: e.nativeEvent.error, loading: false});
+                }
+            },
+            onProgress: (e) => {
+                if (!this.state.loaded) {
+                    this.setState({progress: Math.round(100 * e.nativeEvent.loaded / e.nativeEvent.total)})
+                }
+            },
+            onLoad: (e) => {
+                // console.log("////////////// [Default] onLoad:");
+                if (!this.state.loaded) {
+                    this.setState({ loaded: true, loading: false, error: false });
+                }
+            },
+            onLoadEnd: (e) => {
+                // console.log("////////////// [Default] onLoadEnd:");
+                if (!this.state.loaded) {
+                    this.setState({ loaded: false, error: new Error('Failed to load Image: ' + this.props.source), loading: false });
+                }
+            }
+        };
+
+        const fallbackEvents = this.state.loaded ? {} : {
+            onLoadStart: (e) => {
+                if (!this.state.fallbackError) {
+                    this.setState({ loading: true })
+                }
+            },
+            onError: (e) => {
+                // console.log("////////////// [Fallback] Error:");
+                if (!this.state.loaded) {
+                    this.setState({fallbackError: e.nativeEvent.error, loading: false});
+                }
+            },
+            onProgress: (e) => {
+                if (!this.state.loaded) {
+                    this.setState({progress: Math.round(100 * e.nativeEvent.loaded / e.nativeEvent.total)})
+                }
+            },
+            onLoad: (e) => {
+                // console.log("////////////// [Fallback] onLoad:");
+                if (!this.state.loaded) {
+                    this.setState({loading: false, loaded: true, fallbackError: false})
+                }
+            },
+            onLoadEnd: (e) => {
+                // console.log("////////////// [Fallback] onLoadEnd:");
+                if (!this.state.loaded) {
+                    this.setState({ loaded: false, fallbackError: new Error('Failed to load Fallback Image: ' + this.props.errorSource), loading: false })
+                }
+            }
+        };
+
         return this.state.error ? (
-            this.props.errorSource ?
+            this.props.errorSource && !this.state.fallbackError ?
                 <Image
                     source={this.props.errorSource}
                     style={[this.props.style, { }]}
-                    onLoadStart={(e) => this.setState({ loading: true })}
-                    onError={(e) => this.setState({ fallbackError: e.nativeEvent.error, loading: false })}
-                    onProgress={(e) => this.setState({ progress: Math.round(100 * e.nativeEvent.loaded / e.nativeEvent.total) })}
-                    onLoad={() => this.setState({ loading: false, fallbackError: false })}>
+                    resizeMode={this.props.resizeMode}
+                    {...fallbackEvents}
+                >
                     {loader}
                 </Image> :
                 <View style={[this.props.style, { }]}>
@@ -67,10 +134,9 @@ class NetworkImage extends Component {
             <Image
                 source={this.props.source}
                 style={[this.props.style, { }]}
-                onLoadStart={(e) => this.setState({ loading: true })}
-                onError={(e) => this.setState({ error: e.nativeEvent.error, loading: false })}
-                onProgress={(e) => this.setState({ progress: Math.round(100 * e.nativeEvent.loaded / e.nativeEvent.total) })}
-                onLoad={() => this.setState({ loading: false, error: false })}>
+                resizeMode={this.props.resizeMode}
+                {...events}
+            >
                 {this.state.loading ? loader : this.props.children}
             </Image>
         );
