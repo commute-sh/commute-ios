@@ -3,7 +3,7 @@ import * as StationService from '../services/StationService'
 import { notifyError } from './toast'
 import _ from 'lodash'
 
-import { computeRegionRadiusInMeters } from '../utils'
+import { computeRegionRadiusInMeters } from '../utils/Region'
 
 export function fetchNearbyStationsSucceed(search, stations) {
     return {
