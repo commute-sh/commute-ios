@@ -11,7 +11,8 @@ import {
     TouchableOpacity,
     Text,
     View,
-    Image
+    Image,
+    StatusBar
 } from 'react-native';
 
 import MapTabScene from './MapTabScene';
@@ -56,7 +57,10 @@ class MapTab extends Component {
                 selected={this.props.selectedTab === 'map'}
                 onPress={this.props.onTabIconPress}
             >
-                {this.renderTab()}
+                <View style={{ flex: 1 }}>
+                    <StatusBar barStyle="light-content" networkActivityIndicatorVisible={this.props.nearbyStations.isFetching} />
+                    {this.renderTab()}
+                </View>
             </Icon.TabBarItemIOS>
         );
     }
@@ -149,6 +153,7 @@ class MapTab extends Component {
 
 const mapStateToProps = (state) => Object.assign({}, {
     favoriteStations: state.favoriteStations,
+    nearbyStations: state.nearbyStations,
     map: state.map
 });
 

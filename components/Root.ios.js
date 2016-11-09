@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 
 import {
     View,
-    TabBarIOS,
+    TabBarIOS
 } from 'react-native';
 
 import MapTab from './MapTab';
