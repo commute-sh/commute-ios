@@ -74,11 +74,11 @@ class NetworkImage extends Component {
                     this.setState({ error: e.nativeEvent.error, loading: false });
                 }
             },
-            onProgress: (e) => {
-                if (!this.state.loaded) {
-                    this.setState({ progress: Math.round(100 * e.nativeEvent.loaded / e.nativeEvent.total) })
-                }
-            },
+            // onProgress: (e) => {
+            //     if (!this.state.loaded) {
+            //         this.setState({ progress: Math.round(100 * e.nativeEvent.loaded / e.nativeEvent.total) })
+            //     }
+            // },
             onLoad: (e) => {
                 // console.log("////////////// [Default] onLoad:");
                 if (!this.state.loaded) {
@@ -106,11 +106,11 @@ class NetworkImage extends Component {
                     this.setState({ fallbackError: e.nativeEvent.error, loading: false });
                 }
             },
-            onProgress: (e) => {
-                if (!this.state.loaded) {
-                    this.setState({ progress: Math.round(100 * e.nativeEvent.loaded / e.nativeEvent.total) })
-                }
-            },
+            // onProgress: (e) => {
+            //     if (!this.state.loaded) {
+            //         this.setState({ progress: Math.round(100 * e.nativeEvent.loaded / e.nativeEvent.total) })
+            //     }
+            // },
             onLoad: (e) => {
                 // console.log("////////////// [Fallback] onLoad:");
                 if (!this.state.loaded) {
