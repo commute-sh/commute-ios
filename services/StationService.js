@@ -108,7 +108,7 @@ export function fetchDataByDateAndStationNumber(contractName, date, stationNumbe
 
     const start = moment();
     const targetDate = date.subtract(1, 'days');
-    let url = `${apiBaseUrl}/stations/${contractName}/${stationNumber}/${targetDate.format('YYYYMMDD-HHmm')}/data`;
+    let url = `${apiBaseUrl}/stations/${contractName}/${stationNumber}/availability/${targetDate.format('YYYYMMDD-HHmm')}`;
 
     console.log('[', start.format('HH:mm:ss.SSS'), '][StationService][FetchDataByDateAndStationNumber] Get Data for station:', stationNumber, ', contract name:', contractName, ', Nearby URL:', url);
 
