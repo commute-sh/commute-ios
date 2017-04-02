@@ -21,7 +21,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>201704011808</string>
+	<string>201704030142</string>
 	<key>Fabric</key>
 	<dict>
 		<key>APIKey</key>
@@ -42,6 +42,13 @@
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
+			<key>image-commute-sh.s3-website-eu-west-1.amazonaws.com</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
 			<key>api.commute.sh</key>
 			<dict>
 				<key>NSIncludesSubdomains</key>
@@ -57,7 +64,7 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>La géolocation est active uniquement pendant l'utilisation de l'application. Elle permet d'identifier les stations les plus proches de vous.</string>
+	<string>La géolocation est active uniquement pendant l&apos;utilisation de l&apos;application. Elle permet d&apos;identifier les stations les plus proches de vous.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Entypo.ttf</string>
