@@ -29,9 +29,9 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import SearchBar from 'react-native-search-bar';
 
-var LISTVIEW = 'SearchListView';
+// import DropRefreshControl from 'react-native-drop-refresh';
 
-import DropRefreshControl from 'react-native-drop-refresh';
+// var LISTVIEW = 'SearchListView';
 
 class SearchTabScene extends Component {
 
@@ -47,7 +47,8 @@ class SearchTabScene extends Component {
         super(props);
 
         this.state = {
-            dataSource: this.props.dataSource.cloneWithRows([]),
+          refreshing: false,
+          dataSource: this.props.dataSource.cloneWithRows([]),
             highlightedRow: {
                 sectionID: undefined,
                 rowID: undefined
@@ -70,11 +71,11 @@ class SearchTabScene extends Component {
         this.loadContractStations(this.props.contractName);
 
         if (Platform.OS === 'ios') {
-            DropRefreshControl.configure({
-                node: this.refs[LISTVIEW]
-            }, () => {
-                self.onRefresh();
-            });
+            // DropRefreshControl.configure({
+            //     node: this.refs[LISTVIEW]
+            // }, () => {
+            //     self.onRefresh();
+            // });
         }
     }
 
@@ -86,7 +87,7 @@ class SearchTabScene extends Component {
             this.props.contractStations[this.props.contractName].isFetching &&
             !nextProps.contractStations[nextProps.contractName].isFetching
         ) {
-            DropRefreshControl.endRefreshing(this.refs[LISTVIEW]);
+            // DropRefreshControl.endRefreshing(this.refs[LISTVIEW]);
         }
 
         this.setState({
@@ -150,8 +151,15 @@ class SearchTabScene extends Component {
                               renderRow={this.renderRow}
                               keyboardDismissMode="on-drag"
                               renderSeparator={this.renderSeparator}
-                              ref={LISTVIEW}
+                              refreshControl={
+                                  <RefreshControl
+                                    refreshing={this.state.refreshing}
+                                    onRefresh={this.onRefresh.bind(this)}
+                                    title="Loading stations ..."
+                                  />
+                              }
                     />
+                    {/*ref={LISTVIEW}*/}
 
                     { this.state.dataSource.getRowCount() <= 0 && (
                         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', position: 'absolute', top: 0, left: 0, bottom: 0, right: 0, zIndex: 10, backgroundColor: 'white' }}>
@@ -180,11 +188,16 @@ class SearchTabScene extends Component {
     }
 
     updateSearch(value) {
+
+        const contractNameStations = this.props.contractStations[this.props.contractName].data;
+
         this.setState({
             searchText: value,
-            dataSource: !value ?
-                this.props.dataSource.cloneWithRows(this.props.contractStations[this.props.contractName].data) :
-                this.props.dataSource.cloneWithRows(this.props.contractStations[this.props.contractName].data.filter(station => station.name.search(new RegExp(value, "i")) >= 0))
+            dataSource:
+                this.props.dataSource.cloneWithRows( !value ?
+                    contractNameStations :
+                    contractNameStations.filter(station => station.name.search(new RegExp(value, "i")) >= 0)
+                )
         });
     }
 
@@ -199,7 +212,7 @@ class SearchTabScene extends Component {
     }
 
     renderRow(station, sectionID, rowID, highlightRow) {
-        const backgroundSourceUri = `https://s3-eu-west-1.amazonaws.com/image-commute-sh/${station.contract_name}-${station.number}-1-${640}-${60}.jpg`;
+        const backgroundSourceUri = `http://image-commute-sh.s3-website-eu-west-1.amazonaws.com/contracts/${station.contract_name}/${station.contract_name}-${station.number}-1-${128}-${100}.jpg`;
 
         const rowPress = sectionID === this.state.highlightedRow.sectionID && rowID === this.state.highlightedRow.rowID;
 
@@ -267,7 +280,7 @@ class SearchTabScene extends Component {
     }
 
     onRefresh() {
-        this.props.actions.fetchContractStations(this.props.contractName);
+        this.props.actions.fetchContractStations(this.props.contractName)
     }
 
     pressRowIn(sectionID, rowID) {

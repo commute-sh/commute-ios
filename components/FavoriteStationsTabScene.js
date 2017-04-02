@@ -21,9 +21,9 @@ import Swipeout from 'react-native-animated-swipeout';
 
 import { stationPinColor } from '../utils/Stations';
 
-var LISTVIEW = 'FavoriteListView';
+//var LISTVIEW = 'FavoriteListView';
 
-import DropRefreshControl from 'react-native-drop-refresh';
+// import DropRefreshControl from 'react-native-drop-refresh';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -44,6 +44,7 @@ class FavoriteStationsTabScene extends Component {
         super(props);
 
         this.state = {
+            refreshing: false,
             dataSource: this.props.dataSource.cloneWithRows([]),
             highlightedRow: {
                 sectionID: undefined,
@@ -74,11 +75,11 @@ class FavoriteStationsTabScene extends Component {
         const self = this;
 
         if (Platform.OS === 'ios') {
-            DropRefreshControl.configure({
-                node: this.refs[LISTVIEW]
-            }, () => {
-                self.onRefresh();
-            });
+        //     DropRefreshControl.configure({
+        //         node: this.refs[LISTVIEW]
+        //     }, () => {
+        //         self.onRefresh();
+        //     });
         }
     }
 
@@ -89,7 +90,7 @@ class FavoriteStationsTabScene extends Component {
             this.props.contractStations[this.props.contractName].isFetching &&
             !nextProps.contractStations[nextProps.contractName].isFetching
         ) {
-            DropRefreshControl.endRefreshing(this.refs[LISTVIEW]);
+//            DropRefreshControl.endRefreshing(this.refs[LISTVIEW]);
         }
 
         const stations = nextProps.contractStations[this.props.contractName];
@@ -115,8 +116,15 @@ class FavoriteStationsTabScene extends Component {
                           renderRow={this.renderRow}
                           keyboardDismissMode="on-drag"
                           renderSeparator={this.renderSeparator}
-                          ref={LISTVIEW}
+                          refreshControl={
+                              <RefreshControl
+                                refreshing={this.state.refreshing}
+                                onRefresh={this.onRefresh.bind(this)}
+                                title="Loading stations ..."
+                              />
+                          }
                 />
+                {/*ref={LISTVIEW}*/}
                 { this.state.dataSource.getRowCount() <= 0 &&
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, zIndex: 10, backgroundColor: 'white' }}>
                         <Text>Vous n'avez pas encore ajouté de favoris ...</Text>
@@ -127,7 +135,7 @@ class FavoriteStationsTabScene extends Component {
     }
 
     renderRow(station, sectionID, rowID, highlightRow) {
-        const backgroundSourceUri = `https://s3-eu-west-1.amazonaws.com/image-commute-sh/${station.contract_name}-${station.number}-1-${640}-${60}.jpg`;
+        const backgroundSourceUri = `http://image-commute-sh.s3-website-eu-west-1.amazonaws.com/contracts/${station.contract_name}/${station.contract_name}-${station.number}-1-${128}-${100}.jpg`;
 
         const rowPress = sectionID === this.state.highlightedRow.sectionID && rowID === this.state.highlightedRow.rowID;
 
@@ -201,7 +209,7 @@ class FavoriteStationsTabScene extends Component {
     }
 
     onRefresh() {
-        this.props.actions.fetchContractStations(this.props.contractName);
+      this.props.actions.fetchContractStations(this.props.contractName)
     }
 
     pressRowIn(sectionID, rowID) {

@@ -71,21 +71,26 @@ class Map extends Component {
     }
 
     onCenterOnLocation() {
-        if (this.state.region) {
-            let region = Object.assign({}, this.state.region);
 
-            region.latitude = this.props.geoLocation.latitude();
-            region.longitude = this.props.geoLocation.longitude();
-            region.latitudeDelta = region.latitudeDelta + (Math.random() + 0.0001) * 0.0001;
-            region.longitudeDelta = region.longitudeDelta +  (Math.random() + 0.0001) * 0.0001;
+        if (this.props.geoLocation) {
+            if (this.state.region) {
+                let region = Object.assign({}, this.state.region);
 
-            this.setState({ region: region, centerOnLocation: true });
-            this.props.onRegionChangeComplete(region);
-        } else if (this.props.geoLocation) {
-            let region = this.computeRegionFromLocation(this.props.geoLocation);
+                region.latitude = this.props.geoLocation.latitude();
+                region.longitude = this.props.geoLocation.longitude();
+                region.latitudeDelta = region.latitudeDelta + (Math.random() + 0.0001) * 0.0001;
+                region.longitudeDelta = region.longitudeDelta +  (Math.random() + 0.0001) * 0.0001;
 
-            this.setState({ region: region, centerOnLocation: true });
-            this.props.onRegionChangeComplete(region);
+                this.setState({ region: region, centerOnLocation: true });
+                this.props.onRegionChangeComplete(region);
+            } else {
+                let region = this.computeRegionFromLocation(this.props.geoLocation);
+
+                this.setState({ region: region, centerOnLocation: true });
+                this.props.onRegionChangeComplete(region);
+            }
+        } else {
+            console.warn('No geoLocation found !');
         }
     }
 

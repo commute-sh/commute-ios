@@ -71,14 +71,19 @@ class NetworkImage extends Component {
             onError: (e) => {
                 // console.log("////////////// [Default] onError:");
                 if (!this.state.loaded) {
-                    this.setState({ error: e.nativeEvent.error, loading: false });
+                    // console.log("////////////// [Default] onError: this.state.loaded:", this.state.loaded);
+                    // console.log("////////////// [Default] onError: e.nativeEvent.error:", e.nativeEvent.error);
+                    // console.log("////////////// [Default] onError: e.error:", e.error);
+                    // console.log("////////////// [Default] onError: e.nativeEvent:", e.nativeEvent);
+                    // console.log("////////////// [Default] onError: e:", e);
+                    this.setState({ error: e.nativeEvent.error || e.error || new Error(`Failed to load source: ${this.props.source}`), loading: false });
                 }
             },
-            // onProgress: (e) => {
-            //     if (!this.state.loaded) {
-            //         this.setState({ progress: Math.round(100 * e.nativeEvent.loaded / e.nativeEvent.total) })
-            //     }
-            // },
+            onProgress: (e) => {
+                if (!this.state.loaded) {
+                    this.setState({ progress: Math.round(100 * e.nativeEvent.loaded / e.nativeEvent.total) })
+                }
+            },
             onLoad: (e) => {
                 // console.log("////////////// [Default] onLoad:");
                 if (!this.state.loaded) {
@@ -103,14 +108,14 @@ class NetworkImage extends Component {
             onError: (e) => {
                 // console.log("////////////// [Fallback] Error:");
                 if (!this.state.loaded) {
-                    this.setState({ fallbackError: e.nativeEvent.error, loading: false });
+                    this.setState({ fallbackError: e.nativeEvent.error || e.error || new Error(`Failed to load error source: ${this.props.errorSource}`), loading: false });
                 }
             },
-            // onProgress: (e) => {
-            //     if (!this.state.loaded) {
-            //         this.setState({ progress: Math.round(100 * e.nativeEvent.loaded / e.nativeEvent.total) })
-            //     }
-            // },
+            onProgress: (e) => {
+                if (!this.state.loaded) {
+                    this.setState({ progress: Math.round(100 * e.nativeEvent.loaded / e.nativeEvent.total) })
+                }
+            },
             onLoad: (e) => {
                 // console.log("////////////// [Fallback] onLoad:");
                 if (!this.state.loaded) {
@@ -124,6 +129,10 @@ class NetworkImage extends Component {
                 }
             }
         };
+
+        // console.log("this.state.error:", this.state.error);
+        // console.log("this.props.errorSource:", this.props.errorSource);
+        // console.log("this.state.fallbackError:", this.state.fallbackError);
 
         return this.state.error ? (
             this.props.errorSource && !this.state.fallbackError ?

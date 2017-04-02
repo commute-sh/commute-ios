@@ -19,25 +19,40 @@ xcuserdata
 DerivedData
 *.hmap
 *.ipa
-*.dSYM.zip
 *.xcuserstate
-report.xml
 project.xcworkspace
 
 # Android/IJ
 #
-*.iml
+build/
 .idea
 .gradle
 local.properties
+*.iml
 
 # node.js
 #
 node_modules/
-npm-debug.log
+npm-debug.log*
+yarn-error.log*
 
 # BUCK
 buck-out/
 \.buckd/
+*.keystore
 android/app/libs
 android/keystores/debug.keystore
+
+# fastlane
+#
+# It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
+# screenshots whenever they are needed.
+# For more information about the recommended setup visit:
+# https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Gitignore.md
+
+ios/fastlane/report.xml
+ios/fastlane/Preview.html
+ios/fastlane/screenshots
+
+*.dSYM.zip
+*.swp

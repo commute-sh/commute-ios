@@ -33,7 +33,7 @@ export default class IconButton extends Component {
         color: 'white',
         shadowColor: '#000000',
         bgColor: '#325d7a',
-        activeBgColor: Color('#325d7a').darken(0.5).hexString(),
+        activeBgColor: Color('#325d7a').darken(0.5).toString(),
         shadowOpacity: 0.5,
         shadowRadius: 1,
         activeOpacity: 0.5,

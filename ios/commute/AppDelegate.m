@@ -13,15 +13,18 @@
 #import <Crashlytics/Crashlytics.h>
 
 #import <asl.h>
-#import "RCTLog.h"
+#import <React/RCTLog.h>
 
-#import "RCTBundleURLProvider.h"
-#import "RCTRootView.h"
+#import <React/RCTBundleURLProvider.h>
+#import <React/RCTRootView.h>
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  
+  [Fabric with:@[[Crashlytics class]]];
+  
   NSURL *jsCodeLocation;
 
   jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index.ios" fallbackResource:nil];
@@ -38,54 +41,12 @@
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
 
-  [Fabric with:@[[Answers class], [Crashlytics class]]];
-
 #ifndef DEBUG
   RCTSetLogThreshold(RCTLogLevelInfo);
-  RCTSetLogFunction(CrashlyticsReactLogFunction);
 #endif
 
   return YES;
 }
 
-RCTLogFunction CrashlyticsReactLogFunction = ^(
-                                               RCTLogLevel level,
-                                               __unused RCTLogSource source,
-                                               NSString *fileName,
-                                               NSNumber *lineNumber,
-                                               NSString *message
-                                               )
-{
-  NSString *log = RCTFormatLog([NSDate date], level, fileName, lineNumber, message);
-
-#ifdef DEBUG
-  fprintf(stderr, "%s\n", log.UTF8String);
-  fflush(stderr);
-#else
-  CLS_LOG(@"REACT LOG: %s", log.UTF8String);
-#endif
-
-  int aslLevel;
-  switch(level) {
-    case RCTLogLevelTrace:
-      aslLevel = ASL_LEVEL_DEBUG;
-      break;
-    case RCTLogLevelInfo:
-      aslLevel = ASL_LEVEL_NOTICE;
-      break;
-    case RCTLogLevelWarning:
-      aslLevel = ASL_LEVEL_WARNING;
-      break;
-    case RCTLogLevelError:
-      aslLevel = ASL_LEVEL_ERR;
-      break;
-    case RCTLogLevelFatal:
-      aslLevel = ASL_LEVEL_CRIT;
-      break;
-  }
-  asl_log(NULL, NULL, aslLevel, "%s", message.UTF8String);
-
-
-};
 
 @end
