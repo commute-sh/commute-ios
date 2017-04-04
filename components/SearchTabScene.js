@@ -232,6 +232,8 @@ class SearchTabScene extends Component {
             }
         ];
 
+        const placeholderImage = require('../images/map_placeholder.jpg')
+
         return (
             <Swipeout right={swipeBtns}
                       autoClose={true}
@@ -247,10 +249,11 @@ class SearchTabScene extends Component {
                 }}>
                     <View style={{ flexDirection: 'row', height: 96 }}>
                         <NetworkImage
-                            source={{ uri: backgroundSourceUri }}
-                            errorSource={require('../images/map_placeholder.jpg')}
-                            resizeMode='cover'
-                            style={{ width: 96, height: 96 }} />
+                          source={ (station.images || []).length > 0 ? { uri: backgroundSourceUri } : undefined }
+                          errorSource={placeholderImage}
+                          placeholderSource={placeholderImage}
+                          resizeMode='cover'
+                          style={{ width: 96, height: 96 }} />
 
                         <View style={{ flexDirection: 'column', flex: 1, padding: 20, paddingRight: 10 }}>
                             <Text style={{ fontFamily: 'System', fontSize: 14, fontWeight: '500', color: rowPress ? '#325d7a' : '#325d7a' }}>{station.number} - {station.name}</Text>

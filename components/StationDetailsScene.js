@@ -134,8 +134,9 @@ class StationDetailsScene extends Component {
 
         return (
             <NetworkImage
-                source={{ uri: backgroundSourceUri }}
+                source={ (station.images || []).length > 0 ? { uri: backgroundSourceUri } : undefined }
                 errorSource={{ uri: contractBackgroundSourceUri }}
+                placeholderSource={{ uri: contractBackgroundSourceUri }}
                 style={{
                     width: screen.width,
                     height: screen.width * 240 / 320,

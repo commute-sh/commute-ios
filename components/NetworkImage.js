@@ -16,9 +16,10 @@ const ImageSourcePropType = require('ImageSourcePropType');
 class NetworkImage extends Component {
 
     static propTypes = {
-      source: ImageSourcePropType.isRequired,
+      source: ImageSourcePropType,
       resizeMode: PropTypes.string,
       errorSource: ImageSourcePropType,
+      placeholderSource: ImageSourcePropType,
       style: PropTypes.object,
       children: PropTypes.oneOfType([
           PropTypes.object,
@@ -45,7 +46,7 @@ class NetworkImage extends Component {
 
     render() {
 
-        var loader = this.state.loading && !this.state.loaded ?
+        var loader = this.source && this.state.loading && !this.state.loaded ?
             <View style={styles.progress}>
                 <Spinner color="#000000" type="Pulse" />
             </View> : null;
@@ -79,11 +80,11 @@ class NetworkImage extends Component {
                     this.setState({ error: e.nativeEvent.error || e.error || new Error(`Failed to load source: ${this.props.source}`), loading: false });
                 }
             },
-            onProgress: (e) => {
-                if (!this.state.loaded) {
-                    this.setState({ progress: Math.round(100 * e.nativeEvent.loaded / e.nativeEvent.total) })
-                }
-            },
+            // onProgress: (e) => {
+            //     if (!this.state.loaded) {
+            //         this.setState({ progress: Math.round(100 * e.nativeEvent.loaded / e.nativeEvent.total) })
+            //     }
+            // },
             onLoad: (e) => {
                 // console.log("////////////// [Default] onLoad:");
                 if (!this.state.loaded) {
@@ -111,11 +112,11 @@ class NetworkImage extends Component {
                     this.setState({ fallbackError: e.nativeEvent.error || e.error || new Error(`Failed to load error source: ${this.props.errorSource}`), loading: false });
                 }
             },
-            onProgress: (e) => {
-                if (!this.state.loaded) {
-                    this.setState({ progress: Math.round(100 * e.nativeEvent.loaded / e.nativeEvent.total) })
-                }
-            },
+            // onProgress: (e) => {
+            //     if (!this.state.loaded) {
+            //         this.setState({ progress: Math.round(100 * e.nativeEvent.loaded / e.nativeEvent.total) })
+            //     }
+            // },
             onLoad: (e) => {
                 // console.log("////////////// [Fallback] onLoad:");
                 if (!this.state.loaded) {
@@ -149,7 +150,7 @@ class NetworkImage extends Component {
                 </View>
         ) : (
             <Image
-                source={this.props.source}
+                source={this.props.source ? this.props.source : this.props.placeholderSource}
                 style={[this.props.style, { }]}
                 resizeMode={this.props.resizeMode}
                 {...events}

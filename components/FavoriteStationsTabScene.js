@@ -155,6 +155,8 @@ class FavoriteStationsTabScene extends Component {
             }
         ];
 
+        const placeholderImage = require('../images/map_placeholder.jpg');
+
         return (
             <Swipeout right={swipeBtns}
                       autoClose={true}
@@ -170,8 +172,9 @@ class FavoriteStationsTabScene extends Component {
                 }}>
                     <View style={{ flexDirection: 'row', height: 96 }}>
                         <NetworkImage
-                            source={{ uri: backgroundSourceUri }}
-                            errorSource={require('../images/map_placeholder.jpg')}
+                            source={ (station.images || []).length > 0 ? { uri: backgroundSourceUri } : undefined }
+                            errorSource={placeholderImage}
+                            placeholderSource={placeholderImage}
                             resizeMode='cover'
                             style={{ width: 96, height: 96 }} />
 
