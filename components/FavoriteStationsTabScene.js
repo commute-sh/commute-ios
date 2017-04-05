@@ -179,7 +179,7 @@ class FavoriteStationsTabScene extends Component {
                             style={{ width: 96, height: 96 }} />
 
                         <View style={{ flexDirection: 'column', flex: 1, padding: 20, paddingRight: 10 }}>
-                            <Text style={{ fontFamily: 'System', fontSize: 14, fontWeight: '500', color: rowPress ? '#325d7a' : '#325d7a' }}>{station.number} - {station.name}</Text>
+                            <Text style={{ fontFamily: 'System', fontSize: 14, fontWeight: '500', color: rowPress ? '#49b2d8' : '#49b2d8' }}>{station.number} - {station.name}</Text>
                             <Text  style={{ fontFamily: 'System', fontSize: 12, fontWeight: '500', color: rowPress ? '#9d9d9d' : '#9d9d9d' }}>{station.address}</Text>
                         </View>
 

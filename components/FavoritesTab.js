@@ -111,7 +111,7 @@ class FavoriteTab extends Component {
                                     </View>
                                 ,
                             }}
-                            style={{ backgroundColor: '#325d7a' }}
+                            style={{ backgroundColor: '#49b2d8' }}
                         />
                     }
                 />

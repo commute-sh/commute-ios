@@ -66,10 +66,10 @@ class Root extends Component {
                 style={{ marginTop: 56 }}
                 initialPage={0}
                 tabBarBackgroundColor="white"
-                tabBarActiveTextColor="#325d7a"
-                tabBarInactiveTextColor="#325d7a"
+                tabBarActiveTextColor="#49b2d8"
+                tabBarInactiveTextColor="#49b2d8"
                 onChangeTab={this.onChangeTab.bind(this)}
-                renderTabBar={() => <DefaultTabBar underlineStyle={{ backgroundColor: '#325d7a' }} tabStyle={{ height: 56 }} />}
+                renderTabBar={() => <DefaultTabBar underlineStyle={{ backgroundColor: '#49b2d8' }} tabStyle={{ height: 56 }} />}
             >
                 <MapTabScene tabLabel='Plan' navigator={navigator} />
                 <FavoriteStationsTabScene tabLabel='Favoris' navigator={navigator} />
@@ -161,7 +161,7 @@ class Root extends Component {
                             },
                         }}
                         navigationStyles={navigationStyles}
-                        style={{ backgroundColor: '#325d7a' }}
+                        style={{ backgroundColor: '#49b2d8' }}
                     />
                 }
             />

@@ -171,7 +171,7 @@ class Map extends Component {
                     values={[ 'Places', 'Vélos' ]}
                     selectedIndex={this.state.selectedIndex}
                     style={{ backgroundColor: 'white', width: 160 }}
-                    tintColor="#325d7a"
+                    tintColor="#49b2d8"
                     onChange={this.onChange}
                 />
             );
@@ -180,7 +180,7 @@ class Map extends Component {
 
             return (
                 <AndroidSegmented
-                    tintColor={['#325d7a','#ffffff']}
+                    tintColor={['#49b2d8','#ffffff']}
                     style={{ backgroundColor: 'white', width: 160, height: 30 }}
                     childText={[ 'Places', 'Vélos' ]}
                     orientation='horizontal'

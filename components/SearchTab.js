@@ -114,7 +114,7 @@ class SearchTab extends Component {
                                     );
                                 },
                             }}
-                            style={{ backgroundColor: '#325d7a' }}
+                            style={{ backgroundColor: '#49b2d8' }}
                         />
                     }
                 />

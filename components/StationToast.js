@@ -59,7 +59,7 @@ class StationToast extends Component {
               <Text style={{
                 fontFamily: 'System',
                 fontSize: 12,
-                color: '#325d7a',
+                color: '#49b2d8',
                 paddingTop: 5,
                 paddingBottom: 5
               }}>{station.address || ' '}</Text>
