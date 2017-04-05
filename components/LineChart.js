@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { ART, Dimensions, LayoutAnimation, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { ART, Dimensions, LayoutAnimation, StyleSheet, Text, View, TouchableOpacity, Platform } from 'react-native';
 import _ from 'lodash';
 
 const { Group, Shape, Surface, LinearGradient } = ART;
@@ -271,7 +271,7 @@ export default class LineChart extends Component {
     }
 
     renderChart(linePath, graphWidth, graphHeight) {
-        return (
+        return Platform.OS === 'ios' ? (
             <View style={{ paddingLeft: 10, paddingRight: 10 }}>
                 <Surface width={graphWidth} height={graphHeight} style={{ backgroundColor: 'transparent' }}>
                     <Group x={0} y={0}>
@@ -291,9 +291,20 @@ export default class LineChart extends Component {
                     </Group>
                 </Surface>
             </View>
+        ) : (
+            <View style={{ paddingLeft: 10, paddingRight: 10 }}>
+                <Surface width={graphWidth} height={graphHeight} style={{ backgroundColor: 'transparent' }}>
+                    <Group x={0} y={0}>
+                        <Shape
+                          d={linePath}
+                          stroke={this.props.strokeColor }
+                          strokeWidth={this.props.strokeWidth }
+                        />
+                    </Group>
+                </Surface>
+            </View>
         );
     }
-
 
     renderTicksX(ticks) {
         return (
