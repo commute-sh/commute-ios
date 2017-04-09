@@ -3,6 +3,7 @@ package com.commute;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.geektime.rnonesignalandroid.ReactNativeOneSignalPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.horcrux.svg.SvgPackage;
@@ -32,6 +33,7 @@ public class MainApplication extends Application implements ReactApplication {
       return asList(
           new RNSpinkitPackage(),
           new MainReactPackage(),
+            new ReactNativeOneSignalPackage(),
           new LinearGradientPackage(),
           new VectorIconsPackage(),
           new SvgPackage(),

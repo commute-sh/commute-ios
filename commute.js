@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react';
+import React, {Component, PropTypes} from 'react';
 
 import {
     Animated,
@@ -11,16 +11,18 @@ import {
 
 import Root from './components/Root';
 
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
+import {connect} from 'react-redux'
+import {bindActionCreators} from 'redux'
 
 import * as toastActionCreators from './actions/toast'
 import * as nearbyStationActionCreators from './actions/nearbyStations'
 
-import { initGeoLocation, disposeGeoLocation } from './actions/location';
-import { initFavoriteStations } from './actions/favoriteStations';
-import { initContractStations } from './actions/contractStations';
-import { fetchNearbyStations } from './actions/nearbyStations';
+import {initGeoLocation, disposeGeoLocation} from './actions/location';
+import {initFavoriteStations} from './actions/favoriteStations';
+import {initContractStations} from './actions/contractStations';
+import {fetchNearbyStations} from './actions/nearbyStations';
+
+import OneSignal from 'react-native-onesignal';
 
 import moment from 'moment';
 
@@ -35,7 +37,8 @@ class Commute extends Component {
     }
 
     componentWillMount() {
-        const { dispatch } = this.props;
+
+        const {dispatch} = this.props;
         initFavoriteStations(dispatch);
         initContractStations(dispatch, 'Paris');
         this.watchID = initGeoLocation(dispatch);
@@ -60,23 +63,52 @@ class Commute extends Component {
                 }
             }
         });
+
+        OneSignal.addEventListener('received', this.onReceived);
+        OneSignal.addEventListener('opened', this.onOpened);
+        OneSignal.addEventListener('registered', this.onRegistered);
+        OneSignal.addEventListener('ids', this.onIds);
     }
 
     componentWillUnmount() {
+        OneSignal.addEventListener('received', this.onReceived);
+        OneSignal.addEventListener('opened', this.onOpened);
+        OneSignal.addEventListener('registered', this.onRegistered);
+        OneSignal.addEventListener('ids', this.onIds);
+
         disposeGeoLocation(this.watchID);
     }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.nearbyStations && nextProps.nearbyStations.modalShown !== this.props.modalShown) {
             if (this.props.modalShown) {
-                Animated.timing(this.animatedValue, { toValue: 1, duration: 350 }).start(/*() => {
-                    setTimeout(this.props.toast.hideToast, 2000);
-                }*/);
+                Animated.timing(this.animatedValue, {toValue: 1, duration: 350}).start(/*() => {
+                 setTimeout(this.props.toast.hideToast, 2000);
+                 }*/);
 
             } else {
-                Animated.timing(this.animatedValue, { toValue: 0, duration: 350 }).start();
+                Animated.timing(this.animatedValue, {toValue: 0, duration: 350}).start();
             }
         }
+    }
+
+    onReceived(notification) {
+        console.log("Notification received: ", notification);
+    }
+
+    onOpened(openResult) {
+        console.log('Message: ', openResult.notification.payload.body);
+        console.log('Data: ', openResult.notification.payload.additionalData);
+        console.log('isActive: ', openResult.notification.isAppInFocus);
+        console.log('openResult: ', openResult);
+    }
+
+    onRegistered(notifData) {
+        console.log("Device had been registered for push notifications!", notifData);
+    }
+
+    onIds(device) {
+        console.log('Device info: ', device);
     }
 
     getToastBackgroundColor(type) {
@@ -94,7 +126,7 @@ class Commute extends Component {
 
     render() {
         return (
-            <View style={{ flex: 1 }}>
+            <View style={{flex: 1}}>
                 <Root />
                 {this.props.toast.modalShown && this.renderToast()}
             </View>
@@ -116,21 +148,21 @@ class Commute extends Component {
         }
 
         return (
-            <Animated.View  style={{
+            <Animated.View style={{
                 zIndex: 2,
-                transform: [{ translateY: animation }],
+                transform: [{translateY: animation}],
                 height: 70,
                 backgroundColor: this.getToastBackgroundColor(this.props.toast.type),
                 position: 'absolute',
                 left: 0,
                 top: windowHeight - 70,
                 right: 0,
-                justifyContent:  'center'
+                justifyContent: 'center'
             }}>
-                <Text style={{ marginLeft: 10,  color: 'white',  fontSize: 16, fontWeight: '500', fontFamily: 'System'  }}>
+                <Text style={{marginLeft: 10, color: 'white', fontSize: 16, fontWeight: '500', fontFamily: 'System'}}>
                     { this.props.toast.title }
                 </Text>
-                <Text style={{ marginLeft: 10,  color: 'white',  fontSize: 12, fontWeight: '300', fontFamily: 'System' }}>
+                <Text style={{marginLeft: 10, color: 'white', fontSize: 12, fontWeight: '300', fontFamily: 'System'}}>
                     { messagePrefix }: { this.props.toast.message }
                 </Text>
             </Animated.View>

@@ -137,7 +137,7 @@ class MapTab extends Component {
                             },
                             Title: (route, navigator, index, navState) =>
                                 <View style={{ paddingTop: 2 }}>
-                                    <Image source={require('../images/commute-icon.png')} style={{ width: 32, height: 32 }}/>
+                                    <Image source={require('../images/commute-navbar-icon.png')} style={{ width: 32, height: 32 }}/>
                                 </View>
                             ,
                         }}

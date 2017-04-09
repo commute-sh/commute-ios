@@ -20,6 +20,8 @@
 
 @implementation AppDelegate
 
+@synthesize oneSignal = _oneSignal;
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   
@@ -44,9 +46,16 @@
 #ifndef DEBUG
   RCTSetLogThreshold(RCTLogLevelInfo);
 #endif
+  
+  self.oneSignal = [[RCTOneSignal alloc] initWithLaunchOptions:launchOptions
+                                                         appId:@"0157cba2-6d26-402b-a547-15b686aa4456"];
 
   return YES;
 }
 
+// Required for the notification event.
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)notification {
+  [RCTOneSignal didReceiveRemoteNotification:notification];
+}
 
 @end

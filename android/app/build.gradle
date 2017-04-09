@@ -92,6 +92,8 @@ android {
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
+        manifestPlaceholders = [onesignal_app_id: "0157cba2-6d26-402b-a547-15b686aa4456",
+                                onesignal_google_project_number: "REMOTE"]
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
@@ -126,10 +128,19 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-onesignal')
     compile project(':react-native-linear-gradient')
     compile project(':react-native-vector-icons')
     compile project(':react-native-svg')
-    compile project(':react-native-maps')
+    // compile project(':react-native-maps')
+
+    compile(project(':react-native-maps')){
+      exclude group: 'com.google.android.gms', module: 'play-services-base'
+      exclude group: 'com.google.android.gms', module: 'play-services-maps'
+    }
+    compile 'com.google.android.gms:play-services-base:+'
+    compile 'com.google.android.gms:play-services-maps:+'
+
     compile project(':react-native-fabric')
     compile project(':react-native-spinkit')
     compile project(':react-native-segmented-android')
