@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 
 import MapTabScene from './MapTabScene';
-import StationDetailsScene from './StationDetailsScene';
+import StationDetailsScene from './stations/details/StationDetailsScene';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import EvilIcon from 'react-native-vector-icons/EvilIcons';

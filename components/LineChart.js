@@ -26,14 +26,14 @@ export default class LineChart extends Component {
         yAccessor: PropTypes.func.isRequired,
         icon: PropTypes.string.isRequired,
         title: PropTypes.string.isRequired,
-        titleValue: React.PropTypes.oneOfType([
-            React.PropTypes.string,
-            React.PropTypes.number
+        titleValue: PropTypes.oneOfType([
+            PropTypes.string,
+            PropTypes.number
         ]),
         subTitle: PropTypes.string.isRequired,
-        subTitleValue: React.PropTypes.oneOfType([
-            React.PropTypes.string,
-            React.PropTypes.number
+        subTitleValue: PropTypes.oneOfType([
+            PropTypes.string,
+            PropTypes.number
         ]),
         strokeColor: PropTypes.string,
         strokeWidth: PropTypes.number,

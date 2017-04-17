@@ -19,7 +19,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import EvilIcon from 'react-native-vector-icons/EvilIcons';
 
 import SearchTabScene from './SearchTabScene';
-import StationDetailsScene from './StationDetailsScene';
+import StationDetailsScene from './stations/details/StationDetailsScene';
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
