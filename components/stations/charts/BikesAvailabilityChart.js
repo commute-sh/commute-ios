@@ -66,30 +66,40 @@ class StationDetailsHistory extends Component {
 
         const graphProps = this.computeGraphProps();
 
+        const linearGradients = {
+            'AVAILABLE_BIKES': {
+                '0': 'rgba(251,179,116,1)',
+                '0.25': 'rgba(251,179,116,0.5)',
+                '1': 'rgba(251,179,116,0)'
+            },
+            'AVAILABLE_BIKE_STANDS': {
+                '0': 'rgba(71, 202, 238, 1)',
+                '0.25': 'rgba(71, 202, 238, 0.5)',
+                '1': 'rgba(71, 202, 238, 0)'
+            }
+        };
+
+        const linearGradientColors = {
+            'AVAILABLE_BIKES': [ "#fb9757", "#fc6040", "#fb412b" ],
+            'AVAILABLE_BIKE_STANDS': [ "#4295ff", "#2165c6", "#053a9a" ]
+        };
+
+        const subTitle = "Moyenne journalière: " + "nc";
+        const subTitleValue = "Aujourd'hui";
+
+        const title = dataToShow === 'AVAILABLE_BIKES' ? "Vélos disponibles" : "Places disponibles";
+        const titleValue = dataToShow === 'AVAILABLE_BIKES' ? station.available_bikes : station.available_bike_stands;
+
         return (
             <View style={{ padding: 20 }}>
                 <LineChart
                     icon="ios-bicycle"
-                    title={ dataToShow === 'AVAILABLE_BIKES' ? "Vélos disponibles" : "Places disponibles" }
-                    titleValue={ dataToShow === 'AVAILABLE_BIKES' ? station.available_bikes : station.available_bike_stands }
-                    subTitle={ "Moyenne journalière: " + "nc" }
-                    subTitleValue="Aujourd'hui"
-                    linearGradients={
-                        dataToShow === 'AVAILABLE_BIKES' ? {
-                            '0': 'rgba(251,179,116,1)',
-                            '0.25': 'rgba(251,179,116,0.5)',
-                            '1': 'rgba(251,179,116,0)'
-                        } : {
-                            '0': 'rgba(71, 202, 238, 1)',
-                            '0.25': 'rgba(71, 202, 238, 0.5)',
-                            '1': 'rgba(71, 202, 238, 0)'
-                        }
-                    }
-                    linearGradientColors={
-                        dataToShow === 'AVAILABLE_BIKES' ?
-                            [ "#fb9757", "#fc6040", "#fb412b" ] :
-                            [ "#4295ff", "#2165c6", "#053a9a" ]
-                    }
+                    title={title}
+                    titleValue={titleValue}
+                    subTitle={subTitle}
+                    subTitleValue={subTitleValue}
+                    linearGradients={linearGradients[dataToShow]}
+                    linearGradientColors={linearGradientColors[dataToShow]}
                     onPress={this.onChartPress.bind(this)}
                     {...graphProps}
                 />
