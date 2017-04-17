@@ -1,22 +1,17 @@
 import React, { Component, PropTypes } from 'react';
 
-import StationMarkerView from '../../StationMarkerView';
-
 import {
-    Animated,
-    Image,
     View,
     Text,
-    ScrollView,
-    processColor,
-    Platform
+    ScrollView
 } from 'react-native';
 
 import PageControl from 'react-native-page-control';
 
 import NetworkImage from '../../NetworkImage';
 
-import { stationPinColor } from '../../../utils/Stations';
+import StationDetailsMapHeader from './StationDetailsMapHeader';
+import StationDetailsPhotoHeader from './StationDetailsPhotoHeader';
 
 const screen = require('Dimensions').get('window');
 
@@ -49,9 +44,9 @@ class StationDetailsHeader extends Component {
 
     render() {
         console.log('--- [StationDetailsScene] Render -------------------------------------------------------------------------------------');
+        console.log("screen:", screen);
 
         const station = this.props.station;
-        console.log("screen:", screen);
 
         return (
 
@@ -60,8 +55,8 @@ class StationDetailsHeader extends Component {
                 height: screen.width * 240 / 320
             }}>
                 <ScrollView pagingEnabled={true} horizontal={true} showsHorizontalScrollIndicator={false} bounces={false} onScroll={this.onScroll.bind(this)} scrollEventThrottle={16}>
-                    {this.renderPhotoHeader()}
-                    {this.renderMapHeader()}
+                    <StationDetailsPhotoHeader station={station} />
+                    <StationDetailsMapHeader station={station} />
                 </ScrollView>
                 <PageControl
                     style={{position:'absolute', left:0, right:0, bottom:64}}
@@ -80,61 +75,6 @@ class StationDetailsHeader extends Component {
             </View>
         );
 
-    }
-
-    renderPhotoHeader() {
-        const station = this.props.station || { name: ' ', address: ' ' };
-
-        const backgroundSourceUri = `http://image-commute-sh.s3-website-eu-west-1.amazonaws.com/contracts/${station.contract_name}/${station.contract_name}-${station.number}-1-${640}-${60}.jpg`;
-        const contractBackgroundSourceUri = `http://image-commute-sh.s3-website-eu-west-1.amazonaws.com/contracts/${station.contract_name}/${station.contract_name}-1-${640}-${60}.jpg`;
-
-        console.log("Photo URL:", backgroundSourceUri);
-
-        return (
-            <NetworkImage
-                source={ (station.images || []).length > 0 ? { uri: backgroundSourceUri } : undefined }
-                errorSource={{ uri: contractBackgroundSourceUri }}
-                placeholderSource={{ uri: contractBackgroundSourceUri }}
-                style={{
-                    width: screen.width,
-                    height: screen.width * 240 / 320,
-                }}
-            />
-        );
-    }
-
-    renderMapHeader() {
-        const station = this.props.station || { name: ' ', address: ' ' };
-
-        const imageSize = { w: 640, h: 400 };
-        const zoom = 17;
-
-        const backgroundSourceUri = `https://maps.googleapis.com/maps/api/staticmap?center=${station.position.lat},${station.position.lng}&zoom=${zoom}&size=${imageSize.w}x${imageSize.h}&path=weight:3%7Ccolor:blue%7Cenc:{coaHnetiVjM??_SkM??~R`;
-
-        console.log("Map URL:", backgroundSourceUri);
-
-        return (
-            <NetworkImage source={{ uri: backgroundSourceUri }} style={{
-                width: screen.width,
-                height: screen.width * 240 / 320,
-                justifyContent: 'center',
-                alignItems: 'center'
-            }}>
-                <StationMarkerView
-                    number={station.number}
-                    value={station.available_bikes}
-                    station={station}
-                    pinSize={32}
-                    strokeColor={stationPinColor(station, 'BIKES')}
-                    bgColor="white"
-                    lineWidth={3}
-                    fontSize={14}
-                    fontWeight='900'
-                    opacity={1}
-                    style={{ width: 32, height: 32 }}
-                />
-            </NetworkImage>
-        );
     }
 
 }
