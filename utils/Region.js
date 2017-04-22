@@ -13,3 +13,12 @@ export function computeRegionRadiusInMeters(region) {
 
     return  distance;
 }
+
+export function regionEquals(r1, r2) {
+    return (
+        r1.latitude === r2.latitude && 
+        r1.longitude === r2.longitude && 
+        r1.latitudeDelta === r2.latitudeDelta && 
+        r1.longitudeDelta === r2.longitudeDelta
+    );
+}

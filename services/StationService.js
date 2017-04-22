@@ -1,6 +1,8 @@
 import moment from 'moment';
 import axios from 'axios';
 import Promise from 'bluebird';
+import _ from 'lodash';
+import qs from 'querystring'
 
 //const apiBaseUrl = `http://192.168.4.10:3001`;
 // const apiBaseUrl = `http://172.20.10.2:3001`;
@@ -71,10 +73,20 @@ export function fetchStationsByNumbers(stationNumbers) {
     });
 }
 
-export function fetchStationsNearby(position, distance = 1000, contractName = 'Paris') {
+export function fetchStationsNearby(position, distance = 1000, contractName = 'Paris', limit = -1) {
 
     const start = moment();
-    let url = `${apiBaseUrl}/stations/nearby?lat=${position.latitude}&lng=${position.longitude}&distance=${distance}&city=${contractName}`;
+
+    const query = qs.stringify(Object.assign(
+        {
+            lat: position.latitude,
+            lng: position.longitude,
+            city: contractName
+        },
+        distance > 0 ? { distance: distance } : {}
+    ));
+
+    let url = `${apiBaseUrl}/stations?${query}`;
 
     console.log('[', start.format('HH:mm:ss.SSS'), '][StationService][FetchStationsNearby] Get Stations Nearby URL:', url);
 
@@ -92,7 +104,7 @@ export function fetchStationsNearby(position, distance = 1000, contractName = 'P
             throw new Error(data);
         }
 
-        let stations = data;
+        let stations = limit > 0 ? _.take(data, limit) : data;
 
         const end = moment();
         const duration = moment.duration(end.diff(start)).asMilliseconds();

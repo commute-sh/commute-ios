@@ -20,7 +20,8 @@ export default createReducer(initialState, {
 
         console.log("Found", stations.length, "matching position", position, ", distance", distance, "and contract name", contractName);
 
-        const mergedStations = _.unionBy(state.data, stations, 'number');
+//        const mergedStations = _.unionBy(state.data, stations, 'number');
+        const mergedStations = stations;
 
         mergedStations.forEach(station => {
             if (!station.geoLocation) {

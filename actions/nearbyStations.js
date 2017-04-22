@@ -41,7 +41,7 @@ export function fetchNearbyStationsFromCurrentRegion() {
     };
 }
 
-export function fetchNearbyStations(position, distance = 1000, contractName = 'Paris') {
+export function fetchNearbyStations(position, distance = 1000, contractName = 'Paris', limit = -1) {
 
     const search = { position, distance, contractName };
 
@@ -67,7 +67,7 @@ export function fetchNearbyStations(position, distance = 1000, contractName = 'P
         }
 
         dispatch(fetchNearbyStationsRequest(search));
-        StationService.fetchStationsNearby(position, distance, contractName).then((stations) => {
+        StationService.fetchStationsNearby(position, distance, contractName, limit).then((stations) => {
             dispatch(fetchNearbyStationsSucceed(search, stations));
         }).catch((err) => {
             console.debug('Error:', err, 'Stack:', err.stack);

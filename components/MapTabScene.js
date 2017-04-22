@@ -53,7 +53,7 @@ class MapTabScene extends Component {
 
     componentDidMount() {
         if (this.props.position) {
-            this.props.actions.fetchNearbyStations(this.props.position.coords);
+            this.props.actions.fetchNearbyStations(this.props.position.coords, -1, undefined, 16);
         }
 
         this.enqueueAnimation((animCb) => {
@@ -69,7 +69,7 @@ class MapTabScene extends Component {
             nextProps.position.coords &&
             !isPositionEqual(this.props.position, nextProps.position)
         ) {
-            this.props.actions.fetchNearbyStations(nextProps.position.coords);
+            this.props.actions.fetchNearbyStations(nextProps.position.coords, -1, undefined, 16);
         }
 
         if (this.props.nearbyStations.version !== nextProps.nearbyStations.version) {
@@ -267,7 +267,7 @@ class MapTabScene extends Component {
 
         if (distance <= 100000) {
             console.log("Region radius (", distance, ") <= 100000 - Fetching stations inside perimeter");
-            this.props.actions.fetchNearbyStations({ latitude: region.latitude, longitude: region.longitude }, distance);
+            this.props.actions.fetchNearbyStations({ latitude: region.latitude, longitude: region.longitude }, -1/*distance*/, undefined, 16);
         } else {
             console.log("Region radius (", distance, ") > 100000 - Do not fetch stations inside perimeter");
         }

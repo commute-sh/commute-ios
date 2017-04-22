@@ -13,6 +13,10 @@ import IconButton from './IconButton';
 
 import StationMarkerView from './StationMarkerView';
 
+import { computeRegionRadiusInMeters, regionEquals } from '../utils/Region'
+
+const { min, max, abs } = Math;
+
 class Map extends Component {
 
     static propTypes = {
@@ -97,8 +101,8 @@ class Map extends Component {
     computeRegionFromLocation(location, delta = 0.5) {
         let currentLocationBoundingCoordinates = location.boundingCoordinates(delta, undefined, true);
 
-        let latitudeDelta = Math.abs(Math.abs(location.latitude()) - Math.abs(currentLocationBoundingCoordinates[0].latitude())) * 2;
-        let longitudeDelta = Math.abs(Math.abs(location.longitude()) - Math.abs(currentLocationBoundingCoordinates[0].longitude())) * 2;
+        let latitudeDelta = abs(abs(location.latitude()) - abs(currentLocationBoundingCoordinates[0].latitude())) * 2;
+        let longitudeDelta = abs(abs(location.longitude()) - abs(currentLocationBoundingCoordinates[0].longitude())) * 2;
 
         return {
             latitude: location.latitude(),
@@ -145,6 +149,14 @@ class Map extends Component {
             this.onRegionChangeComplete(region);
 
             console.log('[Map] ------------------ Current location region from center[1]:', this.state.region);
+        } else {
+            const region = {
+                latitude: nextProps.region.latitude,
+                longitude: nextProps.region.longitude,
+                latitudeDelta: this.state.region.latitudeDelta,
+                longitudeDelta: this.state.region.longitudeDelta
+            };
+            this.setState({ region: region })
         }
     }
 
@@ -159,9 +171,13 @@ class Map extends Component {
         } else if (this.props.version !== nextProps.version) {
             console.log('[Map][Updating] props version changed (', this.props.version, ', ', nextProps.version, ')');
             return true;
+        } else if (!regionEquals(this.state.region, nextState.region)) {
+            console.log('[Map][Updating] state region changed (', this.state.region, ', ', nextState.region, ')');
         }
 
         return false;
+
+        return true;
     }
 
     renderSegmentedControl() {
@@ -206,6 +222,23 @@ class Map extends Component {
             this.state.centerOnLocation = false;
         }
 
+        const { region } = this.state;
+
+
+        let circleRegion = { latitude: 0, longitude: 0 };
+        let distance = 0;
+
+        if (region) {
+
+            console.log("===================================computeRegionRadiusInMeters(region):", computeRegionRadiusInMeters(region));
+
+            circleRegion = { latitude: region.latitude, longitude: region.longitude };
+            distance = min(computeRegionRadiusInMeters(region), 2000) / 2;
+        }
+
+        console.log('===============================distance:', distance);
+        console.log('===============================region:', circleRegion);
+
         return (
             <View style={{ flex: 1 }}>
                 <View style={{ zIndex: 100, position: 'absolute', left: 24, right: 24, bottom: Platform.OS === 'ios' ? 72 : 32 }}>
@@ -231,6 +264,16 @@ class Map extends Component {
                     initialRegion={this.state.region}
                     region={centerOnLocation ? this.state.region : undefined}
                  >
+                    <MapView.Circle
+                        key={(circleRegion.longitude + '-' + circleRegion.latitude + '-' + distance).toString()}
+                        center={circleRegion}
+                        radius={distance}
+                        fillColor="rgba(0, 122, 255, 0.25)"
+                        strokeColor="rgba(0, 122, 255, 0.25)"
+                        zIndex={2}
+                        strokeWidth={1}
+                    />
+
                     { this.props.annotations.map(annotation => {
                         return Platform.OS == 'ios' ? (
                             <MapView.Marker
