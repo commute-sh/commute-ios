@@ -170,21 +170,21 @@ class FavoriteStationsTabScene extends Component {
                     this.pressRow(sectionID, rowID);
                     highlightRow(null);
                 }}>
-                    <View style={{ flexDirection: 'row', height: 96 }}>
+                    <View style={{ flexDirection: 'row', height: 72 }}>
                         <NetworkImage
                             source={ (station.images || []).length > 0 ? { uri: backgroundSourceUri } : undefined }
                             errorSource={placeholderImage}
                             placeholderSource={placeholderImage}
                             resizeMode='cover'
-                            style={{ width: 96, height: 96 }} />
+                            style={{ marginLeft: 12, marginTop: 12, marginRight: 12, width: 48, height: 48, borderRadius: 24 }} />
 
-                        <View style={{ flexDirection: 'column', flex: 1, padding: 20, paddingRight: 10 }}>
+                        <View style={{ flexDirection: 'column', flex: 1, padding: 10, paddingLeft: 0, paddingRight: 8 }}>
                             <Text style={{ fontFamily: 'System', fontSize: 14, fontWeight: '500', color: rowPress ? '#49b2d8' : '#49b2d8' }}>{station.number} - {station.name}</Text>
-                            <Text  style={{ fontFamily: 'System', fontSize: 12, fontWeight: '500', color: rowPress ? '#9d9d9d' : '#9d9d9d' }}>{station.address}</Text>
+                            <Text  style={{ fontFamily: 'System', fontSize: 11, fontWeight: '400', color: rowPress ? '#9d9d9d' : '#9d9d9d' }}>{station.address}</Text>
                         </View>
 
-                        <View style={{ width: 80, padding: 20, paddingTop: 20, paddingBottom: 20, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end' }}>
-                            <Text style={{ fontFamily: 'System', fontSize: 18, fontWeight: '500', color: stationPinColor(station, 'BIKES') }}>{station.available_bikes}</Text>
+                        <View style={{ width: 80, padding: 16, paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end' }}>
+                            <Text style={{ fontFamily: 'System', fontSize: 13, fontWeight: '500', color: stationPinColor(station, 'BIKES') }}>{station.available_bikes}</Text>
                             { station.distance && <Text style={{ fontFamily: 'System', fontSize: 12, fontWeight: '500', color: rowPress ? '#c2c2c2' : '#c2c2c2' }}>{(station.distance / 1000).toFixed(1)} km</Text>}
                         </View>
                     </View>
