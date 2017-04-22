@@ -18,7 +18,7 @@ class StationUpdateDate extends Component {
 
     return (
       <View>
-          <Text style={{fontFamily: 'System', fontSize: 12, color: '#9A9A9A', textAlign: 'center', padding: 5}}>
+          <Text style={{ fontFamily: 'System', fontSize: 12, color: '#9A9A9A', textAlign: 'center' }}>
             {this.renderUpdateDate()}
           </Text>
       </View>

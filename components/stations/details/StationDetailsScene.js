@@ -1,6 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 
+import StationHeader from '../StationHeader';
 import StationDetailsHeader from './StationDetailsHeader';
+import StationDetailsHeaderMap from './StationDetailsHeaderMap';
 import StationDetailsHistory from './StationDetailsHistory';
 import StationDetailsContent from './StationDetailsContent';
 
@@ -56,9 +58,18 @@ class StationDetailsScene extends Component {
        return (
             <ScrollView style={{ backgroundColor: '#fff' }}>
                 <Spacer height={ Platform.OS === 'ios' ? 64 : 56 } />
-                <StationDetailsHeader station={this.props.station} />
+                <StationHeader station={this.props.station} />
                 <StationDetailsContent station={this.props.station} distance={this.state.distance} />
-                <StationDetailsHistory station={this.props.station} data={this.state.data} />
+                <StationDetailsHeaderMap
+                    station={this.props.station}
+                    style={{ padding: 0, borderRadius: 12 }}
+                    paddingLeft={12}
+                    paddingRight={12}
+                    paddingTop={0}
+                    paddingBottom={0}
+                    height={128}
+                />
+                <StationDetailsHistory station={this.props.station} data={this.state.data} padding={12} />
                 <Spacer height={ Platform.OS === 'ios' ? 48 : 0 } />
             </ScrollView>
         );

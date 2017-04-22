@@ -54,13 +54,14 @@ class StationToast extends Component {
     }
 
     return (
-      <View style={{flex: 1, paddingLeft: 16, paddingTop: 5, paddingBottom: 5}}>
+      <View>
         <StationHeader station={station} />
+          <View style={{flex: 1, paddingLeft: 0, paddingRight: 0, paddingTop: 0, paddingBottom: 0}}>
+            { station.status == 'CLOSED' && <StationClosed />}
+            { station.status != 'CLOSED' && <StationInfos station={station} distance={this.state.distance} />}
 
-        { station.status == 'CLOSED' && <StationClosed />}
-        { station.status != 'CLOSED' && <StationInfos station={station} distance={this.state.distance} />}
-
-         <StationUpdateDate station={station} />
+             {/*<StationUpdateDate station={station} style={{ padding: 0, paddingBottom: 5 }} />*/}
+          </View>
       </View>
     );
   }

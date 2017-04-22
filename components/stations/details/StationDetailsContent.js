@@ -25,10 +25,7 @@ class StationDetailsContent extends Component {
                 )}
 
                 { station.status != 'CLOSED' && (
-                    <StationInfos station={station} distance={this.props.distance} style={{
-                        borderBottomWidth: 1,
-                        borderBottomColor: '#E4E4E4'
-                    }} />
+                    <StationInfos station={station} distance={this.props.distance} />
                 )}
             </View>
         );

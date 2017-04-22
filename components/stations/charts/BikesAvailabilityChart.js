@@ -14,7 +14,8 @@ class StationDetailsHistory extends Component {
 
     static propTypes = {
         station: PropTypes.object,
-        data: PropTypes.array
+        data: PropTypes.array,
+        padding: PropTypes.number
     };
 
     constructor(props) {
@@ -36,8 +37,8 @@ class StationDetailsHistory extends Component {
                 datum.time = moment(datum.time);
                 return datum;
             }),
-            width: screen.width - 20 * 2,
-            height: screen.width * 120 / 320 - 20 * 2
+            width: screen.width - this.props.padding * 2,
+            height: screen.width * 120 / 320 - this.props.padding * 2
         };
         graphProps.xAccessor = (d) => {
             // console.log('Moment Date:', d.time.format());
@@ -91,7 +92,7 @@ class StationDetailsHistory extends Component {
         const titleValue = dataToShow === 'AVAILABLE_BIKES' ? station.available_bikes : station.available_bike_stands;
 
         return (
-            <View style={{ padding: 20 }}>
+            <View style={{ padding: this.props.padding }}>
                 <LineChart
                     icon="ios-bicycle"
                     title={title}
