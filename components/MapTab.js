@@ -77,6 +77,7 @@ class MapTab extends Component {
                         return (
                             <StationDetailsScene ref="StationDetailsScene"
                                                  station={route.station}
+                                                 geoLocation={this.props.geoLocation}
                                                  navigator={navigator}
                             />
                         );
@@ -154,6 +155,7 @@ class MapTab extends Component {
 const mapStateToProps = (state) => Object.assign({}, {
     favoriteStations: state.favoriteStations,
     nearbyStations: state.nearbyStations,
+    geoLocation: state.location.geoLocation,
     map: state.map
 });
 

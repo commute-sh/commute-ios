@@ -8,8 +8,6 @@ import {
 
 import StationDetailsMapHeader from './StationDetailsMapHeader';
 
-const screen = require('Dimensions').get('window');
-
 class StationDetailsHeaderMap extends Component {
 
     static propTypes = {
@@ -24,7 +22,6 @@ class StationDetailsHeaderMap extends Component {
 
     render() {
         console.log('--- [StationDetailsScene] Render -------------------------------------------------------------------------------------');
-        console.log("screen:", screen);
 
         const station = this.props.station;
 

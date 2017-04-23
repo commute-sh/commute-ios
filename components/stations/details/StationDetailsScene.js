@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
 import StationHeader from '../StationHeader';
-import StationDetailsHeader from './StationDetailsHeader';
 import StationDetailsHeaderMap from './StationDetailsHeaderMap';
 import StationDetailsHistory from './StationDetailsHistory';
 import StationDetailsContent from './StationDetailsContent';
@@ -26,7 +25,8 @@ import Spacer from '../../Spacer'
 class StationDetailsScene extends Component {
 
     static propTypes = {
-        station: PropTypes.object
+        station: PropTypes.object,
+        geoLocation: PropTypes.object
     };
 
     constructor(props) {
@@ -62,6 +62,7 @@ class StationDetailsScene extends Component {
                 <StationDetailsContent station={this.props.station} distance={this.state.distance} />
                 <StationDetailsHeaderMap
                     station={this.props.station}
+                    geoLocation={this.props.geoLocation}
                     style={{ padding: 0, borderRadius: 12 }}
                     paddingLeft={12}
                     paddingRight={12}

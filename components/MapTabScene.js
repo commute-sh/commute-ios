@@ -10,8 +10,6 @@ import {
     Platform
 } from 'react-native';
 
-import moment from 'moment';
-
 import Map from './Map';
 import StationToast from './StationToast';
 
@@ -25,7 +23,7 @@ import { bindActionCreators } from 'redux'
 
 import * as nearbyStationActionCreators from '../actions/nearbyStations'
 import * as mapActionCreators from '../actions/map'
-import { filterStationsInRegion, stationPinColor } from '../utils/Stations'
+import { mapStationsToAnnotations } from '../utils/Stations'
 
 class MapTabScene extends Component {
 
@@ -279,79 +277,6 @@ class MapTabScene extends Component {
         }
     }
 
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Mappings
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    mapStationsToAnnotations(stations) {
-
-        const { region } = this.props;
-
-        const start = moment();
-
-        console.log('stations is array:', _.isArray(stations));
-        console.log('stations length:', stations.length);
-
-        if (!_.isArray(stations)) {
-            console.log('Stations (Not array: ', JSON.stringify(stations), ')');
-        }
-
-        if (!region) {
-            console.log('Not mapping stations to annotations since there is no region available');
-            return ;
-        }
-
-        const stationsInRegion = filterStationsInRegion(stations, region);
-
-        const annotations = _.map(stationsInRegion, (station) => {
-            return this.mapStationToAnnotation(station);
-        });
-
-        const end = moment();
-        const duration = moment.duration(end.diff(start)).asMilliseconds();
-
-        console.log("*** Annotations mapped in", duration, "ms");
-
-        return annotations;
-    }
-
-    mapStationToAnnotation(station) {
-
-        const { annotationType, center, geoLocation, pinSize } = this.props;
-
-//        console.log(`///////////////////// annotationType: ${annotationType} - showStands: ${showStands} - value: ${showStands ? station.available_bike_stands : station.available_bikes}`);
-
-        const showStands = annotationType === 'STANDS';
-
-        const pinColor = stationPinColor(station, annotationType);
-
-        const distanceToRegion = center ? station.geoLocation.distanceTo(center, true) * 1000 : -1;
-
-        const distanceToPosition = geoLocation ? station.geoLocation.distanceTo(geoLocation, true) * 1000 : -1;
-
-        return {
-            id: String(station.number),
-            station: station,
-            distance: station.distance,
-            latitude: station.position.lat,
-            longitude: station.position.lng,
-
-            number: station.number,
-            pinSize: pinSize,
-            value: showStands ? station.available_bike_stands : station.available_bikes,
-            strokeColor: pinColor,
-            bgColor: 'white',
-            lineWidth: pinSize <= 16 ? 0 : (pinSize <= 24 ? 3 : 4),
-            fontSize: (pinSize <= 24 ? 10 : 14),
-            fontWeight: '900',
-            opacity: (distanceToPosition > 1000 && distanceToRegion > 1000) ? 0.33 : 1,
-
-            onPress: this.onStationPress.bind(this, station)
-        };
-    }
-
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// Render
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -359,7 +284,11 @@ class MapTabScene extends Component {
     render() {
         console.log('--- [MapTabScene] Render -------------------------------------------------------------------------------------');
 
-        const annotations = this.mapStationsToAnnotations(this.props.nearbyStations.data);
+        const { props, state, onStationPress } = this;
+        const { version, stationToaster, fadeAnim } = state;
+        const { annotationType, center, geoLocation, pinSize, nearbyStations, region, atLeastOneStationAlreadyShown } = props;
+        const options = { annotationType, center, geoLocation, pinSize, onStationPress };
+        const annotations = mapStationsToAnnotations.bind(this)(nearbyStations.data, region, options);
 
         const onRegionCompleteDebounce = _.debounce(this.onRegionChangeComplete.bind(this), 300);
 
@@ -367,8 +296,8 @@ class MapTabScene extends Component {
             <View style={{flex: 1}}>
                 <Animated.View style={[
                     {
-                        transform: this.state.stationToaster.getTranslateTransform(),
-                        opacity: this.state.fadeAnim
+                        transform: stationToaster.getTranslateTransform(),
+                        opacity: fadeAnim
                     },
                     styles.container,
                     {
@@ -381,13 +310,13 @@ class MapTabScene extends Component {
                         }
                     }
                 ]}>
-                    {this.props.atLeastOneStationAlreadyShown && this.renderStationToast()}
+                    {atLeastOneStationAlreadyShown && this.renderStationToast()}
                 </Animated.View>
                 <Map
-                    version={this.state.version}
+                    version={version}
                     annotations={annotations}
-                    region={this.props.region}
-                    geoLocation={this.props.geoLocation}
+                    region={region}
+                    geoLocation={geoLocation}
                     onRegionChange={onRegionCompleteDebounce}
                     onRegionChangeComplete={onRegionCompleteDebounce}
                     onChange={this.onChange.bind(this)}

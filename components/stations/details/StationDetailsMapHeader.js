@@ -1,19 +1,19 @@
 import React, { Component, PropTypes } from 'react';
 
-import { View } from 'react-native';
+import { View, Platform } from 'react-native';
+
+import MapView from 'react-native-maps';
 
 import StationMarkerView from '../../StationMarkerView';
-
-import NetworkImage from '../../NetworkImage';
-
-import { stationPinColor } from '../../../utils/Stations';
+import { mapStationToAnnotation } from '../../../utils/Stations'
 
 const screen = require('Dimensions').get('window');
 
-class StationDetailsPhotoHeader extends Component {
+class StationDetailsMapHeader extends Component {
 
     static propTypes = {
         station: PropTypes.object,
+        geoLocation: PropTypes.object,
         paddingLeft: PropTypes.number,
         paddingRight: PropTypes.number,
         paddingTop: PropTypes.number,
@@ -21,27 +21,29 @@ class StationDetailsPhotoHeader extends Component {
         height: PropTypes.number
     };
 
+    constructor(props) {
+        super(props);
+
+        this.onStationPress = this.onStationPress.bind(this);
+    }
+
+    onStationPress(station) {
+        console.log(`On Station Press: ${station}`);
+    }
+
     render() {
-        const station = this.props.station || { name: ' ', address: ' ' };
+        const { station, geoLocation } = this.props;
+        const annotationType = 'STANDS';
+        const pinSize = 24;
 
-        console.log("Screen size[w:", screen.width, ', h:', screen.height, ']');
+        const annotation = mapStationToAnnotation.bind(this)(station, { onStationPress: this.onStationPress, annotationType, undefined, geoLocation, pinSize });
 
-        const width = (screen.width - this.props.paddingLeft - this.props.paddingRight);
-        const height = this.props.height;
-        const ratio = 640 / width;
-
-        const imageSize = {
-            w: (width * ratio).toFixed(0),
-            h: (height * ratio).toFixed(0)
+        const initialRegion = {
+            latitude: station.position.lat,
+            longitude: station.position.lng,
+            latitudeDelta: 0.00156125,
+            longitudeDelta: 0.000780625,
         };
-
-        const zoom = 17;
-
-        console.log("Image size[w:", imageSize.w, ', h:', imageSize.h, ']');
-
-        const backgroundSourceUri = `https://maps.googleapis.com/maps/api/staticmap?center=${station.position.lat},${station.position.lng}&zoom=${zoom}&size=${imageSize.w}x${imageSize.h}&path=weight:3%7Ccolor:blue%7Cenc:{coaHnetiVjM??_SkM??~R`;
-
-        console.log("Map URL:", backgroundSourceUri);
 
         return (
             <View style={{
@@ -50,34 +52,44 @@ class StationDetailsPhotoHeader extends Component {
                 paddingTop: this.props.paddingTop,
                 paddingBottom: this.props.paddingBottom
             }}>
-                <NetworkImage
-                    source={{ uri: backgroundSourceUri }}
-                    resizeMode="cover"
+                <MapView
+                    initialRegion={initialRegion}
                     style={{
-                        width: width,
-                        height: height,
-                        justifyContent: 'center',
-                        alignItems: 'center',
+                        width: screen.width - this.props.paddingLeft - this.props.paddingRight,
+                        height: this.props.height,
                         borderRadius: 4
-                }}>
-                    <StationMarkerView
-                        number={station.number}
-                        value={station.available_bikes}
-                        station={station}
-                        pinSize={24}
-                        strokeColor={stationPinColor(station, 'BIKES')}
-                        bgColor="white"
-                        lineWidth={3}
-                        fontSize={11}
-                        fontWeight='900'
-                        opacity={1}
-                        style={{ width: 24, height: 24 }}
-                    />
-                </NetworkImage>
+                    }}
+                >
+                    {
+                        Platform.OS == 'ios' ? (
+                                <MapView.Marker
+                                    key={annotation.id}
+                                    style={{ flex: 1, zIndex: 2 }}
+                                    draggable
+                                    coordinate={annotation}
+                                    showsUserLocation={false}
+                                    showsMyLocationButton={false}
+                                    showsCompass={false}
+                                    toolbarEnabled={false}
+                                >
+                                    <StationMarkerView {...annotation} onPress={annotation.onPress} />
+                                </MapView.Marker>
+                            ) : (
+                                <MapView.Marker
+                                    key={annotation.id}
+                                    onPress={annotation.onPress}
+                                    draggable
+                                    coordinate={annotation}
+                                >
+                                    <StationMarkerView {...annotation} />
+                                </MapView.Marker>
+                            )
+                    }
+                </MapView>
             </View>
         );
     }
 
 }
 
-export default StationDetailsPhotoHeader;
+export default StationDetailsMapHeader;
