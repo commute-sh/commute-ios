@@ -80,7 +80,7 @@ class StationDetailsScene extends Component {
                             paddingTop={0}
                             paddingBottom={0}
                             height={256}
-                            zoomEnabled={false}
+                            zoomEnabled={true}
                         />
                     </View>
                 </TouchableHighlight>
