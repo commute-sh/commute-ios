@@ -38,7 +38,8 @@ class StationDetailsScene extends Component {
 
         this.state = {
             distance: Number.MAX_SAFE_INTEGER,
-            mapBig: false
+            mapBig: false,
+            lastPress: 0
         };
     }
 
@@ -58,7 +59,15 @@ class StationDetailsScene extends Component {
     }
 
     onStationDetailsHeaderMapPress() {
-        this.setState({ mapBig: !this.state.mapBig })
+        var delta = new Date().getTime() - this.state.lastPress;
+
+        if(delta < 200) {
+            this.setState({ mapBig: !this.state.mapBig })
+        }
+
+        this.setState({
+            lastPress: new Date().getTime()
+        })
     }
 
     render() {
@@ -85,7 +94,7 @@ class StationDetailsScene extends Component {
                             paddingTop={0}
                             paddingBottom={0}
                             height={this.state.mapBig ? 256 :  128}
-                            zoomEnabled={this.state.mapBig}
+                            zoomEnabled={false}
                         />
                     </View>
                 </TouchableHighlight>
