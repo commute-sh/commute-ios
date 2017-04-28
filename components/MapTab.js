@@ -71,6 +71,7 @@ class MapTab extends Component {
 
         return (
             <Navigator
+                ref="navigator"
                 initialRoute={{id: 'Map', title: 'Plan' }}
                 renderScene={(route, navigator) => {
                     if (route.id == 'StationDetails') {
@@ -79,6 +80,8 @@ class MapTab extends Component {
                                                  station={route.station}
                                                  geoLocation={this.props.geoLocation}
                                                  navigator={navigator}
+                                                 route={route}
+                                                 {...route.passProps}
                             />
                         );
                     } else if (route.id === 'Map') {

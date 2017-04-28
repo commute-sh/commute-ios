@@ -8,7 +8,10 @@ import StationDetailsContent from './StationDetailsContent';
 import {
     View,
     ScrollView,
-    Platform
+    Platform,
+    TouchableOpacity,
+    TouchableHighlight,
+    Text
 } from 'react-native';
 
 import moment from 'moment';
@@ -26,14 +29,16 @@ class StationDetailsScene extends Component {
 
     static propTypes = {
         station: PropTypes.object,
-        geoLocation: PropTypes.object
+        geoLocation: PropTypes.object,
+        navigator: PropTypes.object
     };
 
     constructor(props) {
         super(props);
 
         this.state = {
-            distance: Number.MAX_SAFE_INTEGER
+            distance: Number.MAX_SAFE_INTEGER,
+            mapBig: false
         };
     }
 
@@ -52,24 +57,39 @@ class StationDetailsScene extends Component {
         }
     }
 
+    onStationDetailsHeaderMapPress() {
+        this.setState({ mapBig: !this.state.mapBig })
+    }
+
     render() {
         console.log('--- [StationDetailsScene] Render -------------------------------------------------------------------------------------');
 
-       return (
-            <ScrollView style={{ backgroundColor: '#fff' }}>
+        return (
+            <ScrollView style={{ backgroundColor: '#fff', position: 'relative' }}>
                 <Spacer height={ Platform.OS === 'ios' ? 64 : 56 } />
                 <StationHeader station={this.props.station} />
                 <StationDetailsContent station={this.props.station} distance={this.state.distance} />
-                <StationDetailsHeaderMap
-                    station={this.props.station}
-                    geoLocation={this.props.geoLocation}
-                    style={{ padding: 0, borderRadius: 12 }}
-                    paddingLeft={12}
-                    paddingRight={12}
-                    paddingTop={0}
-                    paddingBottom={0}
-                    height={128}
-                />
+
+                <TouchableHighlight
+                    onPress={this.onStationDetailsHeaderMapPress.bind(this)}
+                    activeOpacity={0.5}
+                    underlayColor="white"
+                    style={{ flex: 1 }}>
+                    <View style={{ flex: 1 }}>
+                        <StationDetailsHeaderMap
+                            station={this.props.station}
+                            geoLocation={this.props.geoLocation}
+                            style={{ padding: 0, borderRadius: 12 }}
+                            paddingLeft={12}
+                            paddingRight={12}
+                            paddingTop={0}
+                            paddingBottom={0}
+                            height={this.state.mapBig ? 256 :  128}
+                            zoomEnabled={this.state.mapBig}
+                        />
+                    </View>
+                </TouchableHighlight>
+
                 <StationDetailsHistory station={this.props.station} data={this.state.data} padding={12} />
                 <Spacer height={ Platform.OS === 'ios' ? 48 : 0 } />
             </ScrollView>

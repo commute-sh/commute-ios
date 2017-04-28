@@ -18,7 +18,8 @@ class StationDetailsMapHeader extends Component {
         paddingRight: PropTypes.number,
         paddingTop: PropTypes.number,
         paddingBottom: PropTypes.number,
-        height: PropTypes.number
+        height: PropTypes.number,
+        zoomEnabled: PropTypes.bool
     };
 
     constructor(props) {
@@ -47,6 +48,7 @@ class StationDetailsMapHeader extends Component {
 
         return (
             <View style={{
+                flex: 1,
                 paddingLeft: this.props.paddingLeft,
                 paddingRight: this.props.paddingRight,
                 paddingTop: this.props.paddingTop,
@@ -54,6 +56,7 @@ class StationDetailsMapHeader extends Component {
             }}>
                 <MapView
                     initialRegion={initialRegion}
+                    zoomEnabled={this.props.zoomEnabled}
                     style={{
                         width: screen.width - this.props.paddingLeft - this.props.paddingRight,
                         height: this.props.height,
