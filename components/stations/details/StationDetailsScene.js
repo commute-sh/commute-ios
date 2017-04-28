@@ -37,8 +37,7 @@ class StationDetailsScene extends Component {
         super(props);
 
         this.state = {
-            distance: Number.MAX_SAFE_INTEGER,
-            mapBig: false
+            distance: Number.MAX_SAFE_INTEGER
         };
     }
 
@@ -55,10 +54,6 @@ class StationDetailsScene extends Component {
         if (geoLocation && station) {
             this.setState({ distance: (geoLocation.distanceTo(station.geoLocation, true) * 1000) });
         }
-    }
-
-    onStationDetailsHeaderMapPress() {
-        this.setState({ mapBig: !this.state.mapBig })
     }
 
     render() {
@@ -84,7 +79,7 @@ class StationDetailsScene extends Component {
                             paddingRight={12}
                             paddingTop={0}
                             paddingBottom={0}
-                            height={this.state.mapBig ? 256 :  128}
+                            height={256}
                             zoomEnabled={false}
                         />
                     </View>
