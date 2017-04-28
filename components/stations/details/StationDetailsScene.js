@@ -38,8 +38,7 @@ class StationDetailsScene extends Component {
 
         this.state = {
             distance: Number.MAX_SAFE_INTEGER,
-            mapBig: false,
-            lastPress: 0
+            mapBig: false
         };
     }
 
@@ -59,15 +58,7 @@ class StationDetailsScene extends Component {
     }
 
     onStationDetailsHeaderMapPress() {
-        var delta = new Date().getTime() - this.state.lastPress;
-
-        if(delta < 200) {
-            this.setState({ mapBig: !this.state.mapBig })
-        }
-
-        this.setState({
-            lastPress: new Date().getTime()
-        })
+        this.setState({ mapBig: !this.state.mapBig })
     }
 
     render() {
