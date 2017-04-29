@@ -143,15 +143,10 @@ class MapTabScene extends Component {
         console.log('Enqueuing animation: [stationToasterAppear]');
 
         Animated.parallel([
-            Animated.timing(this.state.fadeAnim, {  duration: 300, toValue: 1 }),
+            Animated.timing(this.state.fadeAnim, {  duration: 300, toValue: 0.9 }),
             Animated.timing(this.state.stationToaster, { duration: 300, toValue: { x: 0, y: Platform.OS === 'ios' ? 0 : -64 } })
         ]).start(() => {
             this.stationToastVisible = true;
-            // if (stationToast && stationToast.measure) {
-            //     stationToast.measure((fx, fy, width, height, px, py) => {
-            //     });
-            // }
-
             cb && cb.bind(self)();
         });
     }
@@ -297,12 +292,14 @@ class MapTabScene extends Component {
                 <Animated.View style={[
                     {
                         transform: stationToaster.getTranslateTransform(),
-                        opacity: fadeAnim
+                        opacity: fadeAnim,
+                        margin: 10,
+                        borderRadius: 8
                     },
                     styles.container,
                     {
                         shadowColor: "#000000",
-                        shadowOpacity: 0.8,
+                        shadowOpacity: 0.5,
                         shadowRadius: 2,
                         shadowOffset: {
                             height: 1,
@@ -328,7 +325,11 @@ class MapTabScene extends Component {
 
     renderStationToast() {
         return (
-            <TouchableHighlight onPress={this.onStationToastPress.bind(this)} activeOpacity={0.5} underlayColor="white" style={{ flex: 1 }}>
+            <TouchableHighlight
+                onPress={this.onStationToastPress.bind(this)}
+                activeOpacity={0.5}
+                underlayColor="white"
+                style={{ flex: 1, borderRadius: 8 }}>
                 <View style={{ flex: 1 }}>
                     <StationToast ref="stationToast" station={this.props.station} />
                 </View>
@@ -347,7 +348,7 @@ var styles = EStyleSheet.create({
     container: {
         flexDirection:'row',
         alignSelf: 'stretch',
-        width: '100%',
+        width: 'calc(100% - 16px)',
 /*        height: 147,*/
         top: 64,
         left: 0,
