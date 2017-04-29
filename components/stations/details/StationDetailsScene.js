@@ -65,25 +65,18 @@ class StationDetailsScene extends Component {
                 <StationHeader station={this.props.station} />
                 <StationDetailsContent station={this.props.station} distance={this.state.distance} />
 
-                <TouchableHighlight
-                    onPress={this.onStationDetailsHeaderMapPress.bind(this)}
-                    activeOpacity={0.5}
-                    underlayColor="white"
-                    style={{ flex: 1 }}>
-                    <View style={{ flex: 1 }}>
-                        <StationDetailsHeaderMap
-                            station={this.props.station}
-                            geoLocation={this.props.geoLocation}
-                            style={{ padding: 0, borderRadius: 12 }}
-                            paddingLeft={12}
-                            paddingRight={12}
-                            paddingTop={0}
-                            paddingBottom={0}
-                            height={256}
-                            zoomEnabled={true}
-                        />
-                    </View>
-                </TouchableHighlight>
+
+                <StationDetailsHeaderMap
+                    station={this.props.station}
+                    geoLocation={this.props.geoLocation}
+                    style={{ padding: 0, borderRadius: 12 }}
+                    paddingLeft={12}
+                    paddingRight={12}
+                    paddingTop={0}
+                    paddingBottom={0}
+                    height={256}
+                    zoomEnabled={true}
+                />
 
                 <StationDetailsHistory station={this.props.station} data={this.state.data} padding={12} />
                 <Spacer height={ Platform.OS === 'ios' ? 48 : 0 } />
