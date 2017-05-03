@@ -26,43 +26,45 @@ import OneSignal from 'react-native-onesignal';
 
 import moment from 'moment';
 
+import { getToastBackgroundColor } from './utils/Toast';
+
 let windowHeight = Dimensions.get('window').height;
 
 class Commute extends Component {
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Instances variables
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    animatedValue = new Animated.Value(0);
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Constructor
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     constructor(props) {
         super(props);
 
-        this.animatedValue = new Animated.Value(0);
+        this.lastUpdateTooOld = this.lastUpdateTooOld.bind(this);
     }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Lifecycle
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     componentWillMount() {
 
-        const {dispatch} = this.props;
+        const { dispatch } = this.props;
+
         initFavoriteStations(dispatch);
         initContractStations(dispatch, 'Paris');
+
         this.watchID = initGeoLocation(dispatch);
 
-        const self = this;
-
-        NetInfo.addEventListener('change', (reach) => {
-            console.log('[Commute] Net state change: ' + reach);
-
-            if (!self.props.nearbyStations.isFetching && reach !== 'none' && self.props.location.position && moment(self.props.nearbyStations.lastUpdate).add(5, 'minutes').isBefore(moment())) {
-                console.log("[Commute] Loading stations as last update (", self.props.nearbyStations.lastUpdate.format('YYYY-MM-dd HH:mm:ss'), ") was at least 5 minutes before now and server is reachable");
-                dispatch(fetchNearbyStations(self.props.location.position));
-            } else {
-                if (self.props.nearbyStations.isFetching) {
-                    console.log("[Commute] Does not attempt to load stations as app is already fetching stations");
-                } else if (reach === 'none') {
-                    console.log("[Commute] Does not attempt to load stations as device is offline");
-                } else if (!self.props.location.position) {
-                    console.log("[Commute] Does not attempt to load stations as position is not currently known");
-                } else {
-                    console.log("[Commute] Does not attempt to load stations as last update (", self.props.nearbyStations.lastUpdate.format('YYYY-MM-dd HH:mm:ss'), ") is not at least 5 minutes before now");
-                }
-            }
-        });
+        NetInfo.addEventListener('change', this.onReachabilityChanged.bind(this));
 
         OneSignal.addEventListener('received', this.onReceived);
         OneSignal.addEventListener('opened', this.onOpened);
@@ -92,6 +94,40 @@ class Commute extends Component {
         }
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Events
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    onReachabilityChanged(reach) {
+        console.log(`[Commute] Net state change: ${reach}`);
+
+        if (this.props.nearbyStations.isFetching) {
+            console.log("[Commute] Does not attempt to load stations as app is already fetching stations");
+            return ;
+        }
+
+        if (reach === 'none') {
+            console.log("[Commute] Does not attempt to load stations as device is offline");
+            return ;
+        }
+
+        if (!this.props.location.position || !this.props.location.position.coords) {
+            console.log("[Commute] Does not attempt to load stations as position is not currently known");
+            return ;
+        }
+
+        const lastUpdateFormatted = this.props.nearbyStations.lastUpdate.format('YYYY-MM-dd HH:mm:ss');
+
+        if (!this.lastUpdateTooOld()) {
+            console.log(`[Commute] Does not attempt to load stations as last update (${lastUpdateFormatted}) is not at least 5 minutes before now`);
+            return ;
+        }
+
+        console.log(`[Commute] Loading stations as last update (${lastUpdateFormatted}) was at least 5 minutes before now and server is reachable`);
+        this.props.dispatch(fetchNearbyStations(this.props.location.position.coords));
+    }
+
     onReceived(notification) {
         console.log("Notification received: ", notification);
     }
@@ -111,18 +147,10 @@ class Commute extends Component {
         console.log('Device info: ', device);
     }
 
-    getToastBackgroundColor(type) {
-        // INFO
-        let color = '#2980b9';
 
-        if (type == 'ERROR') {
-            color = '#e74c3c';
-        } else if (type == 'WARNING') {
-            color = '#f39c12';
-        }
-
-        return color;
-    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Render
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     render() {
         return (
@@ -132,7 +160,6 @@ class Commute extends Component {
             </View>
         );
     }
-
 
     renderToast() {
 
@@ -152,7 +179,7 @@ class Commute extends Component {
                 zIndex: 2,
                 transform: [{translateY: animation}],
                 height: 70,
-                backgroundColor: this.getToastBackgroundColor(this.props.toast.type),
+                backgroundColor: getToastBackgroundColor(this.props.toast.type),
                 position: 'absolute',
                 left: 0,
                 top: windowHeight - 70,
@@ -169,7 +196,21 @@ class Commute extends Component {
         );
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Utils
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    lastUpdateTooOld() {
+        return moment(this.props.nearbyStations.lastUpdate).add(5, 'minutes').isBefore(moment());
+    }
+
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Redux
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const mapStateToProps = (state) => Object.assign({}, {
     toast: state.toast,
@@ -178,7 +219,7 @@ const mapStateToProps = (state) => Object.assign({}, {
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    dispatch: dispatch,
+    dispatch,
     actions: bindActionCreators(
         Object.assign({}, toastActionCreators, nearbyStationActionCreators),
         dispatch

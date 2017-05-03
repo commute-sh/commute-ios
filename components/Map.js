@@ -13,11 +13,18 @@ import IconButton from './IconButton';
 
 import StationMarkerView from './StationMarkerView';
 
-import { computeRegionRadiusInMeters, regionEquals } from '../utils/Region'
+import { computeRegionRadiusInMeters, regionEquals, computeRegionFromLocation } from '../utils/Region'
 
-const { min, max, abs } = Math;
+import _ from 'lodash';
+
+const { min, random } = Math;
 
 class Map extends Component {
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Propeties
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     static propTypes = {
         annotations: PropTypes.array,
@@ -34,12 +41,22 @@ class Map extends Component {
         annotations: []
     };
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// instance variables
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    state = {
+        selectedIndex: 0
+    };
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Constructor
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     constructor(props) {
         super(props);
-
-        this.state = {
-            selectedIndex: 0
-        };
 
         this.onCenterOnLocation = this.onCenterOnLocation.bind(this);
         this.onRegionChange = this.onRegionChange.bind(this);
@@ -47,6 +64,71 @@ class Map extends Component {
         this.onChange = this.onChange.bind(this);
         this.onPress = this.onPress.bind(this);
     }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Lifecycle
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    componentWillReceiveProps(nextProps) {
+        /*if (!this.props.geoLocation && nextProps.geoLocation) {
+            if (this.state.region) {
+                console.log('[Map][componentWillReceiveProps][1][a] !this.props.geoLocation && nextProps.geoLocation');
+                const region = {
+                    latitude: nextProps.geoLocation.latitude(),
+                    longitude: nextProps.geoLocation.longitude(),
+                    latitudeDelta: this.state.region.latitudeDelta,
+                    longitudeDelta: this.state.region.longitudeDelta
+                };
+                this.setState({ region, centerOnRegion: true });
+
+                console.log('[Map][componentWillReceiveProps][1][a][End] Current location region from geoLocation[2]:', region);
+            } else {
+                console.log('[Map][componentWillReceiveProps][1][b] !this.props.geoLocation && nextProps.geoLocation');
+                const region = computeRegionFromLocation(nextProps.geoLocation, 0.5);
+                this.setState({ region, centerOnRegion: true });
+
+                console.log('[Map][componentWillReceiveProps][1][b][End] Current location region from geoLocation[2]:', region);
+            }
+
+        } else *//*if (!this.props.geoLocation && !nextProps.geoLocation && !regionEquals(this.state.region, nextProps.region)) {
+            console.log('[Map][componentWillReceiveProps][2] !this.props.geoLocation && !nextProps.geoLocation && nextProps.region');
+
+            const region = nextProps.region;
+            this.setState({ region, centerOnRegion: true });
+
+            console.log('[Map][componentWillReceiveProps][2][End] Current location region from center:', region);
+        } else */if (!regionEquals(this.state.region, nextProps.region)) {
+            console.log('[Map][componentWillReceiveProps][3] else');
+
+            const region = _.clone(nextProps.region);
+            this.setState({ region, centerOnRegion: true });
+
+            console.log('[Map][componentWillReceiveProps][3][End] Current location region from center:', region);
+        }
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+
+        console.log(`[Map][shouldComponentUpdate] selected index: ${this.state.selectedIndex}, ${nextState.selectedIndex}`);
+
+        if (nextState.centerOnRegion) {
+            console.log('[Map][shouldComponentUpdate] center on region');
+            return true;
+        } else if (this.props.version !== nextProps.version) {
+            console.log('[Map][shouldComponentUpdate] props version changed (', this.props.version, ', ', nextProps.version, ')');
+            return true;
+        } else if (!regionEquals(this.state.region, nextState.region)) {
+            console.log('[Map][shouldComponentUpdate] state region changed (', this.state.region, ', ', nextState.region, ')');
+        }
+
+        return false;
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Events
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     onChange(event) {
         this.setState({selectedIndex: Platform.OS === 'ios' ? event.nativeEvent.selectedSegmentIndex : event.selected });
@@ -69,155 +151,72 @@ class Map extends Component {
     }
 
     onRegionChangeComplete(region) {
+        console.log('[Map][onRegionChangeComplete] (region: ', region, ', this.props.region: ', this.props.region, '), geoLocation: ', this.props.geoLocation);
+
         if (this.props.onRegionChangeComplete) {
-            this.props.onRegionChangeComplete(region);
+            if (region && this.props.region) {
+                this.props.onRegionChangeComplete(region);
+            } else if (this.props.geoLocation) {
+                const region = {
+                    latitude: this.props.geoLocation.latitude(),
+                    longitude: this.props.geoLocation.longitude(),
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.025
+                };
+
+                this.props.onRegionChangeComplete(region);
+            } else {
+                region = {
+                    longitudeDelta: 0.00772,
+                    latitude: 48.85319,
+                    longitude: 2.34831,
+                    latitudeDelta: 0.00819
+                };
+
+                this.props.onRegionChangeComplete(region);
+            }
         }
     }
 
     onCenterOnLocation() {
-
         if (this.props.geoLocation) {
             if (this.state.region) {
                 let region = Object.assign({}, this.state.region);
 
                 region.latitude = this.props.geoLocation.latitude();
                 region.longitude = this.props.geoLocation.longitude();
-                region.latitudeDelta = region.latitudeDelta + (Math.random() + 0.0001) * 0.0001;
-                region.longitudeDelta = region.longitudeDelta +  (Math.random() + 0.0001) * 0.0001;
+                region.latitudeDelta = region.latitudeDelta + (random() + 0.0001) * 0.0001;
+                region.longitudeDelta = region.longitudeDelta +  (random() + 0.0001) * 0.0001;
 
-                this.setState({ region: region, centerOnLocation: true });
-                this.props.onRegionChangeComplete(region);
+                this.setState({ region, centerOnRegion: true });
             } else {
-                let region = this.computeRegionFromLocation(this.props.geoLocation);
+                let region = computeRegionFromLocation(this.props.geoLocation);
 
-                this.setState({ region: region, centerOnLocation: true });
-                this.props.onRegionChangeComplete(region);
+                this.setState({ region, centerOnRegion: true });
             }
         } else {
             console.warn('No geoLocation found !');
         }
     }
 
-    computeRegionFromLocation(location, delta = 0.5) {
-        let currentLocationBoundingCoordinates = location.boundingCoordinates(delta, undefined, true);
 
-        let latitudeDelta = abs(abs(location.latitude()) - abs(currentLocationBoundingCoordinates[0].latitude())) * 2;
-        let longitudeDelta = abs(abs(location.longitude()) - abs(currentLocationBoundingCoordinates[0].longitude())) * 2;
-
-        return {
-            latitude: location.latitude(),
-            longitude: location.longitude(),
-            latitudeDelta: latitudeDelta,
-            longitudeDelta: longitudeDelta
-        };
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (!this.props.geoLocation && nextProps.geoLocation) {
-            if (this.state.region) {
-                console.log('[Map][1][a] !this.props.geoLocation && nextProps.geoLocation');
-                const region = {
-                    latitude: nextProps.geoLocation.latitude(),
-                    longitude: nextProps.geoLocation.longitude(),
-                    latitudeDelta: this.state.region.latitudeDelta,
-                    longitudeDelta: this.state.region.longitudeDelta
-                };
-                this.setState({
-                    region: region,
-                    centerOnLocation: true
-                });
-                this.onRegionChangeComplete(region);
-            } else {
-                console.log('[Map][1][b} !this.props.geoLocation && nextProps.geoLocation');
-                const region = this.computeRegionFromLocation(nextProps.geoLocation, 0.5);
-                this.setState({
-                    region: region,
-                    centerOnLocation: true
-                });
-                this.onRegionChangeComplete(region);
-            }
-
-            console.log('[Map] ------------------ Current location region from geoLocation[2]:', this.state.region);
-        } else if (!this.props.geoLocation && !nextProps.geoLocation && nextProps.region) {
-            console.log('[Map][2] !this.props.geoLocation && !nextProps.geoLocation && nextProps.region');
-
-            const region = nextProps.region;
-            this.setState({
-                region: region,
-                centerOnLocation: true
-            });
-            this.onRegionChangeComplete(region);
-
-            console.log('[Map] ------------------ Current location region from center[1]:', this.state.region);
-        } else {
-            const region = {
-                latitude: nextProps.region.latitude,
-                longitude: nextProps.region.longitude,
-                latitudeDelta: this.state.region.latitudeDelta,
-                longitudeDelta: this.state.region.longitudeDelta
-            };
-            this.setState({ region: region })
-        }
-    }
-
-    shouldComponentUpdate(nextProps, nextState) {
-
-        console.log(`--- selectedIndex: ${this.state.selectedIndex}, ${nextState.selectedIndex}`);
-
-        if (nextState.centerOnLocation) {
-            console.log('[Map][Updating] center on location');
-
-            return true;
-        } else if (this.props.version !== nextProps.version) {
-            console.log('[Map][Updating] props version changed (', this.props.version, ', ', nextProps.version, ')');
-            return true;
-        } else if (!regionEquals(this.state.region, nextState.region)) {
-            console.log('[Map][Updating] state region changed (', this.state.region, ', ', nextState.region, ')');
-        }
-
-        return false;
-    }
-
-    renderSegmentedControl() {
-        if (Platform.OS === 'ios') {
-            return (
-                <SegmentedControlIOS
-                    values={[ 'Places', 'Vélos' ]}
-                    selectedIndex={this.state.selectedIndex}
-                    style={{ backgroundColor: 'white', width: 160 }}
-                    tintColor="#49b2d8"
-                    onChange={this.onChange}
-                />
-            );
-        } else {
-            var AndroidSegmented = require('react-native-segmented-android');
-
-            return (
-                <AndroidSegmented
-                    tintColor={['#49b2d8','#ffffff']}
-                    style={{ backgroundColor: 'white', width: 160, height: 30 }}
-                    childText={[ 'Places', 'Vélos' ]}
-                    orientation='horizontal'
-                    selectedPosition={this.state.selectedIndex}
-                    onChange={this.onChange} />
-            );
-        }
-
-    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Render
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     render() {
 
         console.log('--- [Map] Render -------------------------------------------------------------------------------------');
 
-        console.log('[Map] -------------- Region:', this.state.region);
+        console.log('[Map][render] Region:', this.state.region);
 
-        console.log('[Map] -------------- centerOnLocation:', this.state.centerOnLocation);
+        console.log('[Map][render] CenterOnRegion:', this.state.centerOnRegion);
 
-        const centerOnLocation = this.state.centerOnLocation;
+        const centerOnRegion = this.state.centerOnRegion;
 
-        if (centerOnLocation) {
-            console.log('[Map] -------------- Centering on location', this.state.centerOnLocation, '(Setting centerOnLocation to false)');
-            this.state.centerOnLocation = false;
+        if (centerOnRegion) {
+            console.log('[Map][render] Centering on region', this.state.centerOnRegion, '(Setting centerOnRegion to false)');
+            this.state.centerOnRegion = false;
         }
 
         const { region } = this.state;
@@ -228,14 +227,14 @@ class Map extends Component {
 
         if (region) {
 
-            console.log("===================================computeRegionRadiusInMeters(region):", computeRegionRadiusInMeters(region));
+            console.log("[Map][render] computeRegionRadiusInMeters(region):", computeRegionRadiusInMeters(region));
 
             circleRegion = { latitude: region.latitude, longitude: region.longitude };
             distance = min(computeRegionRadiusInMeters(region), 2000) / 2;
         }
 
-        console.log('===============================distance:', distance);
-        console.log('===============================region:', circleRegion);
+        console.log('[Map][render] Distance:', distance);
+        console.log('[Map][render] Region:', circleRegion);
 
         return (
             <View style={{ flex: 1 }}>
@@ -249,7 +248,8 @@ class Map extends Component {
                     {this.renderSegmentedControl()}
                     </View>
                 </View>
-                <IconButton iconName="location-arrow" onPress={this.onCenterOnLocation} style={{ zIndex: 100, position: 'absolute', right: 24, bottom: Platform.OS === 'ios' ? 64 : 24 }} />
+
+                <IconButton iconName="ios-locate-outline" onPress={this.onCenterOnLocation} style={{ zIndex: 100, position: 'absolute', right: 24, bottom: Platform.OS === 'ios' ? 64 : 24 }} />
                 <MapView
                     style={{ flex: 1, zIndex: 2 }}
                     showsUserLocation={true}
@@ -260,7 +260,7 @@ class Map extends Component {
                     onRegionChange={this.onRegionChange}
                     onPress={this.onPress}
                     initialRegion={this.state.region}
-                    region={centerOnLocation ? this.state.region : undefined}
+                    region={centerOnRegion ? this.state.region : undefined}
                  >
                     <MapView.Circle
                         key={(circleRegion.longitude + '-' + circleRegion.latitude + '-' + distance).toString()}
@@ -297,6 +297,37 @@ class Map extends Component {
         )
     }
 
+    renderSegmentedControl() {
+        if (Platform.OS === 'ios') {
+            return (
+                <SegmentedControlIOS
+                    values={[ 'Places', 'Vélos' ]}
+                    selectedIndex={this.state.selectedIndex}
+                    style={{ backgroundColor: 'white', width: 160 }}
+                    tintColor="#49b2d8"
+                    onChange={this.onChange}
+                />
+            );
+        } else {
+            const AndroidSegmented = require('react-native-segmented-android');
+
+            return (
+                <AndroidSegmented
+                    tintColor={['#49b2d8','#ffffff']}
+                    style={{ backgroundColor: 'white', width: 160, height: 30 }}
+                    childText={[ 'Places', 'Vélos' ]}
+                    orientation='horizontal'
+                    selectedPosition={this.state.selectedIndex}
+                    onChange={this.onChange} />
+            );
+        }
+
+    }
+
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Exports
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export default Map;

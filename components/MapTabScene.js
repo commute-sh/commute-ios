@@ -14,7 +14,7 @@ import Map from './Map';
 import StationToast from './StationToast';
 
 import { isPositionEqual } from '../utils';
-import { computeRegionRadiusInMeters } from '../utils/Region';
+import { regionEquals } from '../utils/Region';
 
 import _ from 'lodash';
 
@@ -27,22 +27,28 @@ import { mapStationsToAnnotations } from '../utils/Stations'
 
 class MapTabScene extends Component {
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Propeties
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     static propTypes = {
         navigator: PropTypes.object
     };
 
-    constructor(props) {
-        super(props);
 
-        this.animationQueue = [];
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Instance variables
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        this.state = {
-            version: 0,
-            stationToaster: new Animated.ValueXY(0, -500),
-            fadeAnim: new Animated.Value(0),
-            stationToastVisible: true
-        };
-    }
+    animationQueue = [];
+
+    state = {
+        version: 0,
+        stationToaster: new Animated.ValueXY(0, -500),
+        fadeAnim: new Animated.Value(0),
+        stationToastVisible: true
+    };
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,9 +56,10 @@ class MapTabScene extends Component {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     componentDidMount() {
-        if (this.props.position) {
-            this.props.actions.fetchNearbyStations(this.props.position.coords, -1, undefined, 16);
-        }
+
+        // if (this.props.position) {
+        //     this.props.actions.fetchNearbyStations(this.props.position.coords, -1, undefined, 16);
+        // }
 
         this.enqueueAnimation((animCb) => {
             console.log('Make station toast disappear by default');
@@ -61,38 +68,33 @@ class MapTabScene extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-
-        if (
-            nextProps.position &&
-            nextProps.position.coords &&
-            !isPositionEqual(this.props.position, nextProps.position)
-        ) {
+        /*if ( !isPositionEqual(this.props.position, nextProps.position) ) {
             this.props.actions.fetchNearbyStations(nextProps.position.coords, -1, undefined, 16);
-        }
-
-        if (this.props.nearbyStations.version !== nextProps.nearbyStations.version) {
+        } else */if (this.props.nearbyStations.version !== nextProps.nearbyStations.version) {
+            console.log('[MapTabScene][componentWillReceiveProps][0] Updating version state - nearbyStations version changed');
+            this.setState({ version: this.state.version + 1 });
+        } else if (this.props.annotationType !== nextProps.annotationType) {
+            console.log('[MapTabScene][componentWillReceiveProps][0] Updating version state - Annotation type changed');
             this.setState({ version: this.state.version + 1 });
         }
-        if (this.props.annotationType !== nextProps.annotationType) {
+        /* Already detected by component update - No need to update version */
+         else if (!regionEquals(this.props.region, nextProps.region)) {
+            console.log('[MapTabScene][componentWillReceiveProps][0] Updating version state - Region changed - region:', nextProps.region);
             this.setState({ version: this.state.version + 1 });
+            this.props.actions.updateMapRegion(nextProps.region);
         }
     }
 
     shouldComponentUpdate(nextProps, nextState) {
 
         if (this.state.version !== nextState.version) {
-            console.log('[MapTabScene][Updating][0] state version changed (', this.state.version, ', ', nextState.version, ')');
+            console.log('[MapTabScene][shouldComponentUpdate][0] state version changed (', this.state.version, ', ', nextState.version, ')');
             return true;
         } else if (this.props.station !== nextProps.station) {
-            console.log('[MapTabScene][Updating][1] selected station changed (', this.props.station ? this.props.station.number : '<undefined />', ', ', nextProps.station ? nextProps.station.number : '<undefined />', ')');
+            console.log('[MapTabScene][shouldComponentUpdate][1] selected station changed (', this.props.station ? this.props.station.number : '<undefined />', ', ', nextProps.station ? nextProps.station.number : '<undefined />', ')');
             return true;
-        } else if (this.props.region && nextProps.region && (
-                this.props.region.latitude !== nextProps.region.latitude ||
-                this.props.region.longitude !== nextProps.region.longitude ||
-                this.props.region.longitudeDelta !== nextProps.region.longitudeDelta ||
-                this.props.region.latitudeDelta !== nextProps.region.latitudeDelta
-            )) {
-            console.log('[MapTabScene][Updating][2] position changed (', this.props.region, ', ', nextProps.region, ')');
+        } else if (!regionEquals(this.props.region, nextProps.region)) {
+            console.log('[MapTabScene][shouldComponentUpdate][2] position changed (', this.props.region, ', ', nextProps.region, ')');
             return true;
         }
 
@@ -106,16 +108,16 @@ class MapTabScene extends Component {
 
     enqueueAnimation(fn) {
         setTimeout(() => {
-            console.log('Pushing animation to queue');
+            console.log('[MapTabScene][enqueueAnimation] Pushing animation to queue');
             this.animationQueue.push(fn);
             this.processAnimationQueue();
         }, 0);
     }
 
     processAnimationQueue() {
-        console.log('Processing animation queue');
+        console.log('[MapTabScene][processAnimationQueue] Processing animation queue');
         if (this.processingAnimationQueue) {
-            console.log('Animation queue already processing - ignoring this processing demand');
+            console.log('[MapTabScene][processAnimationQueue] Animation queue already processing - ignoring this processing demand');
             return ;
         }
 
@@ -125,13 +127,13 @@ class MapTabScene extends Component {
     }
 
     processAnimationQueueInternal() {
-        console.log('Animation queue length:', this.animationQueue.length);
+        console.log('[MapTabScene][processAnimationQueueInternal] Animation queue length:', this.animationQueue.length);
         if (this.animationQueue.length) {
-            console.log('Animation queue not empty  - Processing the oldest animation in queue');
+            console.log('[MapTabScene][processAnimationQueueInternal] Animation queue not empty  - Processing the oldest animation in queue');
             const fn = this.animationQueue.shift();
             fn(this.processAnimationQueueInternal);
         } else {
-            console.log('Done with processing queue');
+            console.log('[MapTabScene][processAnimationQueueInternal] Done with processing queue');
             this.processingAnimationQueue = false;
         }
     }
@@ -140,7 +142,7 @@ class MapTabScene extends Component {
         const self = this;
         // const stationToast = this.refs.stationToast;
 
-        console.log('Enqueuing animation: [stationToasterAppear]');
+        console.log('[MapTabScene][stationToasterAppear] Enqueuing animation: [stationToasterAppear]');
 
         Animated.parallel([
             Animated.timing(this.state.fadeAnim, {  duration: 300, toValue: 0.9 }),
@@ -153,7 +155,7 @@ class MapTabScene extends Component {
 
     stationToasterDisappear(duration = 300, cb) {
         const self = this;
-        console.log('Enqueuing animation: [stationToasterDisappear]');
+        console.log('[MapTabScene][stationToasterDisappear] Enqueuing animation: [stationToasterDisappear]');
 
         const stationToast = this.refs.stationToast;
         if (stationToast && stationToast.measure) {
@@ -182,7 +184,6 @@ class MapTabScene extends Component {
     /// Events
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
     onChange(event) {
         const annotationType = (Platform.OS === 'ios' ? event.nativeEvent.selectedSegmentIndex : event.selected) === 0 ? 'STANDS' : 'BIKES';
         this.props.actions.updateAnnotationType(annotationType);
@@ -190,20 +191,20 @@ class MapTabScene extends Component {
     }
 
     onPress() {
-        console.log('--------------- [MapTabScene] onPress (onStationBlur)');
+        console.log('[MapTabScene][onPress] calling onStationBlur');
 
         this.onStationToggleDebounce(this.onStationBlur.bind(this), undefined);
     }
 
     onStationToggle(fn, value) {
-        console.log("--- onStationToggle:", fn, ", value:", value);
+        console.log("[MapTabScene][onStationToggle] ", fn, ", value:", value);
         fn(value);
     }
 
     onStationToggleDebounce = _.debounce(this.onStationToggle.bind(this), 300, {leading:true, trailing:false});
 
     onStationPress(station) {
-        console.log('--------------- [MapTabScene] onStationPress');
+        console.log("[MapTabScene][onStationPress] Station:", station);
         if (!this.props.station) {
             this.onStationToggleDebounce(this.onStationFocus.bind(this), station);
         } else if (station.number !== this.props.station.number) {
@@ -214,7 +215,7 @@ class MapTabScene extends Component {
     }
 
     onStationBlur(station) {
-        console.log('--------------- [MapTabScene] onStationBlur');
+        console.log("[MapTabScene][onStationBlur] Station:", station);
         this.enqueueAnimation((animCb) => {
             console.log('On Blur - Station:', station ? station.number : undefined);
             this.stationToasterDisappear(300, () => {
@@ -225,45 +226,26 @@ class MapTabScene extends Component {
     }
 
     onStationFocus(station) {
-        console.log('--------------- [MapTabScene] onStationFocus');
+        console.log('[MapTabScene][onStationFocus] Station:', station);
         this.enqueueAnimation((animCb) => {
-            console.log('On Focus - Station:', station.number);
+            console.log('MapTabScene][onStationFocus][animCb] Station number:', station.number);
             this.props.actions.selectStation(station);
             this.stationToasterAppear(animCb);
         });
     }
 
     onRegionChangeComplete(region) {
-
         if (!region) {
-//            console.debug('[MapTabScene] onRegionChangeComplete - No region defined. Abort trying to load stations ...');
+            console.debug('[MapTabScene][onRegionChangeComplete] No region defined. Abort trying to load stations ...');
             return ;
-        } else if ( region && this.props.region &&
-            region.latitude == this.props.region.latitude &&
-            region.longitude == this.props.region.longitude &&
-            region.latitudeDelta == this.props.region.latitudeDelta &&
-            region.longitudeDelta == this.props.region.longitudeDelta
-        ) {
-            console.debug('[MapTabScene] onRegionChangeComplete - Region did not changed (region: ', JSON.stringify(region), ', this.props.region: ', JSON.stringify(this.props.region), ')');
+        } else if ( regionEquals(region, this.props.region) ) {
+            console.debug('[MapTabScene][onRegionChangeComplete] Region did not changed (region: ', JSON.stringify(region), ', this.props.region: ', JSON.stringify(this.props.region), ')');
             return ;
         }
 
-        console.log('[MapTabScene] onRegionChangeComplete:', region, '*************************************************');
+        console.log('[MapTabScene][onRegionChangeComplete] Region Changed - (region: ', JSON.stringify(region), ', this.props.region: ', JSON.stringify(this.props.region), ')');
 
         this.props.actions.updateMapRegion(region);
-
-        this.setState({ version: this.state.version + 1 });
-
-        const distance = computeRegionRadiusInMeters(region);
-
-//        console.log("[onRegionChange] regionToCenterDistance:", regionToCenterDistance, ", distance:", distance);
-
-        if (distance <= 100000) {
-            console.log("Region radius (", distance, ") <= 100000 - Fetching stations inside perimeter");
-            this.props.actions.fetchNearbyStations({ latitude: region.latitude, longitude: region.longitude }, -1/*distance*/, undefined, 16);
-        } else {
-            console.log("Region radius (", distance, ") > 100000 - Do not fetch stations inside perimeter");
-        }
     }
 
     onStationToastPress() {

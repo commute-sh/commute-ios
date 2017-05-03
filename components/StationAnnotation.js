@@ -57,16 +57,16 @@ class StationAnnotation extends Component {
     render() {
         const station = this.props.station;
 
-        let pinColor = 'green';
+        let pinColor = '#27ae60';
 
         if (station.status === 'CLOSED') {
-            pinColor = 'black';
+            pinColor = '#2c3e50';
         } else if (station.available_bike_stands === 0 || station.available_bikes === 0) {
-            pinColor = 'red';
+            pinColor = '#e74c3c';
         } else if (station.available_bike_stands <= 3 || station.available_bikes <= 3) {
-            pinColor = 'orange';
+            pinColor = '#e67e22';
         } else if (station.available_bike_stands <= 5 || station.available_bikes <= 5) {
-            pinColor = 'yellow';
+            pinColor = '#f1c40f';
         }
 
         let useSmallPin = this.props.useSmallPins();

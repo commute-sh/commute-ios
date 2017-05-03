@@ -6,6 +6,8 @@ import {
     TouchableWithoutFeedback
 } from 'react-native';
 
+import Color from 'color';
+
 class StationMarkerView extends Component {
 
     static propTypes = {
@@ -20,17 +22,19 @@ class StationMarkerView extends Component {
         fontSize: PropTypes.number,
         fontWeight: PropTypes.string,
         opacity: PropTypes.number,
+        color: PropTypes.string,
         onPress: PropTypes.func
     };
 
     static defaultProps = {
         pinSize: 32,
         value: 0,
-        strokeColor: 'black',
-        bgColor: 'white',
+        strokeColor: '#2c3e50',
+        bgColor: '#2c3e50',
         fontSize: 14,
         lineWidth: 2,
-        fontWeight: 900
+        fontWeight: 100,
+        color: 'white'
     };
 
     onPress(e) {
@@ -45,7 +49,7 @@ class StationMarkerView extends Component {
                 <View style={{
                     width: this.props.pinSize,
                     height: this.props.pinSize,
-                    backgroundColor: 'white',
+                    backgroundColor: this.props.bgColor,
                     borderRadius: 100,
                     borderWidth: this.props.lineWidth,
                     borderColor: this.props.strokeColor,
@@ -56,7 +60,7 @@ class StationMarkerView extends Component {
                         fontSize: this.props.fontSize,
                         fontWeight: this.props.fontWeight,
                         backgroundColor: 'transparent',
-                        color: this.props.strokeColor }}>
+                        color: Color('white').alpha(0.7) }}>
                         {this.props.value}
                     </Text>
                 </View>

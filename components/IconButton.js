@@ -8,6 +8,7 @@ import {
 import Color from 'color';
 
 import FaIcon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 export default class IconButton extends Component {
 
@@ -69,16 +70,18 @@ export default class IconButton extends Component {
                         borderRadius: this.props.size,
                         backgroundColor: this.props.bgColor
                     }}>
-                        <FaIcon
-                            name={this.props.iconName}
-                            size={this.props.fontSize}
-                            color={this.props.color}
-                            backgroundColor="transparent"
-                            style={{
-                                backgroundColor: 'transparent',
-                                padding: this.props.iconPadding
-                            }}
-                        />
+                        <Icon
+                              name={this.props.iconName}
+                              size={this.props.fontSize}
+                              color={this.props.color}
+                              backgroundColor="transparent"
+                              style={{
+                                  backgroundColor: 'transparent',
+                                  paddingLeft: 12,
+                                  paddingRight: 10,
+                                  paddingTop: 12,
+                                  paddingBottom: 10,
+                              }} />
                     </View>
                 </TouchableOpacity>
             </View>

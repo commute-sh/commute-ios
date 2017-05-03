@@ -69,7 +69,7 @@ class StationDetailsMapImageHeader extends Component {
                         bgColor="white"
                         lineWidth={3}
                         fontSize={11}
-                        fontWeight='900'
+                        fontWeight='400'
                         opacity={1}
                         style={{ width: 24, height: 24 }}
                     />

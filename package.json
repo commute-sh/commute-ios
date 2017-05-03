@@ -46,7 +46,7 @@
     "react-native-segmented-android": "gandhidevy/react-native-segmented-android#d373be16ba394d17fd05fabca08d03db5c8e49f9",
     "react-native-spinkit": "^1.0.2",
     "react-native-svg": "^5.1.6",
-    "react-native-vector-icons": "^4.0.0",
+    "react-native-vector-icons": "^4.0.1",
     "react-redux": "^5.0.3",
     "redux": "^3.6.0",
     "redux-logger": "^3.0.1",
