@@ -71,34 +71,7 @@ class Map extends Component {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     componentWillReceiveProps(nextProps) {
-        /*if (!this.props.geoLocation && nextProps.geoLocation) {
-            if (this.state.region) {
-                console.log('[Map][componentWillReceiveProps][1][a] !this.props.geoLocation && nextProps.geoLocation');
-                const region = {
-                    latitude: nextProps.geoLocation.latitude(),
-                    longitude: nextProps.geoLocation.longitude(),
-                    latitudeDelta: this.state.region.latitudeDelta,
-                    longitudeDelta: this.state.region.longitudeDelta
-                };
-                this.setState({ region, centerOnRegion: true });
-
-                console.log('[Map][componentWillReceiveProps][1][a][End] Current location region from geoLocation[2]:', region);
-            } else {
-                console.log('[Map][componentWillReceiveProps][1][b] !this.props.geoLocation && nextProps.geoLocation');
-                const region = computeRegionFromLocation(nextProps.geoLocation, 0.5);
-                this.setState({ region, centerOnRegion: true });
-
-                console.log('[Map][componentWillReceiveProps][1][b][End] Current location region from geoLocation[2]:', region);
-            }
-
-        } else *//*if (!this.props.geoLocation && !nextProps.geoLocation && !regionEquals(this.state.region, nextProps.region)) {
-            console.log('[Map][componentWillReceiveProps][2] !this.props.geoLocation && !nextProps.geoLocation && nextProps.region');
-
-            const region = nextProps.region;
-            this.setState({ region, centerOnRegion: true });
-
-            console.log('[Map][componentWillReceiveProps][2][End] Current location region from center:', region);
-        } else */if (!regionEquals(this.state.region, nextProps.region)) {
+        if (!regionEquals(this.state.region, nextProps.region)) {
             console.log('[Map][componentWillReceiveProps][3] else');
 
             const region = _.clone(nextProps.region);
@@ -238,7 +211,13 @@ class Map extends Component {
 
         return (
             <View style={{ flex: 1 }}>
-                <View style={{ zIndex: 100, position: 'absolute', left: 24, right: 24, bottom: Platform.OS === 'ios' ? 72 : 32 }}>
+                <View style={{
+                    zIndex: 100, position: 'absolute',
+                    left: 0, right: 0, top: 64, height: 44,
+                    backgroundColor: 'white', opacity: 0.9,
+                    borderBottomWidth: 0.33,
+                    borderBottomColor: 'rgba(0, 0, 0, 0.4)'
+                }}>
                     <View style={{
                         flex: 1,
                         flexDirection: 'row',
@@ -249,7 +228,7 @@ class Map extends Component {
                     </View>
                 </View>
 
-                <IconButton iconName="ios-locate-outline" onPress={this.onCenterOnLocation} style={{ zIndex: 100, position: 'absolute', right: 24, bottom: Platform.OS === 'ios' ? 64 : 24 }} />
+                <IconButton iconName="ios-locate-outline" onPress={this.onCenterOnLocation} style={{ zIndex: 100, position: 'absolute', right: 16, bottom: Platform.OS === 'ios' ? 64 : 24 }} />
                 <MapView
                     style={{ flex: 1, zIndex: 2 }}
                     showsUserLocation={true}
@@ -303,7 +282,7 @@ class Map extends Component {
                 <SegmentedControlIOS
                     values={[ 'Places', 'Vélos' ]}
                     selectedIndex={this.state.selectedIndex}
-                    style={{ backgroundColor: 'white', width: 160 }}
+                    style={{ backgroundColor: 'white', width: 260 }}
                     tintColor="#49b2d8"
                     onChange={this.onChange}
                 />
@@ -314,7 +293,7 @@ class Map extends Component {
             return (
                 <AndroidSegmented
                     tintColor={['#49b2d8','#ffffff']}
-                    style={{ backgroundColor: 'white', width: 160, height: 30 }}
+                    style={{ backgroundColor: 'white', width: 260, height: 30 }}
                     childText={[ 'Places', 'Vélos' ]}
                     orientation='horizontal'
                     selectedPosition={this.state.selectedIndex}

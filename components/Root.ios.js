@@ -25,7 +25,7 @@ class Root extends Component {
 
     render() {
         return (
-            <TabBarIOS style={{ zIndex: 1 }}>
+            <TabBarIOS barTintColor="white" style={{ zIndex: 1, backgroundColor: 'white' }}>
                 <MapTab selectedTab={this.state.selectedTab} onTabIconPress={this.onTabIconPress.bind(this, 'map')} />
                 <FavoriteTab selectedTab={this.state.selectedTab} onTabIconPress={this.onTabIconPress.bind(this, 'favorites')} />
                 <SearchTab selectedTab={this.state.selectedTab} onTabIconPress={this.onTabIconPress.bind(this, 'search')} />

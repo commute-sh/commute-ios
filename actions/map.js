@@ -25,7 +25,7 @@ export function updateMapRegion(region) {
 
         if (distance <= 100000) {
             console.log("[Actions][Map][updateMapRegion] Region radius (", distance, ") <= 100000 - Fetching stations inside perimeter");
-            dispatch(fetchNearbyStations({ latitude: region.latitude, longitude: region.longitude }, -1/*distance*/, undefined, 16));
+            dispatch(fetchNearbyStations({ latitude: region.latitude, longitude: region.longitude }, 1000/*distance*/, undefined, 100));
         } else {
             console.log("[Actions][Map][updateMapRegion] Region radius (", distance, ") > 100000 - Do not fetch stations inside perimeter");
         }

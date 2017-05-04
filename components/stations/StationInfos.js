@@ -74,8 +74,8 @@ class StationInfos extends Component {
                     </View>
                 </View>
                 <View style={{ flexDirection: 'column', alignItems: "flex-end", padding: 12, paddingTop: 0, paddingBottom: 5 }}>
-                    { station.banking && (<Icon name='ios-card-outline' size={24} color={Color('#2c3e50').alpha(0.5)} style={{}} />) }
-                    { station.bonus && (<Icon name='ios-thumbs-up-outline' size={24} color={Color('#2c3e50').alpha(0.5)} style={{}} />) }
+                    { station.banking && (<Icon name='ios-card-outline' size={24} color={Color('#2c3e50').alpha(0.5).toString()} style={{}} />) }
+                    { station.bonus && (<Icon name='ios-thumbs-up-outline' size={24} color={Color('#2c3e50').alpha(0.5).toString()} style={{}} />) }
                 </View>
             </View>
         );

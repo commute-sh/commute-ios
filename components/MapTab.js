@@ -24,6 +24,8 @@ import EvilIcon from 'react-native-vector-icons/EvilIcons';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
+import Spinner from 'react-native-spinkit';
+
 import * as favoriteStationActionCreators from '../actions/favoriteStations'
 import * as nearbyStationActionCreators from '../actions/nearbyStations'
 
@@ -126,12 +128,25 @@ class MapTab extends Component {
                                     );
                                 } else if (route.id === 'Map') {
                                     return (
-                                        <View style={{paddingTop: 6, paddingRight: 16}}>
+                                        <View style={{
+                                            paddingTop: !this.props.nearbyStations.isFetching ? 6 : 6,
+                                            paddingRight: !this.props.nearbyStations.isFetching ? 16 : 8
+                                        }}>
                                             <TouchableHighlight underlayColor="transparent" onPress={this.onRefresh.bind(this)}>
-                                                <Icon
-                                                    name="ios-refresh-outline"
-                                                    size={32}
-                                                    color="white" />
+                                                <View>
+                                                    { !this.props.nearbyStations.isFetching ?
+                                                        <Icon
+                                                            name="ios-refresh-outline"
+                                                            size={32}
+                                                            color="white" />
+                                                        :
+                                                        <Spinner
+                                                            size={32}
+                                                            type="Pulse"
+                                                            color="#FFFFFF"
+                                                        />
+                                                    }
+                                                </View>
                                             </TouchableHighlight>
                                         </View>
                                     );

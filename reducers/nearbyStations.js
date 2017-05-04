@@ -1,6 +1,5 @@
 import { createReducer } from '../utils/Reducers';
 import constants from '../constants/nearbyStations';
-import _ from 'lodash';
 import GeoPoint from 'geopoint';
 import moment from 'moment';
 
