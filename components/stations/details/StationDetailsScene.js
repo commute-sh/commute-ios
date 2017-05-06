@@ -37,7 +37,8 @@ class StationDetailsScene extends Component {
         super(props);
 
         this.state = {
-            distance: Number.MAX_SAFE_INTEGER
+            distance: Number.MAX_SAFE_INTEGER,
+            dataToShow: 'AVAILABLE_BIKES'
         };
     }
 
@@ -56,15 +57,20 @@ class StationDetailsScene extends Component {
         }
     }
 
+    onChangeDataToShow() {
+        console.log("On Chart Click:", this.state.dataToShow);
+        this.setState({ dataToShow: this.state.dataToShow === 'AVAILABLE_BIKES' ? 'AVAILABLE_BIKE_STANDS' : 'AVAILABLE_BIKES' });
+    }
+
     render() {
         console.log('--- [StationDetailsScene] Render -------------------------------------------------------------------------------------');
 
         return (
             <ScrollView style={{ backgroundColor: '#fff', position: 'relative' }}>
                 <Spacer height={ Platform.OS === 'ios' ? 64 : 56 } />
+
                 <StationHeader station={this.props.station} />
                 <StationDetailsContent station={this.props.station} distance={this.state.distance} />
-
 
                 <StationDetailsHeaderMap
                     station={this.props.station}
@@ -75,10 +81,19 @@ class StationDetailsScene extends Component {
                     paddingTop={0}
                     paddingBottom={0}
                     height={256}
+                    dataToShow={this.state.dataToShow}
                     zoomEnabled={true}
+                    onMarkerPress={this.onChangeDataToShow.bind(this)}
                 />
 
-                <StationDetailsHistory station={this.props.station} data={this.state.data} padding={12} />
+                <StationDetailsHistory
+                    station={this.props.station}
+                    data={this.state.data}
+                    padding={12}
+                    dataToShow={this.state.dataToShow}
+                    onChartPress={this.onChangeDataToShow.bind(this)}
+                />
+
                 <Spacer height={ Platform.OS === 'ios' ? 48 : 0 } />
             </ScrollView>
         );

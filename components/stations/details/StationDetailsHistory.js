@@ -7,12 +7,14 @@ class StationDetailsHistory extends Component {
     static propTypes = {
         station: PropTypes.object,
         data: PropTypes.array,
-        padding: PropTypes.number
+        padding: PropTypes.number,
+        dataToShow: PropTypes.string,
+        onChartPress: PropTypes.func
     };
 
     render() {
         return (
-            <BikesAvailabilityChart station={this.props.station} data={this.props.data} padding={this.props.padding} />
+            <BikesAvailabilityChart {...this.props} />
         );
     }
 

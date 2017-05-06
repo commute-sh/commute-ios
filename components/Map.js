@@ -178,9 +178,18 @@ class Map extends Component {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     render() {
-
         console.log('--- [Map] Render -------------------------------------------------------------------------------------');
 
+        return (
+            <View style={{ flex: 1 }}>
+                {this.renderActionBar()}
+                {this.renderActionButton()}
+                {this.renderMapView()}
+            </View>
+        )
+    }
+
+    renderMapView() {
         console.log('[Map][render] Region:', this.state.region);
 
         console.log('[Map][render] CenterOnRegion:', this.state.centerOnRegion);
@@ -192,88 +201,106 @@ class Map extends Component {
             this.state.centerOnRegion = false;
         }
 
+
+        return (
+            <MapView
+                style={{ flex: 1, zIndex: 2 }}
+                showsUserLocation={true}
+                showsMyLocationButton={false}
+                showsCompass={false}
+                toolbarEnabled={false}
+                onRegionChangeComplete={this.onRegionChangeComplete}
+                onRegionChange={this.onRegionChange}
+                onPress={this.onPress}
+                initialRegion={this.state.region}
+                region={centerOnRegion ? this.state.region : undefined}
+            >
+                {this.renderCircle()}
+                {this.renderAnnotations()}
+            </MapView>
+        );
+    }
+
+    renderActionBar() {
+        return (
+            <View style={{
+                zIndex: 100, position: 'absolute',
+                left: 0, right: 0, top: Platform.OS === 'ios' ? 64 : 0, height: 44,
+                backgroundColor: 'white', opacity: Platform.OS === 'ios' ? 0.9 : 0.7,
+                borderBottomWidth: 0.33,
+                borderBottomColor: 'rgba(0, 0, 0, 0.4)'
+            }}>
+                <View style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}>
+                    {this.renderSegmentedControl()}
+                </View>
+            </View>
+        );
+    }
+
+    renderAnnotations() {
+        return this.props.annotations.map(annotation => {
+            return Platform.OS == 'ios' ? (
+                <MapView.Marker
+                    key={annotation.id}
+                    draggable
+                    coordinate={annotation}
+                >
+                    <StationMarkerView {...annotation} onPress={annotation.onPress} />
+                </MapView.Marker>
+            ) : (
+                <MapView.Marker
+                    key={annotation.id}
+                    onPress={annotation.onPress}
+                    draggable
+                    coordinate={annotation}
+                >
+                    <StationMarkerView {...annotation} />
+                </MapView.Marker>
+            )
+        });
+    }
+
+    renderActionButton() {
+        return (
+            <IconButton iconName="ios-locate-outline" onPress={this.onCenterOnLocation} style={{ zIndex: 100, position: 'absolute', right: 16, bottom: Platform.OS === 'ios' ? 64 : 24 }} />
+        );
+    }
+
+    renderCircle() {
         const { region } = this.state;
 
-
         let circleRegion = { latitude: 0, longitude: 0 };
-        let distance = 0;
 
         if (region) {
+            const regionRadiusInMeters = computeRegionRadiusInMeters(region);
+            console.log("[Map][render] computeRegionRadiusInMeters(region):", regionRadiusInMeters);
 
-            console.log("[Map][render] computeRegionRadiusInMeters(region):", computeRegionRadiusInMeters(region));
+            if (regionRadiusInMeters < 2500 || regionRadiusInMeters > 10000) {
+                console.log("[Map][render] Not rendering circle as distance is lower than 2500 or greater than 10.000 meters:", regionRadiusInMeters);
+                return;
+            }
 
             circleRegion = { latitude: region.latitude, longitude: region.longitude };
-            distance = min(computeRegionRadiusInMeters(region), 2000) / 2;
         }
 
-        console.log('[Map][render] Distance:', distance);
         console.log('[Map][render] Region:', circleRegion);
 
         return (
-            <View style={{ flex: 1 }}>
-                <View style={{
-                    zIndex: 100, position: 'absolute',
-                    left: 0, right: 0, top: Platform.OS === 'ios' ? 64 : 0, height: 44,
-                    backgroundColor: 'white', opacity: Platform.OS === 'ios' ? 0.9 : 0.7,
-                    borderBottomWidth: 0.33,
-                    borderBottomColor: 'rgba(0, 0, 0, 0.4)'
-                }}>
-                    <View style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}>
-                    {this.renderSegmentedControl()}
-                    </View>
-                </View>
-
-                <IconButton iconName="ios-locate-outline" onPress={this.onCenterOnLocation} style={{ zIndex: 100, position: 'absolute', right: 16, bottom: Platform.OS === 'ios' ? 64 : 24 }} />
-                <MapView
-                    style={{ flex: 1, zIndex: 2 }}
-                    showsUserLocation={true}
-                    showsMyLocationButton={false}
-                    showsCompass={false}
-                    toolbarEnabled={false}
-                    onRegionChangeComplete={this.onRegionChangeComplete}
-                    onRegionChange={this.onRegionChange}
-                    onPress={this.onPress}
-                    initialRegion={this.state.region}
-                    region={centerOnRegion ? this.state.region : undefined}
-                 >
-                    <MapView.Circle
-                        key={(circleRegion.longitude + '-' + circleRegion.latitude + '-' + distance).toString()}
-                        center={circleRegion}
-                        radius={distance}
-                        fillColor="rgba(0, 122, 255, 0.25)"
-                        strokeColor="rgba(0, 122, 255, 0.25)"
-                        zIndex={2}
-                        strokeWidth={1}
-                    />
-
-                    { this.props.annotations.map(annotation => {
-                        return Platform.OS == 'ios' ? (
-                            <MapView.Marker
-                                key={annotation.id}
-                                draggable
-                                coordinate={annotation}
-                            >
-                                <StationMarkerView {...annotation} onPress={annotation.onPress} />
-                            </MapView.Marker>
-                        ) : (
-                            <MapView.Marker
-                                key={annotation.id}
-                                onPress={annotation.onPress}
-                                draggable
-                                coordinate={annotation}
-                            >
-                                <StationMarkerView {...annotation} />
-                            </MapView.Marker>
-                        )
-                    }) }
-                </MapView>
-            </View>
-        )
+            <MapView.Circle
+                key={(circleRegion.longitude + '-' + circleRegion.latitude).toString()}
+                center={circleRegion}
+                radius={1000}
+                fillColor="rgba(0, 122, 255, 0.25)"
+                strokeColor="rgba(0, 122, 255, 0.25)"
+                zIndex={2}
+                strokeWidth={1}
+            />
+        );
     }
 
     renderSegmentedControl() {

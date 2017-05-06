@@ -15,16 +15,10 @@ class StationDetailsHistory extends Component {
     static propTypes = {
         station: PropTypes.object,
         data: PropTypes.array,
-        padding: PropTypes.number
+        padding: PropTypes.number,
+        dataToShow: PropTypes.string,
+        onChartPress: PropTypes.func
     };
-
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            dataToShow: 'AVAILABLE_BIKES'
-        };
-    }
 
     computeGraphProps() {
 
@@ -45,7 +39,7 @@ class StationDetailsHistory extends Component {
             // console.log('Date:', d.time.toDate());
             return d.time.toDate();
         };
-        if (this.state.dataToShow === 'AVAILABLE_BIKES') {
+        if (this.props.dataToShow === 'AVAILABLE_BIKES') {
             graphProps.yAccessor = (d) => {
                 // console.log('d.available_bikes:', d.available_bikes);
                 return d ? (d.available_bikes || 0) : 0;
@@ -59,9 +53,7 @@ class StationDetailsHistory extends Component {
 
     render() {
 
-        const station = this.props.station;
-        const data = this.props.data;
-        const dataToShow = this.state.dataToShow;
+        const { station, data, dataToShow } = this.props;
 
         console.log("this.props.data:", data);
 
@@ -101,16 +93,11 @@ class StationDetailsHistory extends Component {
                     subTitleValue={subTitleValue}
                     linearGradients={linearGradients[dataToShow]}
                     linearGradientColors={linearGradientColors[dataToShow]}
-                    onPress={this.onChartPress.bind(this)}
+                    onPress={this.props.onChartPress}
                     {...graphProps}
                 />
             </View>
         );
-    }
-
-    onChartPress() {
-        console.log("On Chart Click:", this.state.dataToShow);
-        this.setState({ dataToShow: this.state.dataToShow === 'AVAILABLE_BIKES' ? 'AVAILABLE_BIKE_STANDS' : 'AVAILABLE_BIKES' });
     }
 
 }

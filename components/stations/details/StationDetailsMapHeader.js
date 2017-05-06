@@ -19,25 +19,27 @@ class StationDetailsMapHeader extends Component {
         paddingTop: PropTypes.number,
         paddingBottom: PropTypes.number,
         height: PropTypes.number,
-        zoomEnabled: PropTypes.bool
+        zoomEnabled: PropTypes.bool,
+        dataToShow: PropTypes.string,
+        onMarkerPress: PropTypes.func
     };
-
-    constructor(props) {
-        super(props);
-
-        this.onStationPress = this.onStationPress.bind(this);
-    }
 
     onStationPress(station) {
         console.log(`On Station Press: ${station}`);
+        if (this.props.onMarkerPress) {
+            this.props.onMarkerPress();
+        }
     }
 
     render() {
-        const { station, geoLocation } = this.props;
-        const annotationType = 'STANDS';
+        const { station, geoLocation, dataToShow } = this.props;
+
+        console.log("[StationDetailsMapHeader][render] dataToShow: ", this.props.dataToShow);
+
+        const annotationType = dataToShow === 'AVAILABLE_BIKES' ? 'BIKES' : 'STANDS';
         const pinSize = 24;
 
-        const annotation = mapStationToAnnotation.bind(this)(station, { onStationPress: this.onStationPress, annotationType, undefined, geoLocation, pinSize });
+        const annotation = mapStationToAnnotation.bind(this)(station, { onStationPress: this.onStationPress.bind(this), annotationType, undefined, geoLocation, pinSize });
 
         const initialRegion = {
             latitude: station.position.lat,
@@ -63,31 +65,29 @@ class StationDetailsMapHeader extends Component {
                         borderRadius: 4
                     }}
                 >
-                    {
-                        Platform.OS == 'ios' ? (
-                                <MapView.Marker
-                                    key={annotation.id}
-                                    style={{ flex: 1, zIndex: 2 }}
-                                    draggable
-                                    coordinate={annotation}
-                                    showsUserLocation={false}
-                                    showsMyLocationButton={false}
-                                    showsCompass={false}
-                                    toolbarEnabled={false}
-                                >
-                                    <StationMarkerView {...annotation} onPress={annotation.onPress} />
-                                </MapView.Marker>
-                            ) : (
-                                <MapView.Marker
-                                    key={annotation.id}
-                                    onPress={annotation.onPress}
-                                    draggable
-                                    coordinate={annotation}
-                                >
-                                    <StationMarkerView {...annotation} />
-                                </MapView.Marker>
-                            )
-                    }
+                    { Platform.OS == 'ios' ? (
+                        <MapView.Marker
+                            key={annotation.id}
+                            style={{ flex: 1, zIndex: 2 }}
+                            draggable
+                            coordinate={annotation}
+                            showsUserLocation={false}
+                            showsMyLocationButton={false}
+                            showsCompass={false}
+                            toolbarEnabled={false}
+                        >
+                            <StationMarkerView {...annotation} onPress={annotation.onPress} />
+                        </MapView.Marker>
+                    ) : (
+                        <MapView.Marker
+                            key={annotation.id}
+                            onPress={annotation.onPress}
+                            draggable
+                            coordinate={annotation}
+                        >
+                            <StationMarkerView {...annotation} />
+                        </MapView.Marker>
+                    ) }
                 </MapView>
             </View>
         );

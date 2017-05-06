@@ -18,7 +18,9 @@ class StationDetailsHeaderMap extends Component {
         paddingTop:  PropTypes.number,
         paddingBottom: PropTypes.number,
         height: PropTypes.number,
-        zoomEnabled: PropTypes.bool
+        zoomEnabled: PropTypes.bool,
+        dataToShow: PropTypes.string,
+        onMarkerPress: PropTypes.func
     };
 
     render() {
@@ -36,6 +38,8 @@ class StationDetailsHeaderMap extends Component {
                     paddingBottom={this.props.paddingBottom}
                     height={this.props.height}
                     zoomEnabled={this.props.zoomEnabled}
+                    dataToShow={this.props.dataToShow}
+                    onMarkerPress={this.props.onMarkerPress}
                 />
             </View>
         );
