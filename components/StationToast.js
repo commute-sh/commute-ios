@@ -5,7 +5,6 @@ import {
     View
 } from 'react-native';
 
-import StationUpdateDate from './stations/StationUpdateDate'
 import StationClosed from './stations/StationClosed'
 import StationNoInfos from './stations/StationNoInfos'
 import StationInfos from './stations/StationInfos'
@@ -59,8 +58,6 @@ class StationToast extends Component {
           <View style={{flex: 1, paddingLeft: 0, paddingRight: 0, paddingTop: 0, paddingBottom: 0}}>
             { station.status == 'CLOSED' && <StationClosed />}
             { station.status != 'CLOSED' && <StationInfos station={station} distance={this.state.distance} />}
-
-             {/*<StationUpdateDate station={station} style={{ padding: 0, paddingBottom: 5 }} />*/}
           </View>
       </View>
     );

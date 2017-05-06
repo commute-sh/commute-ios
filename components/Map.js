@@ -213,8 +213,8 @@ class Map extends Component {
             <View style={{ flex: 1 }}>
                 <View style={{
                     zIndex: 100, position: 'absolute',
-                    left: 0, right: 0, top: 64, height: 44,
-                    backgroundColor: 'white', opacity: 0.9,
+                    left: 0, right: 0, top: Platform.OS === 'ios' ? 64 : 0, height: 44,
+                    backgroundColor: 'white', opacity: Platform.OS === 'ios' ? 0.9 : 0.7,
                     borderBottomWidth: 0.33,
                     borderBottomColor: 'rgba(0, 0, 0, 0.4)'
                 }}>

@@ -146,7 +146,7 @@ class MapTabScene extends Component {
 
         Animated.parallel([
             Animated.timing(this.state.fadeAnim, {  duration: 300, toValue: 0.9 }),
-            Animated.timing(this.state.stationToaster, { duration: 300, toValue: { x: 0, y: Platform.OS === 'ios' ? 0 : -64 } })
+            Animated.timing(this.state.stationToaster, { duration: 300, toValue: { x: 0, y: Platform.OS === 'ios' ? 44 : -64 } })
         ]).start(() => {
             this.stationToastVisible = true;
             cb && cb.bind(self)();
