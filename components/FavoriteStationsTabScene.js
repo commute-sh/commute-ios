@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
 import * as contractStationActionCreators from '../actions/contractStations'
+import * as favoriteStationActionCreators from '../actions/favoriteStations'
 
 import {
     Animated,
@@ -102,6 +103,16 @@ class FavoriteStationsTabScene extends Component {
                     return favoriteStations.data.map(fs => fs.number).indexOf(station.number) >= 0;
                 }))
         });
+    }
+
+    onFavoriteStarPress(station) {
+        const favoriteStations = this.props.favoriteStations.data;
+
+        if (favoriteStations.map(fs => fs.number).indexOf(station.number) >= 0) {
+            this.props.actions.removeFavoriteStation(station);
+        } else {
+            this.props.actions.addFavoriteStation(station);
+        }
     }
 
     render() {
@@ -236,7 +247,7 @@ const mapStateToProps = (state) => Object.assign({}, {
 
 const mapDispatchToProps = (dispatch) => ({
     actions: bindActionCreators(
-        Object.assign({}, contractStationActionCreators),
+        Object.assign({}, contractStationActionCreators, favoriteStationActionCreators),
         dispatch
     )
 });

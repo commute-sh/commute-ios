@@ -3,8 +3,6 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
-import MapView from 'react-native-maps';
-
 import * as contractStationActionCreators from '../actions/contractStations'
 import * as favoriteStationActionCreators from '../actions/favoriteStations'
 
@@ -114,25 +112,60 @@ class SearchTabScene extends Component {
         this.props.actions.fetchContractStations(contractName);
     }
 
-    renderSearchBar() {
+    onChangeText(value) {
+        console.log("[SearchtabScene] onChangeText:", value);
+        this.updateSearch(value);
+    }
 
-        if (Platform.OS === 'ios') {
-            return (<SearchBar placeholder="Recherche"
-                       ref="searchBar"
+    onCancelButtonPress() {
+        this.refs.searchBar.blur();
+    }
 
-                       tintColor="#edeef2"
-                       barTintColor="#edeef2"
+    onSearchButtonPress(value) {
+        this.refs.searchBar.blur();
+        this.updateSearch(value);
+    }
 
-                       style={{ marginTop: 64, height: 44, backgroundColor: '#edeef2' }}
-                       onChangeText={this.onChangeText}
-                       enablesReturnKeyAutomatically={true}
-                       onSearchButtonPress={this.onSearchButtonPress}
-                       onCancelButtonPress={this.onCancelButtonPress}
-            />);
+    onRefresh() {
+        this.props.actions.fetchContractStations(this.props.contractName)
+    }
+
+    pressRowIn(sectionID, rowID) {
+        console.log("--- On Row pressed In [sectionID: ", sectionID, ", rowID:", rowID, "]");
+        this.setState({ highlightedRow: { sectionID: sectionID, rowID: rowID } });
+    }
+
+    pressRowOut(sectionID, rowID) {
+        console.log("--- On Row pressed Out [sectionID: ", sectionID, ", rowID:", rowID, "]");
+        this.setState({ highlightedRow: { sectionID: undefined, rowID: undefined } });
+    }
+
+    pressRow(sectionID, rowID) {
+        console.log("--- On Row pressed [sectionID: ", sectionID, ", rowID:", rowID, "]");
+        this.props.navigator.push({ id: 'StationDetails', station: this.state.dataSource.getRowData(0, rowID) });
+    }
+
+    updateSearch(value) {
+
+        const contractNameStations = this.props.contractStations[this.props.contractName].data;
+
+        this.setState({
+            searchText: value,
+            dataSource:
+                this.props.dataSource.cloneWithRows( !value ?
+                    contractNameStations :
+                    contractNameStations.filter(station => station.name.search(new RegExp(value, "i")) >= 0)
+                )
+        });
+    }
+
+    onFavoriteStarPress(station) {
+        const favoriteStations = this.props.favoriteStations.data;
+
+        if (favoriteStations.map(fs => fs.number).indexOf(station.number) >= 0) {
+            this.props.actions.removeFavoriteStation(station);
         } else {
-            return (<View style={{ height: 44, backgroundColor: "white" }}>
-                <TextInput onChangeText={this.onChangeText} style={{ flex: 1 }} />
-            </View>);
+            this.props.actions.addFavoriteStation(station);
         }
     }
 
@@ -175,41 +208,25 @@ class SearchTabScene extends Component {
         console.log('--- [SearchTabScene] Render -------------------------------------------------------------------------------------');
     }
 
-    onChangeText(value) {
-        console.log("[SearchtabScene] onChangeText:", value);
-        this.updateSearch(value);
-    }
+    renderSearchBar() {
 
-    onCancelButtonPress() {
-        this.refs.searchBar.blur();
-    }
+        if (Platform.OS === 'ios') {
+            return (<SearchBar placeholder="Recherche"
+                               ref="searchBar"
 
-    onSearchButtonPress(value) {
-        this.refs.searchBar.blur();
-        this.updateSearch(value);
-    }
+                               tintColor="#edeef2"
+                               barTintColor="#edeef2"
 
-    updateSearch(value) {
-
-        const contractNameStations = this.props.contractStations[this.props.contractName].data;
-
-        this.setState({
-            searchText: value,
-            dataSource:
-                this.props.dataSource.cloneWithRows( !value ?
-                    contractNameStations :
-                    contractNameStations.filter(station => station.name.search(new RegExp(value, "i")) >= 0)
-                )
-        });
-    }
-
-    onFavoriteStarPress(station) {
-        const favoriteStations = this.props.favoriteStations.data;
-
-        if (favoriteStations.map(fs => fs.number).indexOf(station.number) >= 0) {
-            this.props.actions.removeFavoriteStation(station);
+                               style={{ marginTop: 64, height: 44, backgroundColor: '#edeef2' }}
+                               onChangeText={this.onChangeText}
+                               enablesReturnKeyAutomatically={true}
+                               onSearchButtonPress={this.onSearchButtonPress}
+                               onCancelButtonPress={this.onCancelButtonPress}
+            />);
         } else {
-            this.props.actions.addFavoriteStation(station);
+            return (<View style={{ height: 44, backgroundColor: "white" }}>
+                <TextInput onChangeText={this.onChangeText} style={{ flex: 1 }} />
+            </View>);
         }
     }
 
@@ -285,25 +302,6 @@ class SearchTabScene extends Component {
                 }}
             />
         );
-    }
-
-    onRefresh() {
-        this.props.actions.fetchContractStations(this.props.contractName)
-    }
-
-    pressRowIn(sectionID, rowID) {
-        console.log("--- On Row pressed In [sectionID: ", sectionID, ", rowID:", rowID, "]");
-        this.setState({ highlightedRow: { sectionID: sectionID, rowID: rowID } });
-    }
-
-    pressRowOut(sectionID, rowID) {
-        console.log("--- On Row pressed Out [sectionID: ", sectionID, ", rowID:", rowID, "]");
-        this.setState({ highlightedRow: { sectionID: undefined, rowID: undefined } });
-    }
-
-    pressRow(sectionID, rowID) {
-        console.log("--- On Row pressed [sectionID: ", sectionID, ", rowID:", rowID, "]");
-        this.props.navigator.push({ id: 'StationDetails', station: this.state.dataSource.getRowData(0, rowID) });
     }
 
 }
