@@ -33,7 +33,7 @@ class StationMarkerView extends Component {
         bgColor: '#2c3e50',
         fontSize: 14,
         lineWidth: 2,
-        fontWeight: 100,
+        fontWeight: '100',
         color: 'white'
     };
 

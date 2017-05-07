@@ -43,7 +43,7 @@ class StationDetailsHeader extends Component {
     }
 
     render() {
-        console.log('--- [StationDetailsScene] Render -------------------------------------------------------------------------------------');
+        console.log('--- [StationDetailsHeader] Render -------------------------------------------------------------------------------------');
         console.log("screen:", screen);
 
         const station = this.props.station;

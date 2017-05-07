@@ -3,6 +3,7 @@ package com.commute;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.rnfs.RNFSPackage;
 import com.airbnb.android.react.maps.MapsPackage;
 import com.geektime.rnonesignalandroid.ReactNativeOneSignalPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
@@ -34,6 +35,7 @@ public class MainApplication extends Application implements ReactApplication {
       return asList(
           new RNSpinkitPackage(),
           new MainReactPackage(),
+            new RNFSPackage(),
           new MapsPackage(),
           new ReactNativeOneSignalPackage(),
           new LinearGradientPackage(),

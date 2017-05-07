@@ -24,7 +24,7 @@ class StationDetailsHeaderMap extends Component {
     };
 
     render() {
-        console.log('--- [StationDetailsScene] Render -------------------------------------------------------------------------------------');
+        console.log('--- [StationDetailsHeaderMap] Render -------------------------------------------------------------------------------------');
 
         const station = this.props.station;
 
