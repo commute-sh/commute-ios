@@ -22,7 +22,7 @@ class StationHeader extends Component {
     render() {
         const station = this.props.station;
 
-        const backgroundSourceUri = `https://cdn.commute.sh/contracts/${station.contract_name}/${station.contract_name}-${station.number}-1-${128}-${100}.jpg`;
+        const backgroundSourceUri = `https://cdn.commute.sh/contracts/${station.contract_name}/photos/${station.contract_name}-${station.number}-1-${128}-${100}.jpg`;
 
         const mapThumbSourceUri = `https://cdn.commute.sh/contracts/${station.contract_name}/thumbs/map/${station.contract_name}-${station.number}-1-${128}-${60}.jpg`;
 
