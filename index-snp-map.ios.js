@@ -8,9 +8,7 @@ import {
 
 import MapView from 'react-native-maps';
 import rnfs from 'react-native-fs';
-import StationMarkerView from './components/StationMarkerView';
 import axios from 'axios';
-import moment from 'moment';
 
 class Commute extends Component {
 
@@ -74,10 +72,10 @@ class Commute extends Component {
         console.log(`Station[${this.state.index}] stations:`, { latitude: station.position.lat, longitude: station.position.lng });
 
         return (
-            <View style={{ marginTop: 96, width: 420, height: 420 }}>
-                <MapView ref="map" style={{ width: 420, height: 420 }}
-                         initialRegion={{ latitude: 0, longitude: 0, latitudeDelta: 0.00819, longitudeDelta: 0.00772 }}
-                         region={{ latitude: station.position.lat, longitude: station.position.lng, latitudeDelta: 0.00819, longitudeDelta: 0.00772 }}
+            <View style={{ marginTop: 96, width: 192, height: 192 }}>
+                <MapView ref="map" style={{ width: 192, height: 192 }}
+                         initialRegion={{ latitude: 0, longitude: 0, latitudeDelta: 0.00410, longitudeDelta: 0.00386 }}
+                         region={{ latitude: station.position.lat, longitude: station.position.lng, latitudeDelta: 0.00410, longitudeDelta: 0.00386 }}
                 >
 {/*                    <MapView.Marker
                         coordinate={{ latitude: station.position.lat, longitude: station.position.lng }}>
@@ -106,7 +104,7 @@ class Commute extends Component {
             this.setState({ mapSnapshot: uri });
 
             const src = uri;
-            const dest = uri.replace(/snapshot-.*\.jpg/g, `Paris-${station.number}-1-420-60.jpg`);
+            const dest = uri.replace(/snapshot-.*\.jpg/g, `Paris-${station.number}-1-128-60.jpg`);
 
             console.log('src:', src);
             console.log('dest:', dest);
