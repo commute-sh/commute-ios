@@ -22,9 +22,9 @@ class StationHeader extends Component {
     render() {
         const station = this.props.station;
 
-        const backgroundSourceUri = `http://image-commute-sh.s3-website-eu-west-1.amazonaws.com/contracts/${station.contract_name}/${station.contract_name}-${station.number}-1-${128}-${100}.jpg`;
+        const backgroundSourceUri = `https://cdn.commute.sh/contracts/${station.contract_name}/${station.contract_name}-${station.number}-1-${128}-${100}.jpg`;
 
-        const mapThumbSourceUri = `http://image-commute-sh.s3-website-eu-west-1.amazonaws.com/contracts/${station.contract_name}/thumbs/map/${station.contract_name}-${station.number}-1-${420}-${60}.jpg`;
+        const mapThumbSourceUri = `https://cdn.commute.sh/contracts/${station.contract_name}/thumbs/map/${station.contract_name}-${station.number}-1-${128}-${60}.jpg`;
 
         const placeholderImage = require('../../images/station-placeholder.jpg');
 
