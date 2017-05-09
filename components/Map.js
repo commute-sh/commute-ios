@@ -176,6 +176,7 @@ class Map extends Component {
     onCenterOnLocation() {
         if (this.props.geoLocation) {
             if (this.state.region) {
+                console.log('[Map][onCenterOnLocation][1] this.props.geoLocation && this.state.region');
                 let region = Object.assign({}, this.state.region);
 
                 region.latitude = this.props.geoLocation.latitude();
@@ -184,11 +185,17 @@ class Map extends Component {
                 region.longitudeDelta = region.longitudeDelta +  (random() + 0.0001) * 0.0001;
 
                 this.setState({ region, centerOnRegion: true });
+                this.onRegionChangeComplete(region);
+                console.log('[Map][onCenterOnLocation][1][End] Current location region from center:', region);
             } else {
+                console.log('[Map][onCenterOnLocation][2] this.props.geoLocation && !this.state.region');
                 let region = computeRegionFromLocation(this.props.geoLocation);
 
                 this.setState({ region, centerOnRegion: true });
+                this.onRegionChangeComplete(region);
+                console.log('[Map][onCenterOnLocation][2][End] Current location region from center:', region);
             }
+
         } else {
             console.warn('No geoLocation found !');
         }
