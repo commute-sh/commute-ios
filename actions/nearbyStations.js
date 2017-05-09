@@ -61,10 +61,10 @@ export function fetchNearbyStations(position, distance = 1000, contractName = 'P
             return;
         }
 
-        if (state().nearbyStations.isFetching) {
-            console.log("Nearby Stations are already fetching - Avoid new call ...");
-            return;
-        }
+        // if (state().nearbyStations.isFetching) {
+        //     console.log("Nearby Stations are already fetching - Avoid new call ...");
+        //     return;
+        // }
 
         dispatch(fetchNearbyStationsRequest(search));
         StationService.fetchStationsNearby(position, distance, contractName, limit).then((stations) => {

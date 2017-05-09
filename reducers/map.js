@@ -25,7 +25,7 @@ export default createReducer(initialState, {
         return Object.assign({}, state, {
             region,
             center: new GeoPoint(region.latitude, region.longitude),
-            pinSize: region.longitudeDelta > 0.1 ? 16 : (region.longitudeDelta < 0.025 ? 24 : 20)
+            pinSize: region.longitudeDelta > 0.1 ? 16 : (region.longitudeDelta <= 0.025 ? 24 : 20)
         })
     },
     [constants.ANNOTATION_TYPE_CHANGE]: (state, { annotationType }) => {

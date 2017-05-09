@@ -94,7 +94,10 @@ class MapTabScene extends Component {
             console.log('[MapTabScene][shouldComponentUpdate][1] selected station changed (', this.props.station ? this.props.station.number : '<undefined />', ', ', nextProps.station ? nextProps.station.number : '<undefined />', ')');
             return true;
         } else if (!regionEquals(this.props.region, nextProps.region)) {
-            console.log('[MapTabScene][shouldComponentUpdate][2] position changed (', this.props.region, ', ', nextProps.region, ')');
+            console.log('[MapTabScene][shouldComponentUpdate][2] region changed (', this.props.region, ', ', nextProps.region, ')');
+            return true;
+        } else if (!regionEquals(this.props.geoLocation, nextProps.geoLocation)) {
+            console.log('[MapTabScene][shouldComponentUpdate][3] geoLocation changed (', this.props.geoLocation, ', ', nextProps.geoLocation, ')');
             return true;
         }
 

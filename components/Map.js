@@ -71,14 +71,36 @@ class Map extends Component {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     componentWillReceiveProps(nextProps) {
-        if (!regionEquals(this.state.region, nextProps.region)) {
+
+        if (!this.props.geoLocation && nextProps.geoLocation) {
+            if (this.state.region) {
+                console.log('[Map][componentWillReceiveProps][1] !this.props.geoLocation && nextProps.geoLocation && this.state.region');
+                const region = {
+                    latitude: nextProps.geoLocation.latitude(),
+                    longitude: nextProps.geoLocation.longitude(),
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.025
+                };
+                this.setState({ region, centerOnRegion: true });
+
+                console.log('[Map][componentWillReceiveProps][1][End] Current location region from center:', region);
+                this.onRegionChangeComplete(region);
+            } else {
+                console.log('[Map][componentWillReceiveProps][2] !this.props.geoLocation && nextProps.geoLocation && !this.state.region');
+                const region = computeRegionFromLocation(nextProps.geoLocation, 0.5);
+                this.setState({ region, centerOnRegion: true });
+
+                console.log('[Map][componentWillReceiveProps][2][End] Current location region from center:', region);
+                this.onRegionChangeComplete(region);
+            }
+        } /*else if (!regionEquals(this.state.region, nextProps.region)) {
             console.log('[Map][componentWillReceiveProps][3] else');
 
             const region = _.clone(nextProps.region);
             this.setState({ region, centerOnRegion: true });
 
             console.log('[Map][componentWillReceiveProps][3][End] Current location region from center:', region);
-        }
+        }*/
     }
 
     shouldComponentUpdate(nextProps, nextState) {
