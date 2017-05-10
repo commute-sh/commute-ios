@@ -93,14 +93,14 @@ class Map extends Component {
                 console.log('[Map][componentWillReceiveProps][2][End] Current location region from center:', region);
                 this.onRegionChangeComplete(region);
             }
-        } /*else if (!regionEquals(this.state.region, nextProps.region)) {
+        } else if (!regionEquals(this.state.region, nextProps.region)) {
             console.log('[Map][componentWillReceiveProps][3] else');
 
             const region = _.clone(nextProps.region);
             this.setState({ region, centerOnRegion: true });
 
             console.log('[Map][componentWillReceiveProps][3][End] Current location region from center:', region);
-        }*/
+        }
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -307,7 +307,7 @@ class Map extends Component {
 
         if (region) {
             const regionRadiusInMeters = computeRegionRadiusInMeters(region);
-            console.log("[Map][render] computeRegionRadiusInMeters(region):", regionRadiusInMeters);
+            console.log("[Map][render] computeRegionRadiusInMeters(region):", regionRadiusInMeters, ' (region:', region, ')');
 
             if (regionRadiusInMeters < 2500 || regionRadiusInMeters > 10000) {
                 console.log("[Map][render] Not rendering circle as distance is lower than 2500 or greater than 10.000 meters:", regionRadiusInMeters);
