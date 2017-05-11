@@ -11,7 +11,8 @@ import {
     Platform,
     TouchableOpacity,
     TouchableHighlight,
-    Text
+    Text,
+    Dimensions
 } from 'react-native';
 
 import moment from 'moment';
@@ -65,6 +66,9 @@ class StationDetailsScene extends Component {
     render() {
         console.log('--- [StationDetailsScene] Render -------------------------------------------------------------------------------------');
 
+        const height = Dimensions.get('window').height;
+        const mapHeight = height <= 568 ? 120 : (height <= 667 ? 192 : 252);
+
         return (
             <ScrollView style={{ backgroundColor: '#fff', position: 'relative' }}>
                 <Spacer height={ Platform.OS === 'ios' ? 64 : 56 } />
@@ -80,7 +84,7 @@ class StationDetailsScene extends Component {
                     paddingRight={12}
                     paddingTop={0}
                     paddingBottom={0}
-                    height={256}
+                    height={mapHeight}
                     dataToShow={this.state.dataToShow}
                     zoomEnabled={true}
                     onMarkerPress={this.onChangeDataToShow.bind(this)}

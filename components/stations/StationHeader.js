@@ -38,8 +38,12 @@ class StationHeader extends Component {
                     style={{ marginLeft: 12, marginTop: 12, marginRight: 12, width: 48, height: 48, borderRadius: 24 }} />
 
                 <View style={{ flexDirection: 'column', flex: 1, padding: 10, paddingLeft: 0, paddingRight: 8 }}>
-                    <Text style={{ fontFamily: 'System', fontSize: 14, fontWeight: '500', color: '#49b2d8' }}>{station.number} - {station.name}</Text>
-                    <Text  style={{ fontFamily: 'System', fontSize: 11, fontWeight: '400', color: '#9d9d9d' }}>{station.address}</Text>
+                    <Text
+                        numberOfLines={2}
+                        style={{ fontFamily: 'System', fontSize: 14, fontWeight: '500', color: '#49b2d8' }}>{station.number} - {station.name}</Text>
+                    <Text
+                        numberOfLines={2}
+                        style={{ fontFamily: 'System', fontSize: 11, fontWeight: '400', color: '#9d9d9d' }}>{station.address}</Text>
                 </View>
             </View>
         );

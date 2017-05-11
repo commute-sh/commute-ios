@@ -20,7 +20,8 @@ import {
     TouchableHighlight,
     RefreshControl,
     Platform,
-    TextInput
+    TextInput,
+    Dimensions
 } from 'react-native';
 
 import NetworkImage from './NetworkImage';
@@ -255,6 +256,9 @@ class SearchTabScene extends Component {
 
         const placeholderImage = require('../images/station-placeholder.jpg');
 
+        const height = Dimensions.get('window').height;
+        const rowHeight = height <= 568 ? 80 : (height <= 667 ? 80 : 80);
+
         return (
             <Swipeout right={swipeBtns}
                       autoClose={true}
@@ -268,7 +272,7 @@ class SearchTabScene extends Component {
                     this.pressRow(sectionID, rowID);
                     highlightRow(null);
                 }}>
-                    <View style={{ flexDirection: 'row', height: 72 }}>
+                    <View style={{ flexDirection: 'row', height: rowHeight }}>
 
                         <NetworkImage
                           source={ (station.images || []).length > 0 ? { uri: backgroundSourceUri } : { uri: mapThumbSourceUri } }
@@ -278,13 +282,19 @@ class SearchTabScene extends Component {
                           style={{ marginLeft: 12, marginTop: 12, marginRight: 12, width: 48, height: 48, borderRadius: 24 }} />
 
                         <View style={{ flexDirection: 'column', flex: 1, padding: 10, paddingLeft: 0, paddingRight: 8 }}>
-                            <Text style={{ fontFamily: 'System', fontSize: 14, fontWeight: '500', color: rowPress ? '#49b2d8' : '#49b2d8' }}>{station.number} - {station.name}</Text>
-                            <Text  style={{ fontFamily: 'System', fontSize: 11, fontWeight: '400', color: rowPress ? '#9d9d9d' : '#9d9d9d' }}>{station.address}</Text>
+                            <Text
+                                numberOfLines={2}
+                                style={{ fontFamily: 'System', fontSize: 14, fontWeight: '500', color: rowPress ? '#49b2d8' : '#49b2d8' }}>{station.number} - {station.name}</Text>
+                            <Text
+                                numberOfLines={2}
+                                style={{ fontFamily: 'System', fontSize: 11, fontWeight: '400', color: rowPress ? '#9d9d9d' : '#9d9d9d' }}>{station.address}</Text>
                         </View>
 
-                        <View style={{ width: 80, padding: 16, paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end' }}>
+                        <View style={{ width: 42, padding: 16, paddingTop: 8, paddingBottom: 8, paddingLeft: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end' }}>
                             <Text style={{ fontFamily: 'System', fontSize: 13, fontWeight: '500', color: stationPinColor(station, 'BIKES') }}>{station.available_bikes}</Text>
+{/*
                             { station.distance && <Text style={{ fontFamily: 'System', fontSize: 12, fontWeight: '500', color: rowPress ? '#c2c2c2' : '#c2c2c2' }}>{(station.distance / 1000).toFixed(1)} km</Text>}
+*/}
                         </View>
                     </View>
                 </TouchableHighlight>
